@@ -1,0 +1,24 @@
+From f4cad4c84a1ad861cbb4f368409e28d4e821794b Mon Sep 17 00:00:00 2001
+From: ahs <amrita.h.s@intel.com>
+Date: Tue, 17 Mar 2020 17:17:43 +0530
+Subject: List the full interface hierarchy for thermal HAL
+
+Tracked-On:
+Signed-off-by: ahs <amrita.h.s@intel.com>
+---
+ thermal/android.hardware.thermal@2.0-service.intel.rc | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/thermal/android.hardware.thermal@2.0-service.intel.rc b/thermal/android.hardware.thermal@2.0-service.intel.rc
+index 40e33cb..f433f66 100644
+--- a/thermal/android.hardware.thermal@2.0-service.intel.rc
++++ b/thermal/android.hardware.thermal@2.0-service.intel.rc
+@@ -1,4 +1,5 @@
+ service vendor.thermal-hal-2-0 /vendor/bin/hw/android.hardware.thermal@2.0-service.intel
++    interface android.hardware.thermal@1.0::IThermal default
+     interface android.hardware.thermal@2.0::IThermal default
+     class hal
+     user system
+-- 
+2.24.0
+

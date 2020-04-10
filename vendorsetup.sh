@@ -1,61 +1,68 @@
+
+# autopatch.sh: script to manage patches on top of repo
+# Copyright (C) 2019 Intel Corporation. All rights reserved.
+# Author: sgnanase <sundar.gnanasekaran@intel.com>
+# Author: Sun, Yi J <yi.j.sun@intel.com>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
 # save the official lunch command to aosp_lunch() and source it
 tmp_lunch=`mktemp`
 sed '/ lunch()/,/^}/!d'  build/envsetup.sh | sed 's/function lunch/function aosp_lunch/' > ${tmp_lunch}
 source ${tmp_lunch}
-rm ${tmp_lunch}
+rm -f ${tmp_lunch}
 
-function get_aosp_type
-{
-    local cmn_path="device/intel/common/select_aosp"
-    local target_list="${cmn_path}/target_list.txt"
-
-    while read -r line
-    do
-        echo "${TARGET_PRODUCT}" | grep -q "${line}" && echo "vanilla" && return
-    done < "${target_list}"
-
-    echo "legacy"
-}
-
-# Override lunch function to apply patches on AOSP
+# Override lunch function to filter lunch targets
 function lunch
 {
-    local aosp_type
+    local T=$(gettop)
+    if [ ! "$T" ]; then
+        echo "[lunch] Couldn't locate the top of the tree.  Try setting TOP." >&2
+        return
+    fi
 
-    previous_aosp_type=$(get_aosp_type)
     aosp_lunch $*
 
-    # return an error if aosp lunch return an error
-    if [ "$?" -ne "0" ]; then
-        return 1
+    rm -rf vendor/intel/utils/Android.mk vendor/intel/utils_priv/Android.mk
+    vendor/intel/utils/autopatch.sh
+
+    # check if product configuration files are out of date
+    if [[ $(find device/intel -path "*mixins*" -prune -o -name ${TARGET_PRODUCT}.mk -print) ]]; then
+        product_dir=$(dirname $(find device/intel -path "*mixins*" -prune -o -name ${TARGET_PRODUCT}.mk -print))
+	echo "Executing mixin update..."
+        mixinup -s $product_dir/mixins.spec
     fi
+}
 
-    local cmn_path="device/intel/common/select_aosp"
+# Get the exact value of a build variable.
+function get_build_var()
+{
+    if [ "$1" = "COMMON_LUNCH_CHOICES" ]
+    then
+        valid_targets=`mixinup -t`
+        save=`build/soong/soong_ui.bash --dumpvar-mode $1`
+        unset LUNCH_MENU_CHOICES
+        for t in ${save[@]}; do
+            array=(${t/-/ })
+            target=${array[0]}
+            if [[ "${valid_targets}" =~ "$target" ]]; then
+                   LUNCH_MENU_CHOICES+=($t)
+            fi
+        done
+        echo ${LUNCH_MENU_CHOICES[@]}
+        return
+    else
+        if [ "$BUILD_VAR_CACHE_READY" = "true" ]
+        then
+            eval "echo \"\${var_cache_$1}\""
+            return
+        fi
 
-    aosp_type=$(get_aosp_type)
-    echo AOSP_TYPE is $aosp_type
-
-    # In case script does not execute to the end - create show stopper
-    (\cp ${cmn_path}/Show-stopper.mk ${cmn_path}/Android.mk)
-
-    if [ "${aosp_type}" == "vanilla" ]; then
-        (\repo forall -g aosp -c 'echo "$REPO_PROJECT $REPO_PATH"' | xargs -P 5 -L 1 bash -c 'cd "$1" && pwd && git fetch --no-tags ssh://android.intel.com/"$0" +platform/android/vanilla_imin_legacy:remotes/umg/platform/android/vanilla_imin_legacy && git checkout remotes/umg/platform/android/vanilla_imin_legacy' || (t=$? ; echo "cannot setup environment"; echo "failed" > lunch_failed.txt; exit $t))
-
-        # Generate specific manifest for Nexus devices
-        (\mkdir pub)
-        (\repo manifest -r -o pub/manifest-generated-nexus.xml)
-        (\sed -i 's/.*vendor\/intel\/PRIVATE\/utils.*//g' pub/manifest-generated-nexus.xml)
+        local T=$(gettop)
+        if [ ! "$T" ]; then
+            echo "Couldn't locate the top of the tree.  Try setting TOP." >&2
+            return
+        fi
+        (\cd $T; build/soong/soong_ui.bash --dumpvar-mode $1)
     fi
-
-    if [ "${previous_aosp_type}" == "vanilla" ] && [ "${aosp_type}" == "legacy" ]; then
-        echo "*********************************************************************"
-        echo "** WARNING : Switching from vanilla aosp to legacy aosp            **"
-        echo "**           Syncing AOSP from imin_legacy                         **"
-        echo "*********************************************************************"
-        repo init -m android-imin_legacy
-        repo sync -c -j5 -l $(repo forall -g aosp -c 'echo "$REPO_PATH "')
-    fi
-
-    # All went well, disable the show-stopper Makefile
-    (\rm -f ${cmn_path}/Android.mk)
 }

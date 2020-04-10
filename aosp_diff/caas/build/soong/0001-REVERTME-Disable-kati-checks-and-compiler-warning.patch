@@ -1,0 +1,81 @@
+From 7d0494208399a5a64c0c2b3cb8660944b35c55c4 Mon Sep 17 00:00:00 2001
+From: ahs <amrita.h.s@intel.com>
+Date: Tue, 17 Mar 2020 12:33:51 +0530
+Subject: REVERTME Disable kati checks and compiler warning
+
+Suppress compiler warnings
+-Wno-tautological-bitwise-compare
+-Werror=pragma-pack
+-Werror=pragma-pack-suspicious-include
+
+Disable below kati checks
+--werror_overriding_commands
+--werror_real_to_phony
+--werror_phony_looks_real
+--werror_writable
+
+Change-Id: I735f0c2c6fab153e9991e27fb08677723764afe5
+Tracked-On:
+Signed-off-by: ahs <amrita.h.s@intel.com>
+---
+ cc/config/clang.go  | 1 +
+ cc/config/global.go | 4 ++--
+ ui/build/kati.go    | 8 ++++----
+ 3 files changed, 7 insertions(+), 6 deletions(-)
+
+diff --git a/cc/config/clang.go b/cc/config/clang.go
+index d8499060..13402394 100644
+--- a/cc/config/clang.go
++++ b/cc/config/clang.go
+@@ -173,6 +173,7 @@ func init() {
+ 		"-Wno-int-in-bool-context",          // http://b/148287349
+ 		"-Wno-sizeof-array-div",             // http://b/148815709
+ 		"-Wno-tautological-overlap-compare", // http://b/148815696
++		"-Wno-tautological-bitwise-compare",
+ 	}, " "))
+ 
+ 	// Extra cflags for external third-party projects to disable warnings that
+diff --git a/cc/config/global.go b/cc/config/global.go
+index d01dd843..143a1555 100644
+--- a/cc/config/global.go
++++ b/cc/config/global.go
+@@ -48,8 +48,8 @@ var (
+ 		"-fno-strict-aliasing",
+ 
+ 		"-Werror=date-time",
+-		"-Werror=pragma-pack",
+-		"-Werror=pragma-pack-suspicious-include",
++		//"-Werror=pragma-pack",
++		//"-Werror=pragma-pack-suspicious-include",
+ 	}
+ 
+ 	commonGlobalConlyflags = []string{}
+diff --git a/ui/build/kati.go b/ui/build/kati.go
+index a845c5be..b34b6b69 100644
+--- a/ui/build/kati.go
++++ b/ui/build/kati.go
+@@ -78,9 +78,9 @@ func runKati(ctx Context, config Config, extraSuffix string, args []string, envF
+ 		"--werror_suffix_rules",
+ 		"--warn_real_to_phony",
+ 		"--warn_phony_looks_real",
+-		"--werror_real_to_phony",
+-		"--werror_phony_looks_real",
+-		"--werror_writable",
++		//"--werror_real_to_phony",
++		//"--werror_phony_looks_real",
++		//"--werror_writable",
+ 		"--top_level_phony",
+ 		"--kati_stats",
+ 	}, args...)
+@@ -139,7 +139,7 @@ func runKatiBuild(ctx Context, config Config) {
+ 	}
+ 
+ 	if !config.BuildBrokenDupRules() {
+-		args = append(args, "--werror_overriding_commands")
++		//args = append(args, "--werror_overriding_commands")
+ 	}
+ 
+ 	args = append(args, config.KatiArgs()...)
+-- 
+2.24.0
+

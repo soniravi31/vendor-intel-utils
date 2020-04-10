@@ -1,0 +1,20 @@
+From 3133735956d803da7b3cafe255077e8ce8215c6f Mon Sep 17 00:00:00 2001
+From: Qiming Shi <qiming.shi@intel.com>
+Date: Thu, 26 Mar 2020 23:03:06 -0700
+Subject: WA remove NN sepolicy
+
+Tracked-On:
+Signed-off-by: Qiming Shi <qiming.shi@intel.com>
+---
+ graphics/mesa/hal_neuralnetworks_default.te | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/graphics/mesa/hal_neuralnetworks_default.te b/graphics/mesa/hal_neuralnetworks_default.te
+index ce82451..e69de29 100644
+--- a/graphics/mesa/hal_neuralnetworks_default.te
++++ b/graphics/mesa/hal_neuralnetworks_default.te
+@@ -1 +0,0 @@
+-allow hal_neuralnetworks_default graphics_device:dir search;
+-- 
+2.24.0
+
