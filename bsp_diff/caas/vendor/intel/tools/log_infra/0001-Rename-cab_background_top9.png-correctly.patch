@@ -1,0 +1,19 @@
+From 25b33e7b8c896231206917811a2ed1db91b9135d Mon Sep 17 00:00:00 2001
+From: ahs <amrita.h.s@intel.com>
+Date: Tue, 17 Mar 2020 18:29:55 +0530
+Subject: Rename cab_background_top9..png correctly
+
+Tracked-On:
+Signed-off-by: ahs <amrita.h.s@intel.com>
+---
+ ...ackground_top9..png => cab_background_top.9.png} | Bin
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+ rename crashreport/themes/drawable-mdpi/{cab_background_top9..png => cab_background_top.9.png} (100%)
+
+diff --git a/crashreport/themes/drawable-mdpi/cab_background_top9..png b/crashreport/themes/drawable-mdpi/cab_background_top.9.png
+similarity index 100%
+rename from crashreport/themes/drawable-mdpi/cab_background_top9..png
+rename to crashreport/themes/drawable-mdpi/cab_background_top.9.png
+-- 
+2.24.0
+
