@@ -1,0 +1,29 @@
+From 9912c926846bab1289e6bf94880e9e6d7c2cc746 Mon Sep 17 00:00:00 2001
+From: "ji, zhenlong z" <zhenlong.z.ji@intel.com>
+Date: Mon, 25 May 2020 15:20:27 +0800
+Subject: [PATCH 10/10] Set a new tcp listening port for adb
+
+Change-Id: I00f01a62c39c2ecee10c942a3b2fe65b4fb8bf52
+Tracked-On: OAM-91243
+Signed-off-by: ji, zhenlong z <zhenlong.z.ji@intel.com>
+Reviewed-on: https://android.intel.com:443/689523
+---
+ groups/device-specific/caas/init.rc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/groups/device-specific/caas/init.rc b/groups/device-specific/caas/init.rc
+index 2c67e82d..1dbf08d6 100644
+--- a/groups/device-specific/caas/init.rc
++++ b/groups/device-specific/caas/init.rc
+@@ -27,7 +27,7 @@ on boot
+     write /sys/class/gpio/gpio444/value 1
+ 
+ # adb over ethernet
+-    setprop service.adb.tcp.port 5555
++    setprop persist.adb.tcp.port 5555
+ 
+ # workaround for the sys fs create
+ on post-fs
+-- 
+2.17.1
+

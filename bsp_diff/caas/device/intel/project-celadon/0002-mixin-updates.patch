@@ -1,0 +1,31 @@
+From 8ba40498c0b0c54be790f626056a95740271fdba Mon Sep 17 00:00:00 2001
+From: buildslave <ctbbot@intel.com>
+Date: Wed, 3 Jun 2020 09:06:19 +0000
+Subject: [PATCH 3/4] mixin updates
+
+Set a new tcp listening port for adb
+
+Change-Id: Iebd8dc95814bd74ce1518f81ee0737495d375988
+Tracked-On: OAM-91243
+Mixin-Reviewed-On: https://android.intel.com:443/#/c/689523
+Signed-off-by: ji, zhenlong z <zhenlong.z.ji@intel.com>
+---
+ caas/init.rc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/caas/init.rc b/caas/init.rc
+index 21d24e5..e26788f 100644
+--- a/caas/init.rc
++++ b/caas/init.rc
+@@ -117,7 +117,7 @@ on boot
+     write /sys/class/gpio/gpio444/value 1
+ 
+ # adb over ethernet
+-    setprop service.adb.tcp.port 5555
++    setprop persist.adb.tcp.port 5555
+ 
+ # workaround for the sys fs create
+ on post-fs
+-- 
+2.17.1
+

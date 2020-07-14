@@ -1,0 +1,57 @@
+From 4cd95a81ef431ebfc2f3ae5cda77b324b593ccce Mon Sep 17 00:00:00 2001
+From: ahs <amrita.h.s@intel.com>
+Date: Tue, 17 Mar 2020 18:40:04 +0530
+Subject: [PATCH 01/10] Add following BUILD_BROKEN_* flags for makefiles
+
+BUILD_BROKEN_USES_BUILD_HOST_STATIC_LIBRARY
+BUILD_BROKEN_USES_BUILD_HOST_SHARED_LIBRARY
+BUILD_BROKEN_USES_BUILD_HOST_EXECUTABLE
+BUILD_BROKEN_USES_BUILD_COPY_HEADERS
+
+Tracked-On:
+Signed-off-by: ahs <amrita.h.s@intel.com>
+---
+ groups/device-specific/caas/BoardConfig.mk           | 4 ++++
+ groups/device-specific/celadon_ivi/BoardConfig.mk    | 4 ++++
+ groups/device-specific/celadon_tablet/BoardConfig.mk | 4 ++++
+ 3 files changed, 12 insertions(+)
+
+diff --git a/groups/device-specific/caas/BoardConfig.mk b/groups/device-specific/caas/BoardConfig.mk
+index d1edd50d..ae5c72e6 100644
+--- a/groups/device-specific/caas/BoardConfig.mk
++++ b/groups/device-specific/caas/BoardConfig.mk
+@@ -25,3 +25,7 @@ BOARD_USES_GENERIC_AUDIO := false
+ 
+ DEVICE_MANIFEST_FILE := ${TARGET_DEVICE_DIR}/manifest.xml
+ DEVICE_MATRIX_FILE   := ${TARGET_DEVICE_DIR}/compatibility_matrix.xml
++BUILD_BROKEN_USES_BUILD_HOST_STATIC_LIBRARY := true
++BUILD_BROKEN_USES_BUILD_HOST_SHARED_LIBRARY := true
++BUILD_BROKEN_USES_BUILD_HOST_EXECUTABLE := true
++BUILD_BROKEN_USES_BUILD_COPY_HEADERS := true
+diff --git a/groups/device-specific/celadon_ivi/BoardConfig.mk b/groups/device-specific/celadon_ivi/BoardConfig.mk
+index 9e3bb003..552251d9 100644
+--- a/groups/device-specific/celadon_ivi/BoardConfig.mk
++++ b/groups/device-specific/celadon_ivi/BoardConfig.mk
+@@ -25,3 +25,7 @@ BOARD_USES_GENERIC_AUDIO := false
+ 
+ DEVICE_MANIFEST_FILE := ${TARGET_DEVICE_DIR}/manifest.xml
+ DEVICE_MATRIX_FILE   := ${TARGET_DEVICE_DIR}/compatibility_matrix.xml
++BUILD_BROKEN_USES_BUILD_HOST_STATIC_LIBRARY := true
++BUILD_BROKEN_USES_BUILD_HOST_SHARED_LIBRARY := true
++BUILD_BROKEN_USES_BUILD_HOST_EXECUTABLE := true
++BUILD_BROKEN_USES_BUILD_COPY_HEADERS := true
+diff --git a/groups/device-specific/celadon_tablet/BoardConfig.mk b/groups/device-specific/celadon_tablet/BoardConfig.mk
+index e1ccc929..f920aa7c 100644
+--- a/groups/device-specific/celadon_tablet/BoardConfig.mk
++++ b/groups/device-specific/celadon_tablet/BoardConfig.mk
+@@ -24,3 +24,7 @@ BOARD_USES_GENERIC_AUDIO := false
+ 
+ DEVICE_MANIFEST_FILE := ${TARGET_DEVICE_DIR}/manifest.xml
+ DEVICE_MATRIX_FILE   := ${TARGET_DEVICE_DIR}/compatibility_matrix.xml
++BUILD_BROKEN_USES_BUILD_HOST_STATIC_LIBRARY := true
++BUILD_BROKEN_USES_BUILD_HOST_SHARED_LIBRARY := true
++BUILD_BROKEN_USES_BUILD_HOST_EXECUTABLE := true
++BUILD_BROKEN_USES_BUILD_COPY_HEADERS := true
+-- 
+2.17.1
+

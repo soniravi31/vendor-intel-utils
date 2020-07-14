@@ -1,0 +1,26 @@
+From 83639698660711843cb81d454121d7b71c8f2e79 Mon Sep 17 00:00:00 2001
+From: ahs <amrita.h.s@intel.com>
+Date: Tue, 17 Mar 2020 18:46:19 +0530
+Subject: [PATCH 02/10] Remove deprecated PRODUCT_STATIC_BOOT_CONTROL_HAL
+
+Tracked-On:
+Signed-off-by: ahs <amrita.h.s@intel.com>
+---
+ groups/slot-ab/true/BoardConfig.mk | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/groups/slot-ab/true/BoardConfig.mk b/groups/slot-ab/true/BoardConfig.mk
+index 731bc84e..82b2cd01 100644
+--- a/groups/slot-ab/true/BoardConfig.mk
++++ b/groups/slot-ab/true/BoardConfig.mk
+@@ -8,7 +8,6 @@ BOARD_BUILD_SYSTEM_ROOT_IMAGE := true
+ TARGET_NO_RECOVERY := true
+ BOARD_USES_RECOVERY_AS_BOOT := true
+ BOARD_SLOT_AB_ENABLE := true
+-PRODUCT_STATIC_BOOT_CONTROL_HAL := bootctrl.intel.static
+ BOARD_KERNEL_CMDLINE += rootfstype={{system_fs}}
+ 
+ AB_OTA_POSTINSTALL_CONFIG += \
+-- 
+2.17.1
+

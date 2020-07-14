@@ -1,0 +1,55 @@
+From 687d2660ca64e8bdceee32f092aa2b44e5de9aa1 Mon Sep 17 00:00:00 2001
+From: ahs <amrita.h.s@intel.com>
+Date: Tue, 17 Mar 2020 18:51:32 +0530
+Subject: [PATCH 05/10] Update with new PRODUCT_VERITY_* variables
+
+Tracked-On:
+Signed-off-by: ahs <amrita.h.s@intel.com>
+---
+ groups/kernel/AndroidBoard.mk     | 2 +-
+ groups/trusty/true/trusty_efi.mk  | 4 ++--
+ groups/trusty/true/trusty_vsbl.mk | 4 ++--
+ 3 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/groups/kernel/AndroidBoard.mk b/groups/kernel/AndroidBoard.mk
+index b2807873..7fea721e 100644
+--- a/groups/kernel/AndroidBoard.mk
++++ b/groups/kernel/AndroidBoard.mk
+@@ -218,7 +218,7 @@ endif
+ {{/camera_cos_hack}}
+ 
+ {{#slot-ab}}
+-ifeq ($(PRODUCTS.$(INTERNAL_PRODUCT).PRODUCT_SUPPORTS_VERITY), true)
++ifeq ($(PRODUCT_SUPPORTS_VERITY), true)
+ DM_VERITY_CERT := $(LOCAL_KERNEL_PATH)/verity.x509
+ $(DM_VERITY_CERT): $(PRODUCTS.$(INTERNAL_PRODUCT).PRODUCT_VERITY_SIGNING_KEY).x509.pem $(OPENSSL)
+ 	$(transform-pem-cert-to-der-cert)
+diff --git a/groups/trusty/true/trusty_efi.mk b/groups/trusty/true/trusty_efi.mk
+index c82b69c3..664ff0a4 100644
+--- a/groups/trusty/true/trusty_efi.mk
++++ b/groups/trusty/true/trusty_efi.mk
+@@ -1,7 +1,7 @@
+ INSTALLED_TOS_IMAGE_TARGET := $(PRODUCT_OUT)/tos.img
+ INSTALLED_MULTIBOOT_IMAGE_TARGET := none
+-TOS_SIGNING_KEY := $(PRODUCTS.$(INTERNAL_PRODUCT).PRODUCT_VERITY_SIGNING_KEY).pk8
+-TOS_SIGNING_CERT := $(PRODUCTS.$(INTERNAL_PRODUCT).PRODUCT_VERITY_SIGNING_KEY).x509.pem
++TOS_SIGNING_KEY := $(PRODUCT_VERITY_SIGNING_KEY).pk8
++TOS_SIGNING_CERT := $(PRODUCT_VERITY_SIGNING_KEY).x509.pem
+ 
+ tosimage: $(INSTALLED_TOS_IMAGE_TARGET)
+ 
+diff --git a/groups/trusty/true/trusty_vsbl.mk b/groups/trusty/true/trusty_vsbl.mk
+index 951a7fe8..9c63b90f 100644
+--- a/groups/trusty/true/trusty_vsbl.mk
++++ b/groups/trusty/true/trusty_vsbl.mk
+@@ -1,5 +1,5 @@
+-SIGNING_KEY := $(PRODUCTS.$(INTERNAL_PRODUCT).PRODUCT_VERITY_SIGNING_KEY).pk8
+-SIGNING_CERT := $(PRODUCTS.$(INTERNAL_PRODUCT).PRODUCT_VERITY_SIGNING_KEY).x509.pem
++SIGNING_KEY := $(PRODUCT_VERITY_SIGNING_KEY).pk8
++SIGNING_CERT := $(PRODUCT_VERITY_SIGNING_KEY).x509.pem
+ 
+ INSTALLED_TOS_IMAGE_TARGET := $(PRODUCT_OUT)/tos.img
+ 
+-- 
+2.17.1
+

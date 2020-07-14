@@ -1,0 +1,48 @@
+From afe6b5b3772d5b792fae59de440eadf9118bd804 Mon Sep 17 00:00:00 2001
+From: ahs <amrita.h.s@intel.com>
+Date: Tue, 17 Mar 2020 19:55:22 +0530
+Subject: [PATCH 03/10] Remove unsupported VINTF from PRODUCT_COPY_FILES
+
+Tracked-On:
+Signed-off-by: ahs <amrita.h.s@intel.com>
+---
+ groups/device-specific/caas/product.mk           | 1 -
+ groups/device-specific/celadon_ivi/product.mk    | 1 -
+ groups/device-specific/celadon_tablet/product.mk | 1 -
+ 3 files changed, 3 deletions(-)
+
+diff --git a/groups/device-specific/caas/product.mk b/groups/device-specific/caas/product.mk
+index c9e3f181..16d855d4 100755
+--- a/groups/device-specific/caas/product.mk
++++ b/groups/device-specific/caas/product.mk
+@@ -27,6 +27,5 @@ PRODUCT_PACKAGES += android.hardware.keymaster@3.0-impl \
+                     android.hardware.graphics.composer@2.1-impl \
+                     android.hardware.graphics.composer@2.1-service
+ 
+-PRODUCT_COPY_FILES += $(LOCAL_PATH)/manifest.xml:vendor/manifest.xml
+ PRODUCT_COPY_FILES += $(LOCAL_PATH)/file_share.sh:$(TARGET_COPY_OUT_VENDOR)/bin/file_share.sh
+ PRODUCT_COPY_FILES += vendor/intel/utils/LICENSE:$(PRODUCT_OUT)/LICENSE
+diff --git a/groups/device-specific/celadon_ivi/product.mk b/groups/device-specific/celadon_ivi/product.mk
+index 63b8ed7b..df37282f 100755
+--- a/groups/device-specific/celadon_ivi/product.mk
++++ b/groups/device-specific/celadon_ivi/product.mk
+@@ -26,6 +26,5 @@ PRODUCT_PACKAGES += android.hardware.keymaster@3.0-impl \
+                     android.hardware.graphics.composer@2.3-service \
+                     libbt-vendor
+ 
+-PRODUCT_COPY_FILES += $(LOCAL_PATH)/manifest.xml:vendor/manifest.xml
+ PRODUCT_COPY_FILES += vendor/intel/utils/LICENSE:$(PRODUCT_OUT)/LICENSE
+ PRODUCT_PROPERTY_OVERRIDES += ro.control_privapp_permissions=enforce
+diff --git a/groups/device-specific/celadon_tablet/product.mk b/groups/device-specific/celadon_tablet/product.mk
+index ca268eb8..f26dc54a 100755
+--- a/groups/device-specific/celadon_tablet/product.mk
++++ b/groups/device-specific/celadon_tablet/product.mk
+@@ -27,5 +27,4 @@ PRODUCT_PACKAGES += android.hardware.keymaster@3.0-impl \
+                     android.hardware.graphics.composer@2.1-service \
+                     libbt-vendor
+ 
+-PRODUCT_COPY_FILES += $(LOCAL_PATH)/manifest.xml:vendor/manifest.xml
+ PRODUCT_COPY_FILES += vendor/intel/utils/LICENSE:$(PRODUCT_OUT)/LICENSE
+-- 
+2.17.1
+
