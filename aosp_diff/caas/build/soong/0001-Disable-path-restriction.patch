@@ -16,12 +16,12 @@ index f3feac2b..0d057163 100644
 --- a/ui/build/build.go
 +++ b/ui/build/build.go
 @@ -172,7 +172,7 @@ func Build(ctx Context, config Config, what int) {
- 
+
  	ensureEmptyDirectoriesExist(ctx, config.TempDir())
- 
+
 -	SetupPath(ctx, config)
 +	//SetupPath(ctx, config)
- 
+
  	if config.StartGoma() {
  		// Ensure start Goma compiler_proxy
 diff --git a/ui/build/path.go b/ui/build/path.go
@@ -31,11 +31,11 @@ index c34ba1b5..84e999a4 100644
 @@ -198,6 +198,6 @@ func SetupPath(ctx Context, config Config) {
  	prebuiltsPath, _ := filepath.Abs("prebuilts/build-tools/path/" + runtime.GOOS + "-x86")
  	myPath = prebuiltsPath + string(os.PathListSeparator) + myPath
- 
+
 -	config.Environment().Set("PATH", myPath)
 +//	config.Environment().Set("PATH", myPath)
  	config.pathReplaced = true
  }
--- 
+--
 2.24.0
 

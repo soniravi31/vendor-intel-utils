@@ -1,36 +1,21 @@
-From d3847028d1f1cff31af4a9798998b57afed49412 Mon Sep 17 00:00:00 2001
-From: ahs <amrita.h.s@intel.com>
-Date: Tue, 17 Mar 2020 12:07:10 +0530
-Subject: REVERTME: Disabled libart-gtest for build
+From 5bd9a94e67115c9a23b5542b894facff18360cfa Mon Sep 17 00:00:00 2001
+From: "N, Shyjumon" <shyjumon.n@intel.com>
+Date: Sat, 22 Aug 2020 23:32:47 +0530
+Subject: [PATCH] REVERTME: Disabled libart-gtest for build
 
-Change-Id: Idec788791a00001b2baca9f394b6d116838cd79f
-Tracked-On:
+Change-Id: Ie5d203c49737219d5a9813a56334cdce40517d5a
+Tracked-On:None
 Signed-off-by: ahs <amrita.h.s@intel.com>
 ---
- test/Android.bp | 2702 +++++++++++++++++++++++------------------------
- 1 file changed, 1351 insertions(+), 1351 deletions(-)
+ test/Android.bp | 2738 +++++++++++++++++++++++------------------------
+ 1 file changed, 1369 insertions(+), 1369 deletions(-)
 
 diff --git a/test/Android.bp b/test/Android.bp
-index 400fc3acad..d8739bce33 100644
+index 0f09fcc997..4a6cfd78c5 100644
 --- a/test/Android.bp
 +++ b/test/Android.bp
-@@ -1,1352 +1,1352 @@
-+////
-+//// Copyright (C) 2016 The Android Open Source Project
-+////
-+//// Licensed under the Apache License, Version 2.0 (the "License");
-+//// you may not use this file except in compliance with the License.
-+//// You may obtain a copy of the License at
-+////
-+////      http://www.apache.org/licenses/LICENSE-2.0
-+////
-+//// Unless required by applicable law or agreed to in writing, software
-+//// distributed under the License is distributed on an "AS IS" BASIS,
-+//// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-+//// See the License for the specific language governing permissions and
-+//// limitations under the License.
-+////
- //
+@@ -1,1369 +1,1369 @@
+-//
 -// Copyright (C) 2016 The Android Open Source Project
 -//
 -// Licensed under the Apache License, Version 2.0 (the "License");
@@ -398,6 +383,7 @@ index 400fc3acad..d8739bce33 100644
 -        "1976-hello-structural-static-methods/structural_transform_methods.cc",
 -        "2005-pause-all-redefine-multithreaded/pause-all.cc",
 -        "2009-structural-local-ref/local-ref.cc",
+-        "2035-structural-native-method/structural-native.cc",
 -    ],
 -    // Use NDK-compatible headers for ctstiagent.
 -    header_libs: [
@@ -432,6 +418,7 @@ index 400fc3acad..d8739bce33 100644
 -        "1964-add-to-dex-classloader-file/add_to_loader.cc",
 -        "1963-add-to-dex-classloader-in-memory/check_memfd_create.cc",
 -        "2012-structural-redefinition-failures-jni-id/set-jni-id-used.cc",
+-        "2031-zygote-compiled-frame-deopt/native-wait.cc",
 -    ],
 -    static_libs: [
 -        "libz",
@@ -626,6 +613,7 @@ index 400fc3acad..d8739bce33 100644
 -        "1972-jni-id-swap-indices/jni_id.cc",
 -        "1985-structural-redefine-stack-scope/stack_scope.cc",
 -        "2011-stack-walk-concurrent-instrument/stack_walk_concurrent.cc",
+-        "2031-zygote-compiled-frame-deopt/native-wait.cc",
 -        "common/runtime_state.cc",
 -        "common/stack_inspect.cc",
 -    ],
@@ -957,6 +945,8 @@ index 400fc3acad..d8739bce33 100644
 -        ":art-gtest-jars-ErroneousA",
 -        ":art-gtest-jars-ErroneousB",
 -        ":art-gtest-jars-ErroneousInit",
+-        ":art-gtest-jars-Extension1",
+-        ":art-gtest-jars-Extension2",
 -        ":art-gtest-jars-ForClassLoaderA",
 -        ":art-gtest-jars-ForClassLoaderB",
 -        ":art-gtest-jars-ForClassLoaderC",
@@ -1053,6 +1043,18 @@ index 400fc3acad..d8739bce33 100644
 -java_library {
 -    name: "art-gtest-jars-ErroneousInit",
 -    srcs: ["ErroneousInit/**/*.java"],
+-    defaults: ["art-gtest-jars-defaults"],
+-}
+-
+-java_library {
+-    name: "art-gtest-jars-Extension1",
+-    srcs: ["Extension1/**/*.java"],
+-    defaults: ["art-gtest-jars-defaults"],
+-}
+-
+-java_library {
+-    name: "art-gtest-jars-Extension2",
+-    srcs: ["Extension2/**/*.java"],
 -    defaults: ["art-gtest-jars-defaults"],
 -}
 -
@@ -1382,6 +1384,22 @@ index 400fc3acad..d8739bce33 100644
 -    srcs: ["VerifySoftFailDuringClinit/**/*.smali"],
 -    out: ["art-gtest-jars-VerifySoftFailDuringClinit.jar"],
 -}
++////
++//// Copyright (C) 2016 The Android Open Source Project
++////
++//// Licensed under the Apache License, Version 2.0 (the "License");
++//// you may not use this file except in compliance with the License.
++//// You may obtain a copy of the License at
++////
++////      http://www.apache.org/licenses/LICENSE-2.0
++////
++//// Unless required by applicable law or agreed to in writing, software
++//// distributed under the License is distributed on an "AS IS" BASIS,
++//// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++//// See the License for the specific language governing permissions and
++//// limitations under the License.
++////
++//
 +//// ART gtests.
 +//
 +//art_cc_defaults {
@@ -1734,6 +1752,7 @@ index 400fc3acad..d8739bce33 100644
 +//        "1976-hello-structural-static-methods/structural_transform_methods.cc",
 +//        "2005-pause-all-redefine-multithreaded/pause-all.cc",
 +//        "2009-structural-local-ref/local-ref.cc",
++//        "2035-structural-native-method/structural-native.cc",
 +//    ],
 +//    // Use NDK-compatible headers for ctstiagent.
 +//    header_libs: [
@@ -1768,6 +1787,7 @@ index 400fc3acad..d8739bce33 100644
 +//        "1964-add-to-dex-classloader-file/add_to_loader.cc",
 +//        "1963-add-to-dex-classloader-in-memory/check_memfd_create.cc",
 +//        "2012-structural-redefinition-failures-jni-id/set-jni-id-used.cc",
++//        "2031-zygote-compiled-frame-deopt/native-wait.cc",
 +//    ],
 +//    static_libs: [
 +//        "libz",
@@ -1962,6 +1982,7 @@ index 400fc3acad..d8739bce33 100644
 +//        "1972-jni-id-swap-indices/jni_id.cc",
 +//        "1985-structural-redefine-stack-scope/stack_scope.cc",
 +//        "2011-stack-walk-concurrent-instrument/stack_walk_concurrent.cc",
++//        "2031-zygote-compiled-frame-deopt/native-wait.cc",
 +//        "common/runtime_state.cc",
 +//        "common/stack_inspect.cc",
 +//    ],
@@ -2293,6 +2314,8 @@ index 400fc3acad..d8739bce33 100644
 +//        ":art-gtest-jars-ErroneousA",
 +//        ":art-gtest-jars-ErroneousB",
 +//        ":art-gtest-jars-ErroneousInit",
++//        ":art-gtest-jars-Extension1",
++//        ":art-gtest-jars-Extension2",
 +//        ":art-gtest-jars-ForClassLoaderA",
 +//        ":art-gtest-jars-ForClassLoaderB",
 +//        ":art-gtest-jars-ForClassLoaderC",
@@ -2389,6 +2412,18 @@ index 400fc3acad..d8739bce33 100644
 +//java_library {
 +//    name: "art-gtest-jars-ErroneousInit",
 +//    srcs: ["ErroneousInit/**/*.java"],
++//    defaults: ["art-gtest-jars-defaults"],
++//}
++//
++//java_library {
++//    name: "art-gtest-jars-Extension1",
++//    srcs: ["Extension1/**/*.java"],
++//    defaults: ["art-gtest-jars-defaults"],
++//}
++//
++//java_library {
++//    name: "art-gtest-jars-Extension2",
++//    srcs: ["Extension2/**/*.java"],
 +//    defaults: ["art-gtest-jars-defaults"],
 +//}
 +//
@@ -2718,6 +2753,6 @@ index 400fc3acad..d8739bce33 100644
 +//    srcs: ["VerifySoftFailDuringClinit/**/*.smali"],
 +//    out: ["art-gtest-jars-VerifySoftFailDuringClinit.jar"],
 +//}
--- 
-2.24.0
+--
+2.17.1
 

@@ -1,0 +1,55 @@
+From 34fe8df935f4524d8be6769d7ba2383a38846acd Mon Sep 17 00:00:00 2001
+From: yaravapa <yasoda.aravapalli@intel.com>
+Date: Sun, 14 Jun 2020 10:02:40 +0530
+Subject: [PATCH] Update clang version to latest available r383902b
+
+Change-Id: I875e449c8f363cfad8c8a9c53afe9f6857e9206a
+Tracked-On:
+Signed-off-by: yaravapa <yasoda.aravapalli@intel.com>
+---
+ groups/kernel/AndroidBoard.mk                                 | 3 ++-
+ .../gmin64/config-lts/lts2019-chromium/x86_64_defconfig       | 4 ++--
+ 2 files changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/groups/kernel/AndroidBoard.mk b/groups/kernel/AndroidBoard.mk
+index 0abf137..acc24a9 100644
+--- a/groups/kernel/AndroidBoard.mk
++++ b/groups/kernel/AndroidBoard.mk
+@@ -22,7 +22,7 @@ kernel: $(PRODUCT_OUT)/kernel
+
+ else
+
+-TARGET_KERNEL_CLANG_VERSION := r377782
++TARGET_KERNEL_CLANG_VERSION := r383902b
+ CLANG_PREBUILTS_PATH := $(abspath $(INTEL_PATH_DEVICE)/../../../prebuilts/clang)
+
+ ifneq ($(TARGET_KERNEL_CLANG_VERSION),)
+@@ -32,6 +32,7 @@ else
+     # Only set the latest version of clang if TARGET_KERNEL_CLANG_VERSION hasn't been set by the device con    fig
+     KERNEL_CLANG_VERSION := $(shell ls -d $(CLANG_PREBUILTS_PATH)/host/$(HOST_OS)-x86/clang-* | xargs -n 1     basename | tail -1)
+ endif
++
+ TARGET_KERNEL_CLANG_PATH ?= $(CLANG_PREBUILTS_PATH)/host/$(HOST_OS)-x86/$(KERNEL_CLANG_VERSION)/bin
+ KERNEL_CLANG_TRIPLE ?= CLANG_TRIPLE=x86_64-linux-gnu-
+ KERNEL_CC ?= CC="$(ccache) $(TARGET_KERNEL_CLANG_PATH)/clang"
+diff --git a/groups/kernel/gmin64/config-lts/lts2019-chromium/x86_64_defconfig b/groups/kernel/gmin64/config-lts/lts2019-chromium/x86_64_defconfig
+index 61d08eb..a471dd4 100644
+--- a/groups/kernel/gmin64/config-lts/lts2019-chromium/x86_64_defconfig
++++ b/groups/kernel/gmin64/config-lts/lts2019-chromium/x86_64_defconfig
+@@ -4,11 +4,11 @@
+ #
+
+ #
+-# Compiler: Android (6207600 based on r377782b) clang version 10.0.4 (https://android.googlesource.com/toolchain/llvm-project 0cb1afdb060d6619a9837ab6866cf4adf2336416)
++# Compiler: Android (6573524 based on r383902b) clang version 11.0.2 (https://android.googlesource.com/toolchain/llvm-project b397f81060ce6d701042b782172ed13bee898b79)
+ #
+ CONFIG_GCC_VERSION=0
+ CONFIG_CC_IS_CLANG=y
+-CONFIG_CLANG_VERSION=100004
++CONFIG_CLANG_VERSION=110002
+ CONFIG_CC_CAN_LINK=y
+ CONFIG_CC_HAS_ASM_GOTO=y
+ CONFIG_IRQ_WORK=y
+--
+2.17.1
+
