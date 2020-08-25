@@ -1,0 +1,83 @@
+From 28b2943b1bdfb708720cd5ee4836fc4331005841 Mon Sep 17 00:00:00 2001
+From: Tanuj Tekriwal <tanuj.tekriwal@intel.com>
+Date: Mon, 24 Aug 2020 14:29:14 +0530
+Subject: [PATCH] [REVERTME] Enable Default Google provided Health Hal
+
+This patch enabled the Google provided Health HAL 2.1.
+
+Tracked-On: None
+Signed-off-by: Tanuj Tekriwal <tanuj.tekriwal@intel.com>
+---
+ groups/device-specific/caas/framework_manifest.xml | 9 +++++++++
+ groups/device-specific/caas/manifest.xml           | 9 +++++++++
+ groups/health/true/product.mk                      | 2 +-
+ groups/wlan/auto/init.rc                           | 4 ++++
+ 4 files changed, 23 insertions(+), 1 deletion(-)
+
+diff --git a/groups/device-specific/caas/framework_manifest.xml b/groups/device-specific/caas/framework_manifest.xml
+index 0a0312b..785497f 100644
+--- a/groups/device-specific/caas/framework_manifest.xml
++++ b/groups/device-specific/caas/framework_manifest.xml
+@@ -22,6 +22,15 @@
+             <instance>default</instance>
+         </interface>
+     </hal>
++    <hal format="hidl">
++        <name>android.hardware.health</name>
++        <transport>hwbinder</transport>
++        <version>2.1</version>
++        <interface>
++            <name>IHealth</name>
++            <instance>default</instance>
++        </interface>
++    </hal>
+     <hal format="hidl">
+         <name>android.hardware.thermal</name>
+         <transport>hwbinder</transport>
+diff --git a/groups/device-specific/caas/manifest.xml b/groups/device-specific/caas/manifest.xml
+index e426a8b..f82d7d3 100644
+--- a/groups/device-specific/caas/manifest.xml
++++ b/groups/device-specific/caas/manifest.xml
+@@ -22,6 +22,15 @@
+             <instance>default</instance>
+         </interface>
+     </hal>
++    <hal format="hidl">
++        <name>android.hardware.health</name>
++        <transport>hwbinder</transport>
++        <version>2.1</version>
++        <interface>
++            <name>IHealth</name>
++            <instance>default</instance>
++        </interface>
++    </hal>
+     <hal format="hidl">
+         <name>android.hardware.thermal</name>
+         <transport>hwbinder</transport>
+diff --git a/groups/health/true/product.mk b/groups/health/true/product.mk
+index 2f1c801..fe467e5 100644
+--- a/groups/health/true/product.mk
++++ b/groups/health/true/product.mk
+@@ -1,3 +1,3 @@
+ PRODUCT_PACKAGES += health
+
+-PRODUCT_PACKAGES += android.hardware.health@2.0-service.intel
++PRODUCT_PACKAGES += android.hardware.health@2.1-service
+diff --git a/groups/wlan/auto/init.rc b/groups/wlan/auto/init.rc
+index a784fe4..ee61de8 100644
+--- a/groups/wlan/auto/init.rc
++++ b/groups/wlan/auto/init.rc
+@@ -9,6 +9,10 @@ on zygote-start
+     mkdir /data/vendor/wifi/wpa 0770 wifi wifi
+     mkdir /data/vendor/wifi/wpa/sockets 0770 wifi wifi
+
++on boot
++    # enable fake battery state, details in system/core/healthd/BatteryMonitor.cpp
++    setprop ro.boot.fake_battery 1
++
+ service dhcpcd_wlan0 /system/bin/dhcpcd -ABDKL
+     class main
+     disabled
+--
+2.21.0
+
