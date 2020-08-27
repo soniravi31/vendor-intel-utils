@@ -1,6 +1,6 @@
-From 9416a4ae7f4dc859d6fc9158673619f9bc7b60eb Mon Sep 17 00:00:00 2001
-From: yaravapa <yasoda.aravapalli@intel.com>
-Date: Thu, 9 Apr 2020 10:24:39 +0530
+From ac848451fc0e1163d2c55ac2472ef57bbf76676f Mon Sep 17 00:00:00 2001
+From: Tanuj Tekriwal <tanuj.tekriwal@intel.com>
+Date: Thu, 27 Aug 2020 12:43:35 +0530
 Subject: [PATCH] New Update mixins for R
 
 1. Delete sepolicy setting in manifest.xml
@@ -8,17 +8,17 @@ Subject: [PATCH] New Update mixins for R
 3. Update configstore to 1.1
 4. Use Google's default power 1.0 and delete power sepolicy
 
-Tracked-On:
+Tracked-On: None
 Signed-off-by: yaravapa <yasoda.aravapalli@intel.com>
 ---
  groups/device-specific/caas/manifest.xml | 13 ++-----------
- groups/device-specific/caas/product.mk   |  4 +++-
+ groups/device-specific/caas/product.mk   |  2 ++
  groups/power/true/BoardConfig.mk         |  2 +-
  groups/power/true/product.mk             |  4 ++--
- 4 files changed, 8 insertions(+), 15 deletions(-)
+ 4 files changed, 7 insertions(+), 14 deletions(-)
 
 diff --git a/groups/device-specific/caas/manifest.xml b/groups/device-specific/caas/manifest.xml
-index 72ec3c9..3e95bcb 100644
+index f88e9b3..7d3c9b9 100644
 --- a/groups/device-specific/caas/manifest.xml
 +++ b/groups/device-specific/caas/manifest.xml
 @@ -32,15 +32,6 @@
@@ -37,7 +37,7 @@ index 72ec3c9..3e95bcb 100644
      <hal format="hidl">
          <name>android.hardware.memtrack</name>
          <transport>hwbinder</transport>
-@@ -211,7 +202,7 @@
+@@ -238,7 +229,7 @@
      <hal format="hidl">
          <name>android.hardware.configstore</name>
          <transport>hwbinder</transport>
@@ -46,7 +46,7 @@ index 72ec3c9..3e95bcb 100644
          <interface>
              <name>ISurfaceFlingerConfigs</name>
              <instance>default</instance>
-@@ -220,7 +211,7 @@
+@@ -247,7 +238,7 @@
      <hal format="hidl">
          <name>android.hardware.power</name>
          <transport>hwbinder</transport>
@@ -56,27 +56,25 @@ index 72ec3c9..3e95bcb 100644
              <name>IPower</name>
              <instance>default</instance>
 diff --git a/groups/device-specific/caas/product.mk b/groups/device-specific/caas/product.mk
-index de78933..1168eb4 100755
+index 0fa8b17..02030a5 100755
 --- a/groups/device-specific/caas/product.mk
 +++ b/groups/device-specific/caas/product.mk
-@@ -27,7 +27,9 @@ PRODUCT_PACKAGES += android.hardware.keymaster@3.0-impl \
-                     android.hardware.graphics.composer@2.1-impl \
+@@ -28,6 +28,8 @@ PRODUCT_PACKAGES += android.hardware.keymaster@3.0-impl \
                      android.hardware.graphics.composer@2.1-service \
                      batsys \
--                    thermsys
-+                    thermsys \
+                     thermsys \
 +                    android.hardware.health@2.1-service \
-+		    android.hardware.health@2.1-impl
- 
- PRODUCT_COPY_FILES += $(LOCAL_PATH)/file_share.sh:$(TARGET_COPY_OUT_VENDOR)/bin/file_share.sh
- PRODUCT_COPY_FILES += vendor/intel/utils/LICENSE:$(PRODUCT_OUT)/LICENSE
++                    android.hardware.health@2.1-impl \
+                     vinput-manager \
+                     sendkey
+
 diff --git a/groups/power/true/BoardConfig.mk b/groups/power/true/BoardConfig.mk
 index 17b005e..4ffd348 100644
 --- a/groups/power/true/BoardConfig.mk
 +++ b/groups/power/true/BoardConfig.mk
 @@ -11,4 +11,4 @@ HAS_THD := true
  {{/has_thd}}
- 
+
  BOARD_SEPOLICY_M4DEFS += module_power=true
 -BOARD_SEPOLICY_DIRS += $(INTEL_PATH_SEPOLICY)/power
 +#BOARD_SEPOLICY_DIRS += $(INTEL_PATH_SEPOLICY)/power
@@ -92,7 +90,7 @@ index bb4134f..2c19cd1 100644
 +                    android.hardware.power@1.0-service \
 +                    android.hardware.power@1.0-impl \
                      power_hal_helper
- 
--- 
-2.17.1
+
+--
+2.21.0
 

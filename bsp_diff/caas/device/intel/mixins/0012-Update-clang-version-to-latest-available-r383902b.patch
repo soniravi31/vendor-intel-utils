@@ -1,18 +1,17 @@
-From 34fe8df935f4524d8be6769d7ba2383a38846acd Mon Sep 17 00:00:00 2001
-From: yaravapa <yasoda.aravapalli@intel.com>
-Date: Sun, 14 Jun 2020 10:02:40 +0530
+From 6dfb5eb7679343b7c123361870bf07c0aaf28ddc Mon Sep 17 00:00:00 2001
+From: Tanuj Tekriwal <tanuj.tekriwal@intel.com>
+Date: Thu, 27 Aug 2020 12:57:31 +0530
 Subject: [PATCH] Update clang version to latest available r383902b
 
-Change-Id: I875e449c8f363cfad8c8a9c53afe9f6857e9206a
-Tracked-On:
+Tracked-On: None
 Signed-off-by: yaravapa <yasoda.aravapalli@intel.com>
 ---
- groups/kernel/AndroidBoard.mk                                 | 3 ++-
+ groups/kernel/AndroidBoard.mk                                 | 2 +-
  .../gmin64/config-lts/lts2019-chromium/x86_64_defconfig       | 4 ++--
- 2 files changed, 4 insertions(+), 3 deletions(-)
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/groups/kernel/AndroidBoard.mk b/groups/kernel/AndroidBoard.mk
-index 0abf137..acc24a9 100644
+index 0abf137..844b5c9 100644
 --- a/groups/kernel/AndroidBoard.mk
 +++ b/groups/kernel/AndroidBoard.mk
 @@ -22,7 +22,7 @@ kernel: $(PRODUCT_OUT)/kernel
@@ -24,16 +23,8 @@ index 0abf137..acc24a9 100644
  CLANG_PREBUILTS_PATH := $(abspath $(INTEL_PATH_DEVICE)/../../../prebuilts/clang)
 
  ifneq ($(TARGET_KERNEL_CLANG_VERSION),)
-@@ -32,6 +32,7 @@ else
-     # Only set the latest version of clang if TARGET_KERNEL_CLANG_VERSION hasn't been set by the device con    fig
-     KERNEL_CLANG_VERSION := $(shell ls -d $(CLANG_PREBUILTS_PATH)/host/$(HOST_OS)-x86/clang-* | xargs -n 1     basename | tail -1)
- endif
-+
- TARGET_KERNEL_CLANG_PATH ?= $(CLANG_PREBUILTS_PATH)/host/$(HOST_OS)-x86/$(KERNEL_CLANG_VERSION)/bin
- KERNEL_CLANG_TRIPLE ?= CLANG_TRIPLE=x86_64-linux-gnu-
- KERNEL_CC ?= CC="$(ccache) $(TARGET_KERNEL_CLANG_PATH)/clang"
 diff --git a/groups/kernel/gmin64/config-lts/lts2019-chromium/x86_64_defconfig b/groups/kernel/gmin64/config-lts/lts2019-chromium/x86_64_defconfig
-index 61d08eb..a471dd4 100644
+index 2c07164..c7fd169 100644
 --- a/groups/kernel/gmin64/config-lts/lts2019-chromium/x86_64_defconfig
 +++ b/groups/kernel/gmin64/config-lts/lts2019-chromium/x86_64_defconfig
 @@ -4,11 +4,11 @@
@@ -51,5 +42,5 @@ index 61d08eb..a471dd4 100644
  CONFIG_CC_HAS_ASM_GOTO=y
  CONFIG_IRQ_WORK=y
 --
-2.17.1
+2.21.0
 

@@ -1,26 +1,24 @@
-From b86883f32f0eb9941b7602fcad7b107c3a8dcb96 Mon Sep 17 00:00:00 2001
-From: yaravapa <yasoda.aravapalli@intel.com>
-Date: Sun, 12 Apr 2020 14:44:26 +0530
+From 3f233fd82d522b12b5a69c0f79ba638bc3eea37b Mon Sep 17 00:00:00 2001
+From: Tanuj Tekriwal <tanuj.tekriwal@intel.com>
+Date: Thu, 27 Aug 2020 13:03:05 +0530
 Subject: [PATCH] Update mixin for R
 
-1. disable trusy, nn and health
+1. disable trusy and health
 2. set sepolicy to permissive
 
-Change-Id: I7311046ac88ef8ed29fb22084b87a176a7bc07cc
-Tracked-On:
 Signed-off-by: yaravapa <yasoda.aravapalli@intel.com>
 ---
- caas/mixins.spec | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ caas/mixins.spec | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/caas/mixins.spec b/caas/mixins.spec
-index 981be13..6561295 100755
+index 2f4ac94..0438fa6 100755
 --- a/caas/mixins.spec
 +++ b/caas/mixins.spec
 @@ -10,7 +10,7 @@ product.mk: device.mk
  kernel: gmin64(useprebuilt=false,src_path=kernel/lts2019-chromium, loglevel=7, interactive_governor=false, relative_sleepstates=false, modules_in_bootimg=false, external_modules=,debug_modules=, use_bcmdhd=false, use_iwlwifi=false, extmod_platform=bxt, iwl_defconfig=, cfg_path=config-lts/lts2019-chromium, more_modules=true, yocto_src_path=kernel/lts2019-yocto, yocto_cfg_path=config-lts/lts2019-yocto, chromium_src_path=kernel/lts2019-chromium, chromium_cfg_path=config-lts/lts2019-chromium)
  disk-bus: auto
- boot-arch: project-celadon(uefi_arch=x86_64,fastboot=efi,ignore_rsci=true,disable_watchdog=true,watchdog_parameters=10 30,verity_warning=false,txe_bind_root_of_trust=false,bootloader_block_size=4096,verity_mode=false,disk_encryption=false,file_encryption=true,target=caas,rpmb_simulate=true,ignore_not_applicable_reset=true,self_usb_device_mode_protocol=true,usb_storage=true,live_boot=true)
+ boot-arch: project-celadon(uefi_arch=x86_64,fastboot=efi,ignore_rsci=true,disable_watchdog=true,watchdog_parameters=10 30,verity_warning=false,txe_bind_root_of_trust=false,bootloader_block_size=4096,verity_mode=false,disk_encryption=false,file_encryption=true,target=caas,ignore_not_applicable_reset=true,self_usb_device_mode_protocol=true,usb_storage=true,live_boot=true)
 -sepolicy: enforcing
 +sepolicy: permissive
  bluetooth: auto(ivi=false)
@@ -39,15 +37,6 @@ index 981be13..6561295 100755
  slot-ab: true
  abota-fw: true
  firststage-mount: true
-@@ -67,7 +67,7 @@ vndk: true
- public-libraries: true
- device-specific: caas
- hdcpd: true
--neuralnetworks: true
-+neuralnetworks: false
- treble: true
- swap: zram_auto(size=1073741824,swappiness=true,hardware=gordon_peak)
- art-config: true
--- 
-2.17.1
+--
+2.21.0
 

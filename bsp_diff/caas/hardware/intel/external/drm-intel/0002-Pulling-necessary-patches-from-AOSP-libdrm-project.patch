@@ -1,6 +1,6 @@
-From ee8a2b0f193a42d90b657894ca5677e78ab7a33d Mon Sep 17 00:00:00 2001
-From: yaravapa <yasoda.aravapalli@intel.com>
-Date: Sun, 14 Jun 2020 10:05:27 +0530
+From e9bd6a9a5f64a800ac743b3aa5f9e41f83bc332c Mon Sep 17 00:00:00 2001
+From: Tanuj Tekriwal <tanuj.tekriwal@intel.com>
+Date: Thu, 27 Aug 2020 13:26:25 +0530
 Subject: [PATCH] Pulling necessary patches from AOSP libdrm project
 
 minibgm aosp project has some changes which refers to some
@@ -13,18 +13,19 @@ tree - git://anongit.freedesktop.org/drm/drm
 branch - drm-next
 commit - 14d2bd53a47a7e1cb3e03d00a6b952734cf90f3f
 
-Some of the chnages in include/drm/drm_fourcc.h file could
-not be applied entirely. They seem to unnecessary for drm-intel.
+Some of the changes in include/drm/drm_fourcc.h file could
+not be applied entirely. They seem to be unnecessary for drm-intel.
 However, we will have to check for runtime issues.
 
 Tracked-On:
 Signed-off-by: yaravapa <yasoda.aravapalli@intel.com>
+Signed-off-by: svenate <salini.venate@intel.com>
 ---
  include/drm/drm.h        |  36 ++++++
  include/drm/drm_fourcc.h | 123 ++++++++++++++++++++
  include/drm/drm_mode.h   |  23 +++-
- include/drm/i915_drm.h   | 237 +++++++++++++++++++++++++++++++++------
- 4 files changed, 383 insertions(+), 36 deletions(-)
+ include/drm/i915_drm.h   | 236 +++++++++++++++++++++++++++++++++------
+ 4 files changed, 382 insertions(+), 36 deletions(-)
 
 diff --git a/include/drm/drm.h b/include/drm/drm.h
 index f0bd91de..b77f181d 100644
@@ -306,7 +307,7 @@ index 5f9fadbd..a9042986 100644
  }
  #endif
 diff --git a/include/drm/i915_drm.h b/include/drm/i915_drm.h
-index d8e2b796..772ddfa5 100644
+index cd82ab83..78a1d440 100644
 --- a/include/drm/i915_drm.h
 +++ b/include/drm/i915_drm.h
 @@ -62,6 +62,28 @@ extern "C" {
@@ -386,16 +387,15 @@ index d8e2b796..772ddfa5 100644
 
  #define I915_PARAM_HUC_STATUS		 42
 
-@@ -531,6 +566,8 @@ typedef struct drm_i915_irq_wait {
-  */
+@@ -532,6 +567,7 @@ typedef struct drm_i915_irq_wait {
  #define I915_PARAM_CS_TIMESTAMP_FREQUENCY 51
 
+ #define I915_PARAM_IS_GVT                 55
 +/* Must be kept compact -- no holes and well documented */
-+
+
  typedef struct drm_i915_getparam {
  	__s32 param;
- 	/*
-@@ -546,6 +583,7 @@ typedef struct drm_i915_getparam {
+@@ -548,6 +584,7 @@ typedef struct drm_i915_getparam {
  #define I915_SETPARAM_TEX_LRU_LOG_GRANULARITY             2
  #define I915_SETPARAM_ALLOW_BATCHBUFFER                   3
  #define I915_SETPARAM_NUM_USED_FENCES                     4
@@ -403,7 +403,7 @@ index d8e2b796..772ddfa5 100644
 
  typedef struct drm_i915_setparam {
  	int param;
-@@ -944,7 +982,7 @@ struct drm_i915_gem_execbuffer2 {
+@@ -946,7 +983,7 @@ struct drm_i915_gem_execbuffer2 {
  	 * struct drm_i915_gem_exec_fence *fences.
  	 */
  	__u64 cliprects_ptr;
@@ -412,7 +412,7 @@ index d8e2b796..772ddfa5 100644
  #define I915_EXEC_DEFAULT                (0<<0)
  #define I915_EXEC_RENDER                 (1<<0)
  #define I915_EXEC_BSD                    (2<<0)
-@@ -1092,32 +1130,34 @@ struct drm_i915_gem_busy {
+@@ -1094,32 +1131,34 @@ struct drm_i915_gem_busy {
  	 * as busy may become idle before the ioctl is completed.
  	 *
  	 * Furthermore, if the object is busy, which engine is busy is only
@@ -462,7 +462,7 @@ index d8e2b796..772ddfa5 100644
  	 *
  	 * Caveat emptor:
  	 * Only the boolean result of this query is reliable; that is whether
-@@ -1399,16 +1439,159 @@ struct drm_i915_gem_wait {
+@@ -1401,16 +1440,159 @@ struct drm_i915_gem_wait {
  };
 
  struct drm_i915_gem_context_create {
@@ -624,7 +624,7 @@ index d8e2b796..772ddfa5 100644
  struct drm_i915_reg_read {
  	/*
  	 * Register offset.
-@@ -1421,6 +1604,7 @@ struct drm_i915_reg_read {
+@@ -1423,6 +1605,7 @@ struct drm_i915_reg_read {
 
  	__u64 val; /* Return value */
  };
@@ -632,7 +632,7 @@ index d8e2b796..772ddfa5 100644
  /* Known registers:
   *
   * Render engine timestamp - 0x2358 + 64bit - gen7+
-@@ -1460,22 +1644,6 @@ struct drm_i915_gem_userptr {
+@@ -1462,22 +1645,6 @@ struct drm_i915_gem_userptr {
  	__u32 handle;
  };
 
@@ -655,7 +655,7 @@ index d8e2b796..772ddfa5 100644
  enum drm_i915_oa_format {
  	I915_OA_FORMAT_A13 = 1,	    /* HSW only */
  	I915_OA_FORMAT_A29,	    /* HSW only */
-@@ -1637,6 +1805,7 @@ struct drm_i915_perf_oa_config {
+@@ -1639,6 +1806,7 @@ struct drm_i915_perf_oa_config {
  struct drm_i915_query_item {
  	__u64 query_id;
  #define DRM_I915_QUERY_TOPOLOGY_INFO    1
@@ -664,5 +664,5 @@ index d8e2b796..772ddfa5 100644
  	/*
  	 * When set to zero by userspace, this is filled with the size of the
 --
-2.17.1
+2.21.0
 
