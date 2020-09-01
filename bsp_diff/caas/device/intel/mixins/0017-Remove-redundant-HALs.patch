@@ -1,0 +1,72 @@
+From 0e3dbd2345c5484dea50e8de391ef3b4c9a7ac9d Mon Sep 17 00:00:00 2001
+From: Tanuj Tekriwal <tanuj.tekriwal@intel.com>
+Date: Tue, 1 Sep 2020 14:01:44 +0530
+Subject: [PATCH] Remove redundant HALs
+
+This patch remove few HALs from manifest.xml
+They have not been removed from framework_manifest.xml
+These HALs were giving conflicts while doing "make publish"
+
+Tracked-On: None
+Signed-off-by: Tanuj Tekriwal <tanuj.tekriwal@intel.com>
+---
+ groups/device-specific/caas/manifest.xml | 36 ------------------------
+ 1 file changed, 36 deletions(-)
+
+diff --git a/groups/device-specific/caas/manifest.xml b/groups/device-specific/caas/manifest.xml
+index 7d3c9b9..9da716b 100644
+--- a/groups/device-specific/caas/manifest.xml
++++ b/groups/device-specific/caas/manifest.xml
+@@ -142,33 +142,6 @@
+             <instance>default</instance>
+         </interface>
+     </hal>
+-    <hal format="hidl">
+-        <name>android.hardware.wifi.supplicant</name>
+-        <transport>hwbinder</transport>
+-        <version>1.3</version>
+-        <interface>
+-            <name>ISupplicant</name>
+-            <instance>default</instance>
+-        </interface>
+-    </hal>
+-    <hal format="hidl">
+-        <name>android.hardware.wifi</name>
+-        <transport>hwbinder</transport>
+-        <version>1.4</version>
+-        <interface>
+-            <name>IWifi</name>
+-            <instance>default</instance>
+-        </interface>
+-    </hal>
+-    <hal format="hidl">
+-        <name>android.hardware.wifi.hostapd</name>
+-        <transport>hwbinder</transport>
+-        <version>1.2</version>
+-        <interface>
+-            <name>IHostapd</name>
+-            <instance>default</instance>
+-        </interface>
+-    </hal>
+     <hal format="hidl">
+         <name>android.hardware.media.omx</name>
+         <transport>hwbinder</transport>
+@@ -199,15 +172,6 @@
+         <fqname>@1.1::ICryptoFactory/widevine</fqname>
+         <fqname>@1.1::IDrmFactory/widevine</fqname>
+     </hal>
+-    <hal format="hidl">
+-        <name>android.hardware.usb</name>
+-        <transport>hwbinder</transport>
+-        <version>1.0</version>
+-        <interface>
+-            <name>IUsb</name>
+-            <instance>default</instance>
+-        </interface>
+-    </hal>
+     <hal format="hidl">
+         <name>android.hardware.dumpstate</name>
+         <transport>hwbinder</transport>
+--
+2.21.0
+
