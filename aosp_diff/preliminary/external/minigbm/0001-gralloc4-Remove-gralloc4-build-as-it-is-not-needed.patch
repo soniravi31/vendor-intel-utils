@@ -1,0 +1,103 @@
+From 099099c46a7bf4ce322a015edeade0ed6ea49707 Mon Sep 17 00:00:00 2001
+From: Tanuj Tekriwal <tanuj.tekriwal@intel.com>
+Date: Mon, 11 Jan 2021 16:07:42 +0530
+Subject: [PATCH] gralloc4: Remove gralloc4 build as it is not needed.
+
+Signed-off-by: Tanuj Tekriwal <tanuj.tekriwal@intel.com>
+Change-Id: I2384a2bc3c56f479cc73ede73a3179a1e50c921e
+---
+ cros_gralloc/gralloc4/Android.bp | 82 --------------------------------
+ 1 file changed, 82 deletions(-)
+ delete mode 100644 cros_gralloc/gralloc4/Android.bp
+
+diff --git a/cros_gralloc/gralloc4/Android.bp b/cros_gralloc/gralloc4/Android.bp
+deleted file mode 100644
+index a0a8622..0000000
+--- a/cros_gralloc/gralloc4/Android.bp
++++ /dev/null
+@@ -1,82 +0,0 @@
+-/*
+- * Copyright 2020 The Android Open Source Project
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- *      http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-cc_binary {
+-    name: "android.hardware.graphics.allocator@4.0-service.minigbm",
+-    relative_install_path: "hw",
+-    vendor: true,
+-    init_rc: ["android.hardware.graphics.allocator@4.0-service.minigbm.rc"],
+-
+-    cflags: [
+-        "-Wall",
+-        "-Werror",
+-    ],
+-
+-    shared_libs: [
+-        "android.hardware.graphics.allocator@4.0",
+-        "android.hardware.graphics.mapper@4.0",
+-        "libbase",
+-        "libcutils",
+-        "libgralloctypes",
+-        "libhidlbase",
+-        "liblog",
+-        "libsync",
+-        "libutils",
+-    ],
+-
+-    static_libs: [
+-        "libdrm",
+-        "libminigbm_cros_gralloc",
+-    ],
+-
+-    srcs: [
+-        "CrosGralloc4Allocator.cc",
+-        "CrosGralloc4AllocatorService.cc",
+-        "CrosGralloc4Utils.cc",
+-    ],
+-}
+-
+-cc_library_shared {
+-    name: "android.hardware.graphics.mapper@4.0-impl.minigbm",
+-    relative_install_path: "hw",
+-    vendor: true,
+-
+-    cflags: [
+-        "-Wall",
+-        "-Werror",
+-    ],
+-
+-    shared_libs: [
+-        "android.hardware.graphics.mapper@4.0",
+-        "libbase",
+-        "libcutils",
+-        "libgralloctypes",
+-        "libhidlbase",
+-        "liblog",
+-        "libsync",
+-        "libutils",
+-    ],
+-
+-    static_libs: [
+-        "libdrm",
+-        "libminigbm_cros_gralloc",
+-    ],
+-
+-    srcs: [
+-        "CrosGralloc4Mapper.cc",
+-        "CrosGralloc4Utils.cc",
+-    ],
+-}
+-- 
+2.17.1
+

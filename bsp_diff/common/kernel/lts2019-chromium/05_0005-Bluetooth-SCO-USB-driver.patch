@@ -1,4 +1,4 @@
-From 9e3a55552f5eeb25e174914af69c405663f9963e Mon Sep 17 00:00:00 2001
+From abfd85d433033fdd58c769649706a21577ae61bb Mon Sep 17 00:00:00 2001
 From: Amalendu Prasad Das <amalendu.prasad.das@intel.com>
 Date: Wed, 20 May 2020 10:55:20 +0530
 Subject: [PATCH] Bluetooth SCO USB driver.
@@ -8,12 +8,23 @@ with USB interface to support SCO.
 
 Tracked-On: OAM-91225
 Signed-off-by: Amalendu Prasad Das <amalendu.prasad.das@intel.com>
+---
+ drivers/bluetooth/btusb.c            |    2 +
+ sound/usb/Kconfig                    |    1 +
+ sound/usb/Makefile                   |    1 +
+ sound/usb/btusb/Kconfig              |   12 +
+ sound/usb/btusb/Makefile             |    2 +
+ sound/usb/btusb/btusb_sco_snd_card.c | 1051 ++++++++++++++++++++++++++
+ 6 files changed, 1069 insertions(+)
+ create mode 100644 sound/usb/btusb/Kconfig
+ create mode 100644 sound/usb/btusb/Makefile
+ create mode 100644 sound/usb/btusb/btusb_sco_snd_card.c
 
 diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 6aaa1ffe4b5c..0241a1403802 100644
+index a74f0faea6f2..fd809db72e47 100644
 --- a/drivers/bluetooth/btusb.c
 +++ b/drivers/bluetooth/btusb.c
-@@ -3953,10 +3953,12 @@ static int btusb_probe(struct usb_interface *intf,
+@@ -3983,10 +3983,12 @@ static int btusb_probe(struct usb_interface *intf,
  	if (id->driver_info & BTUSB_AMP) {
  		/* AMP controllers do not support SCO packets */
  		data->isoc = NULL;
@@ -25,7 +36,7 @@ index 6aaa1ffe4b5c..0241a1403802 100644
 +#endif
  	}
  
- 	if (!reset)
+ #ifdef CONFIG_PM
 diff --git a/sound/usb/Kconfig b/sound/usb/Kconfig
 index e2c53a0841da..1a1639dab65b 100644
 --- a/sound/usb/Kconfig

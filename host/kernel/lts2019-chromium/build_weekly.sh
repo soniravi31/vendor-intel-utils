@@ -5,7 +5,7 @@ mkdir -p host_kernel
 cd host_kernel
 git clone https://github.com/projectceladon/linux-intel-lts2019-chromium.git
 cd linux-intel-lts2019-chromium
-git checkout de8cedc8e73ae5a72b3fe9cb2fa7b7b60aabf118
+git checkout 3a80a43b14ca228cefabb5ee198ec53a38886e94
 cp ../../x86_64_defconfig .config
 patch_list=`find ../../ -iname "*.patch" | sort -u`
 for i in $patch_list
@@ -20,7 +20,7 @@ do
     else
       git am --abort
       echo "Not able to apply\t"`basename $i`
-      break
+      exit
     fi
   else
     echo -e "\tAlready applied\t\t"`basename $i`
