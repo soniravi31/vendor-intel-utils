@@ -1,28 +1,38 @@
-From 2748b5f85176d289ded73dd6ca07b65e47c01745 Mon Sep 17 00:00:00 2001
-From: ahs <amrita.h.s@intel.com>
-Date: Tue, 17 Mar 2020 17:58:27 +0530
-Subject: REVERTME: Disable visibility restriction
+From ac54c3e2f07da826cb243be8b1a2167f7f8ec20a Mon Sep 17 00:00:00 2001
+From: Tanuj Tekriwal <tanuj.tekriwal@intel.com>
+Date: Mon, 15 Mar 2021 15:36:04 +0530
+Subject: [PATCH] REVERTME: Disable visibility restriction
 
 Change-Id: I8d6be6ebeadc043ac8cbcf411e7a3546baa031a3
 Tracked-On:
 Signed-off-by: ahs <amrita.h.s@intel.com>
 ---
- Android.bp | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ Android.bp | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
 diff --git a/Android.bp b/Android.bp
-index da50c0a..fdab87f 100644
+index 33ba0e9..4aacab1 100644
 --- a/Android.bp
 +++ b/Android.bp
-@@ -109,7 +109,7 @@ cc_library {
+@@ -134,12 +134,12 @@ cc_library {
      name: "libhidltransport",
      vendor_available: true,
  
--    visibility: [":__subpackages__"],
-+    //visibility: [":__subpackages__"],
+-    visibility: [
+-        ":__subpackages__",
+-        "//hardware:__subpackages__",
+-        "//test/sts:__subpackages__",
+-        "//vendor:__subpackages__",
+-    ],
++//    visibility: [
++//        ":__subpackages__",
++//        "//hardware:__subpackages__",
++//        "//test/sts:__subpackages__",
++//        "//vendor:__subpackages__",
++//    ],
  }
  
  cc_defaults {
 -- 
-2.24.0
+2.17.1
 

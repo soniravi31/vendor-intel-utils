@@ -1,0 +1,58 @@
+From 4a798d9cb8d7c0b90866c2a781ac5ea7d5bf8b4b Mon Sep 17 00:00:00 2001
+From: svenate <salini.venate@intel.com>
+Date: Wed, 5 May 2021 12:44:43 +0530
+Subject: [PATCH] REVERT: Remove the bluetooth hal
+
+Remove the Bluetooth hal from framework and device manifest
+for Android 12 to boot to UI
+
+Tracked-On: None
+Signed-off-by: Tanuj Tekriwal <tanuj.tekriwal@intel.com>
+---
+ groups/device-specific/caas/framework_manifest.xml | 9 ---------
+ groups/device-specific/caas/manifest.xml           | 9 ---------
+ 2 files changed, 18 deletions(-)
+
+diff --git a/groups/device-specific/caas/framework_manifest.xml b/groups/device-specific/caas/framework_manifest.xml
+index c76e2a3..498d32f 100644
+--- a/groups/device-specific/caas/framework_manifest.xml
++++ b/groups/device-specific/caas/framework_manifest.xml
+@@ -114,15 +114,6 @@
+             <instance>default</instance>
+         </interface>
+     </hal>
+-    <hal format="hidl">
+-        <name>android.hardware.bluetooth</name>
+-        <transport>hwbinder</transport>
+-        <version>1.0</version>
+-        <interface>
+-            <name>IBluetoothHci</name>
+-            <instance>default</instance>
+-        </interface>
+-    </hal>
+     <hal format="hidl">
+         <name>android.hardware.wifi.supplicant</name>
+         <transport>hwbinder</transport>
+diff --git a/groups/device-specific/caas/manifest.xml b/groups/device-specific/caas/manifest.xml
+index cc4026c..7838bf2 100644
+--- a/groups/device-specific/caas/manifest.xml
++++ b/groups/device-specific/caas/manifest.xml
+@@ -114,15 +114,6 @@
+             <instance>default</instance>
+         </interface>
+     </hal>
+-    <hal format="hidl">
+-        <name>android.hardware.bluetooth</name>
+-        <transport>hwbinder</transport>
+-        <version>1.0</version>
+-        <interface>
+-            <name>IBluetoothHci</name>
+-            <instance>default</instance>
+-        </interface>
+-    </hal>
+     <hal format="hidl">
+         <name>android.hardware.media.omx</name>
+         <transport>hwbinder</transport>
+-- 
+2.17.1
+

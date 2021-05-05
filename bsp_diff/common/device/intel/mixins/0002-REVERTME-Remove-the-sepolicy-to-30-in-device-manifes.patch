@@ -1,0 +1,31 @@
+From f74776a6a2bd6623c518f3b11009f52cb4449d02 Mon Sep 17 00:00:00 2001
+From: Tanuj Tekriwal <tanuj.tekriwal@intel.com>
+Date: Thu, 18 Mar 2021 09:46:44 +0530
+Subject: [PATCH 2/4] [REVERTME] Remove the sepolicy to 30 in device manifest
+
+This patch is needed now as the value for sepolicy is set to
+1000 by google on intermediate release.
+
+When REL for Android 12 will be in, then this change wont be
+needed.
+
+Signed-off-by: Tanuj Tekriwal <tanuj.tekriwal@intel.com>
+---
+ groups/device-specific/caas/manifest.xml | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/groups/device-specific/caas/manifest.xml b/groups/device-specific/caas/manifest.xml
+index 405289b..cc4026c 100644
+--- a/groups/device-specific/caas/manifest.xml
++++ b/groups/device-specific/caas/manifest.xml
+@@ -188,7 +188,4 @@
+         </interface>
+     </hal>
+     <kernel target-level="5"/>
+-    <sepolicy>
+-        <version>30.0</version>
+-    </sepolicy>
+ </manifest>
+-- 
+2.17.1
+

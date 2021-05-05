@@ -1,0 +1,26 @@
+From 4683cf6fb250842cf316d24d455384e0a08dd7d3 Mon Sep 17 00:00:00 2001
+From: Tanuj Tekriwal <tanuj.tekriwal@intel.com>
+Date: Thu, 18 Mar 2021 09:50:43 +0530
+Subject: [PATCH 4/4] Update the clang version to 12003 in kernel defconfig
+
+Signed-off-by: Tanuj Tekriwal <tanuj.tekriwal@intel.com>
+---
+ .../kernel/gmin64/config-lts/lts2019-chromium/x86_64_defconfig  | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/groups/kernel/gmin64/config-lts/lts2019-chromium/x86_64_defconfig b/groups/kernel/gmin64/config-lts/lts2019-chromium/x86_64_defconfig
+index 264b7a0..69a7c62 100644
+--- a/groups/kernel/gmin64/config-lts/lts2019-chromium/x86_64_defconfig
++++ b/groups/kernel/gmin64/config-lts/lts2019-chromium/x86_64_defconfig
+@@ -9,7 +9,7 @@
+ CONFIG_GCC_VERSION=0
+ CONFIG_CC_IS_CLANG=y
+ CONFIG_LD_IS_LLD=y
+-CONFIG_CLANG_VERSION=110002
++CONFIG_CLANG_VERSION=120003
+ CONFIG_CC_CAN_LINK=y
+ CONFIG_CC_HAS_ASM_GOTO=y
+ CONFIG_TOOLS_SUPPORT_RELR=y
+-- 
+2.17.1
+

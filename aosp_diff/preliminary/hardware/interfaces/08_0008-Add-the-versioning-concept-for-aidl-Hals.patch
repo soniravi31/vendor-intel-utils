@@ -1,0 +1,42 @@
+From e8e17e7f64c01fac02239d332d0ba6c224e80b2c Mon Sep 17 00:00:00 2001
+From: Tanuj Tekriwal <tanuj.tekriwal@intel.com>
+Date: Tue, 27 Apr 2021 10:18:58 +0530
+Subject: [PATCH] Add the versioning concept for aidl Hals.
+
+This patch adds the new concept of version in aidl
+Hal in Android 12.
+
+Signed-off-by: Tanuj Tekriwal <tanuj.tekriwal@intel.com>
+Change-Id: I3bffa1a9a4ef8edbda96b89bf0f8d28860aa54c3
+---
+ light/aidl/default/lights-default.xml | 1 +
+ power/aidl/default/power-default.xml  | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/light/aidl/default/lights-default.xml b/light/aidl/default/lights-default.xml
+index db604d61f..f4092e26b 100644
+--- a/light/aidl/default/lights-default.xml
++++ b/light/aidl/default/lights-default.xml
+@@ -1,6 +1,7 @@
+ <manifest version="1.0" type="device">
+     <hal format="aidl">
+         <name>android.hardware.light</name>
++	<version>1</version>
+         <fqname>ILights/default</fqname>
+     </hal>
+ </manifest>
+diff --git a/power/aidl/default/power-default.xml b/power/aidl/default/power-default.xml
+index caf6ea2d5..a1dbce0ff 100644
+--- a/power/aidl/default/power-default.xml
++++ b/power/aidl/default/power-default.xml
+@@ -1,6 +1,7 @@
+ <manifest version="1.0" type="device">
+     <hal format="aidl">
+         <name>android.hardware.power</name>
++	<version>1</version>
+         <fqname>IPower/default</fqname>
+     </hal>
+ </manifest>
+-- 
+2.17.1
+

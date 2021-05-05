@@ -1,0 +1,31 @@
+From 62dec97672e07b3bfa1dcf602006f68dea5e2582 Mon Sep 17 00:00:00 2001
+From: Tanuj Tekriwal <tanuj.tekriwal@intel.com>
+Date: Thu, 22 Apr 2021 16:13:49 +0530
+Subject: [PATCH] [REVERTME] Commented out the file to resolve err
+
+The relevance of OPENSSL needs to be checked on boot/security
+aspect and fixed properly. This patch was introduced to only
+to resolve the error encountered during bring up.
+
+Signed-off-by: Tanuj Tekriwal <tanuj.tekriwal@intel.com>
+Change-Id: Ibe2f33ce74dbccce246f572e69008147c78108b3
+---
+ src/crypto/fipsmodule/rand/fork_detect.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/crypto/fipsmodule/rand/fork_detect.c b/src/crypto/fipsmodule/rand/fork_detect.c
+index 8dd2c958..85aaefcf 100644
+--- a/src/crypto/fipsmodule/rand/fork_detect.c
++++ b/src/crypto/fipsmodule/rand/fork_detect.c
+@@ -20,7 +20,7 @@
+
+ #include "fork_detect.h"
+
+-#if defined(OPENSSL_LINUX)
++#if 0 //defined(OPENSSL_LINUX)
+ #include <sys/mman.h>
+ #include <unistd.h>
+ #include <stdlib.h>
+--
+2.17.1
+

@@ -1,6 +1,6 @@
-From eed440fb816970e9e7f04518f22db5fad1ce7b97 Mon Sep 17 00:00:00 2001
+From 32ee64fcb18ec57f94acca9913edff666fda5872 Mon Sep 17 00:00:00 2001
 From: Tanuj Tekriwal <tanuj.tekriwal@intel.com>
-Date: Thu, 7 Jan 2021 12:50:53 +0530
+Date: Mon, 15 Mar 2021 13:43:01 +0530
 Subject: [PATCH] Add settings screen to set ethernet proxy host and port
 
 Ethernet Settings screen provided under Network & Internet
@@ -17,18 +17,18 @@ Signed-off-by: Jeevaka Prabu Badrappan <jeevaka.badrappan@intel.com>
  src/com/android/settings/Settings.java        |   1 +
  .../core/gateway/SettingsGateway.java         |   2 +
  .../settings/network/EthernetSettings.java    | 184 ++++++++++++++++++
- .../network/NetworkDashboardFragment.java     |  22 ++-
- 8 files changed, 395 insertions(+), 2 deletions(-)
+ .../network/NetworkDashboardFragment.java     |  18 +-
+ 8 files changed, 390 insertions(+), 3 deletions(-)
  create mode 100644 res/xml/ethernet_proxy_settings.xml
  create mode 100644 res/xml/network_and_internet_and_ethernet.xml
  create mode 100644 src/com/android/settings/network/EthernetSettings.java
 
 diff --git a/AndroidManifest.xml b/AndroidManifest.xml
-index de4ae39e84..7b6c611989 100644
+index 86d7992127..d0856bdd01 100644
 --- a/AndroidManifest.xml
 +++ b/AndroidManifest.xml
-@@ -1914,6 +1914,24 @@
-                        android:value="com.android.settings.network.ApnEditor" />
+@@ -2042,6 +2042,24 @@
+                        android:value="com.android.settings.network.apn.ApnEditor" />
          </activity>
  
 +        <activity android:name="Settings$EthernetSettingsActivity"
@@ -53,10 +53,10 @@ index de4ae39e84..7b6c611989 100644
              android:name="Settings$DevelopmentSettingsDashboardActivity"
              android:label="@string/development_settings_title"
 diff --git a/res/values/strings.xml b/res/values/strings.xml
-index 2e52996861..d68f410784 100644
+index 5abba1faab..b0410a5f7c 100644
 --- a/res/values/strings.xml
 +++ b/res/values/strings.xml
-@@ -12178,6 +12178,9 @@
+@@ -12618,6 +12618,9 @@
      <!-- Keywords for the media controls setting [CHAR LIMIT=NONE]-->
      <string name="keywords_media_controls">media</string>
  
@@ -65,10 +65,10 @@ index 2e52996861..d68f410784 100644
 +    <string name="ethernet_settings" translatable="false">Ethernet</string>
      <!-- Summary for see all preference when bluetooth is disable [CHAR LIMIT=none]-->
      <string name="connected_device_see_all_summary">Bluetooth will turn on</string>
- </resources>
+ 
 diff --git a/res/xml/ethernet_proxy_settings.xml b/res/xml/ethernet_proxy_settings.xml
 new file mode 100644
-index 0000000000..7ae6eab942
+index 0000000000..e5d5294296
 --- /dev/null
 +++ b/res/xml/ethernet_proxy_settings.xml
 @@ -0,0 +1,41 @@
@@ -96,7 +96,7 @@ index 0000000000..7ae6eab942
 +
 +    <EditTextPreference
 +        android:key="proxy"
-+	android:title="@string/proxy_settings_title"
++        android:title="@string/proxy_settings_title"
 +        android:dialogTitle="@string/proxy_settings_title"
 +        android:singleLine="true"
 +        android:inputType="textUri"
@@ -105,7 +105,7 @@ index 0000000000..7ae6eab942
 +
 +    <EditTextPreference
 +        android:key="port"
-+	android:title="@string/proxy_port_label"
++        android:title="@string/proxy_port_label"
 +        android:dialogTitle="@string/proxy_port_label"
 +        android:singleLine="true"
 +        android:inputType="number"
@@ -246,30 +246,30 @@ index 0000000000..f32394f871
 +
 +</PreferenceScreen>
 diff --git a/src/com/android/settings/Settings.java b/src/com/android/settings/Settings.java
-index 2f23c84928..67d2067163 100644
+index f351d264b7..cc80ef9d30 100644
 --- a/src/com/android/settings/Settings.java
 +++ b/src/com/android/settings/Settings.java
-@@ -82,6 +82,7 @@ public class Settings extends SettingsActivity {
-     public static class PublicVolumeSettingsActivity extends SettingsActivity { /* empty */ }
+@@ -84,6 +84,7 @@ public class Settings extends SettingsActivity {
      public static class WifiSettingsActivity extends SettingsActivity { /* empty */ }
      public static class WifiSettings2Activity extends SettingsActivity { /* empty */ }
+     public static class NetworkProviderSettingsActivity extends SettingsActivity { /* empty */ }
 +    public static class EthernetSettingsActivity extends SettingsActivity { /* empty */ }
      public static class WifiP2pSettingsActivity extends SettingsActivity { /* empty */ }
      public static class AvailableVirtualKeyboardActivity extends SettingsActivity { /* empty */ }
      public static class KeyboardLayoutPickerActivity extends SettingsActivity { /* empty */ }
 diff --git a/src/com/android/settings/core/gateway/SettingsGateway.java b/src/com/android/settings/core/gateway/SettingsGateway.java
-index ad4da08aed..9c2ad51c24 100644
+index bc2582eef7..9444cf9000 100644
 --- a/src/com/android/settings/core/gateway/SettingsGateway.java
 +++ b/src/com/android/settings/core/gateway/SettingsGateway.java
-@@ -110,6 +110,7 @@ import com.android.settings.location.LocationSettings;
- import com.android.settings.location.ScanningSettings;
- import com.android.settings.network.ApnEditor;
- import com.android.settings.network.ApnSettings;
+@@ -118,6 +118,7 @@ import com.android.settings.network.NetworkDashboardFragment;
+ import com.android.settings.network.NetworkProviderSettings;
+ import com.android.settings.network.apn.ApnEditor;
+ import com.android.settings.network.apn.ApnSettings;
 +import com.android.settings.network.EthernetSettings;
- import com.android.settings.network.MobileNetworkListFragment;
- import com.android.settings.network.NetworkDashboardFragment;
  import com.android.settings.nfc.AndroidBeam;
-@@ -256,6 +257,7 @@ public class SettingsGateway {
+ import com.android.settings.nfc.PaymentSettings;
+ import com.android.settings.notification.ConfigureNotificationSettings;
+@@ -260,6 +261,7 @@ public class SettingsGateway {
              ChannelNotificationSettings.class.getName(),
              ApnSettings.class.getName(),
              ApnEditor.class.getName(),
@@ -279,7 +279,7 @@ index ad4da08aed..9c2ad51c24 100644
              ZenModeEventRuleSettings.class.getName(),
 diff --git a/src/com/android/settings/network/EthernetSettings.java b/src/com/android/settings/network/EthernetSettings.java
 new file mode 100644
-index 0000000000..c7791a09b4
+index 0000000000..3c36d7a52f
 --- /dev/null
 +++ b/src/com/android/settings/network/EthernetSettings.java
 @@ -0,0 +1,184 @@
@@ -378,7 +378,7 @@ index 0000000000..c7791a09b4
 +            if (mProxyPort > -1) {
 +                mPortPreference.setText(String.valueOf(mProxyPort));
 +            }
-+	}
++        }
 +    }
 +
 +    @Override
@@ -468,7 +468,7 @@ index 0000000000..c7791a09b4
 +    }
 +}
 diff --git a/src/com/android/settings/network/NetworkDashboardFragment.java b/src/com/android/settings/network/NetworkDashboardFragment.java
-index db704ae850..ed7921a2b6 100644
+index 14d85e9e5a..b3e69de697 100644
 --- a/src/com/android/settings/network/NetworkDashboardFragment.java
 +++ b/src/com/android/settings/network/NetworkDashboardFragment.java
 @@ -21,6 +21,8 @@ import android.app.Dialog;
@@ -477,50 +477,57 @@ index db704ae850..ed7921a2b6 100644
  import android.os.Bundle;
 +import android.os.SystemProperties;
 +import android.provider.SearchIndexableResource;
+ import android.provider.SearchIndexableResource;
  import android.util.Log;
  
- import androidx.appcompat.app.AlertDialog;
-@@ -36,6 +38,7 @@ import com.android.settingslib.core.instrumentation.MetricsFeatureProvider;
+@@ -38,6 +40,7 @@ import com.android.settingslib.core.instrumentation.MetricsFeatureProvider;
  import com.android.settingslib.core.lifecycle.Lifecycle;
  import com.android.settingslib.search.SearchIndexable;
  
 +import java.util.Arrays;
  import java.util.ArrayList;
+ import java.util.Arrays;
  import java.util.List;
- 
-@@ -57,7 +60,11 @@ public class NetworkDashboardFragment extends DashboardFragment implements
+@@ -60,9 +63,13 @@ public class NetworkDashboardFragment extends DashboardFragment implements
  
      @Override
      protected int getPreferenceScreenResId() {
--        return R.xml.network_and_internet;
 +        String build = SystemProperties.get("ro.build.type", "user");
+         if (Utils.isProviderModelEnabled(getContext())) {
+             return R.xml.network_provider_internet;
+         } else {
 +        if (build.equals("userdebug") || build.equals("eng"))
 +            return R.xml.network_and_internet_and_ethernet;
 +        else
-+            return R.xml.network_and_internet;
+             return R.xml.network_and_internet;
+         }
      }
- 
-     @Override
-@@ -154,7 +161,18 @@ public class NetworkDashboardFragment extends DashboardFragment implements
+@@ -182,17 +189,22 @@ public class NetworkDashboardFragment extends DashboardFragment implements
      }
  
      public static final BaseSearchIndexProvider SEARCH_INDEX_DATA_PROVIDER =
 -            new BaseSearchIndexProvider(R.xml.network_and_internet) {
+-
 +            new BaseSearchIndexProvider() {
-+                @Override
-+                public List<SearchIndexableResource> getXmlResourcesToIndex(
-+                        Context context, boolean enabled) {
+                 @Override
+                 // TODO(b/167474581): Should remove this method when Provider Model finished.
+                 public List<SearchIndexableResource> getXmlResourcesToIndex(Context context,
+                         boolean enabled) {
 +                    final SearchIndexableResource sir = new SearchIndexableResource(context);
 +                    final String build = SystemProperties.get("ro.build.type", "user");
-+                    if (build.equals("userdebug") || build.equals("eng"))
-+                        sir.xmlResId = R.xml.network_and_internet_and_ethernet;
-+                    else
-+                        sir.xmlResId = R.xml.network_and_internet;
-+                    return Arrays.asList(sir);
-+                }
+                     if (Utils.isProviderModelEnabled(context)) {
+-                        final SearchIndexableResource sir = new SearchIndexableResource(context);
+                         sir.xmlResId = R.xml.network_provider_internet;
++		        if (build.equals("userdebug") || build.equals("eng"))
++                            sir.xmlResId = R.xml.network_and_internet_and_ethernet;
++                        else
++                            sir.xmlResId = R.xml.network_and_internet;
+                         return Arrays.asList(sir);
+                     }
++
+                     return super.getXmlResourcesToIndex(context, enabled);
+                 }
  
-                 @Override
-                 public List<AbstractPreferenceController> createPreferenceControllers(Context
 -- 
 2.17.1
 

@@ -1,0 +1,119 @@
+From 22e8ecbd03c78ef3abbcf30dca4461a2b60b8c7a Mon Sep 17 00:00:00 2001
+From: svenate <salini.venate@intel.com>
+Date: Wed, 5 May 2021 09:07:35 +0530
+Subject: [PATCH] Framework manifest changes
+
+Changes include:
+ 1) Add Gatekeeper HAL to framework manifest
+ 2) Migrate android.hardware.audio to 6.0
+ 3) Migrate android.hardware.audio.effect to 6.0
+ 4) Migrate android.hardware.graphics.mapper to 4.0
+ 5) Migrate android.hardware.graphics.allocator to 4.0 
+ 6) Migrate android.hardware.graphics.composer to 2.4
+ 7) Migrate android.hardware.wifi to 1.5
+ 8) Add drm manifest fragment to framework manifest
+
+Signed-off-by: Tanuj Tekriwal <tanuj.tekriwal@intel.com>
+---
+ .../caas/framework_manifest.xml               | 29 ++++++++++++++-----
+ 1 file changed, 22 insertions(+), 7 deletions(-)
+
+diff --git a/groups/device-specific/caas/framework_manifest.xml b/groups/device-specific/caas/framework_manifest.xml
+index f04618a..c76e2a3 100644
+--- a/groups/device-specific/caas/framework_manifest.xml
++++ b/groups/device-specific/caas/framework_manifest.xml
+@@ -41,6 +41,15 @@
+             <instance>default</instance>
+         </interface>
+     </hal>
++    <hal format="hidl">
++        <name>android.hardware.gatekeeper</name>
++        <transport>hwbinder</transport>
++        <version>1.0</version>
++        <interface>
++            <name>IGatekeeper</name>
++            <instance>default</instance>
++        </interface>
++    </hal>
+     <hal format="hidl">
+         <name>android.hardware.memtrack</name>
+         <transport>hwbinder</transport>
+@@ -53,7 +62,7 @@
+     <hal format="hidl">
+         <name>android.hardware.audio</name>
+         <transport>hwbinder</transport>
+-        <version>5.0</version>
++        <version>6.0</version>
+         <interface>
+             <name>IDevicesFactory</name>
+             <instance>default</instance>
+@@ -62,7 +71,7 @@
+     <hal format="hidl">
+         <name>android.hardware.audio.effect</name>
+         <transport>hwbinder</transport>
+-        <version>5.0</version>
++        <version>6.0</version>
+         <interface>
+             <name>IEffectsFactory</name>
+             <instance>default</instance>
+@@ -80,7 +89,7 @@
+     <hal format="hidl">
+         <name>android.hardware.graphics.mapper</name>
+         <transport arch="32+64">passthrough</transport>
+-        <version>2.0</version>
++        <version>4.0</version>
+         <interface>
+             <name>IMapper</name>
+             <instance>default</instance>
+@@ -90,7 +99,7 @@
+     <hal format="hidl">
+         <name>android.hardware.graphics.allocator</name>
+         <transport>hwbinder</transport>
+-        <version>2.0</version>
++        <version>4.0</version>
+         <interface>
+             <name>IAllocator</name>
+             <instance>default</instance>
+@@ -99,7 +108,7 @@
+     <hal format="hidl">
+         <name>android.hardware.graphics.composer</name>
+         <transport>hwbinder</transport>
+-        <version>2.1</version>
++        <version>2.4</version>
+         <interface>
+             <name>IComposer</name>
+             <instance>default</instance>
+@@ -114,7 +123,7 @@
+             <instance>default</instance>
+         </interface>
+     </hal>
+-	<hal format="hidl">
++    <hal format="hidl">
+         <name>android.hardware.wifi.supplicant</name>
+         <transport>hwbinder</transport>
+         <version>1.3</version>
+@@ -126,7 +135,7 @@
+     <hal format="hidl">
+         <name>android.hardware.wifi</name>
+         <transport>hwbinder</transport>
+-        <version>1.4</version>
++        <version>1.5</version>
+         <interface>
+             <name>IWifi</name>
+             <instance>default</instance>
+@@ -154,6 +163,12 @@
+             <instance>default</instance>
+         </interface>
+     </hal>
++    <hal format="hidl">
++        <name>android.hardware.drm</name>
++        <transport>hwbinder</transport>
++        <fqname>@1.3::ICryptoFactory/clearkey</fqname>
++        <fqname>@1.3::IDrmFactory/clearkey</fqname>
++    </hal>
+     <hal format="hidl">
+         <name>android.hardware.usb</name>
+         <transport>hwbinder</transport>
+-- 
+2.17.1
+

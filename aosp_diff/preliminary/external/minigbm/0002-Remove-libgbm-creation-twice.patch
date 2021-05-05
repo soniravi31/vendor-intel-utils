@@ -1,0 +1,54 @@
+From afbe327a99affa7a5be3a306fee5e97487064e04 Mon Sep 17 00:00:00 2001
+From: Tanuj Tekriwal <tanuj.tekriwal@intel.com>
+Date: Wed, 20 Jan 2021 19:01:12 +0530
+Subject: [PATCH] Remove libgbm creation twice
+
+Remove the libgbm creation as it is already created in
+hardware/intel/external/mesa3d-intel/src/gbm/Android.mk
+
+Signed-off-by: Tanuj Tekriwal <tanuj.tekriwal@intel.com>
+Change-Id: I76a31dd686c5ff425cb45227dda771591be60358
+---
+ Android.bp | 26 --------------------------
+ 1 file changed, 26 deletions(-)
+
+diff --git a/Android.bp b/Android.bp
+index 458bcc9..c5b5775 100644
+--- a/Android.bp
++++ b/Android.bp
+@@ -87,32 +87,6 @@ cc_defaults {
+     export_include_dirs: ["."],
+ }
+ 
+-cc_library {
+-    name: "libgbm",
+-    defaults: ["gbm_defaults"],
+-    host_supported: true,
+-
+-    target: {
+-        host: {
+-            // Avoid linking to another host copy of libdrm; this library will cause
+-            // binary GPU drivers to be loaded from the host, which might be linked
+-            // to a system copy of libdrm, which conflicts with the AOSP one
+-            allow_undefined_symbols: true,
+-            header_libs: ["libdrm_headers"],
+-        },
+-        android: {
+-            shared_libs: [
+-                "libdrm",
+-                "liblog"
+-            ],
+-        },
+-    },
+-    apex_available: [
+-        "//apex_available:platform",
+-        "com.android.virt",
+-    ],
+-}
+-
+ cc_library_static {
+     name: "libminigbm_cros_gralloc",
+     defaults: ["minigbm_cros_gralloc_defaults"],
+-- 
+2.17.1
+

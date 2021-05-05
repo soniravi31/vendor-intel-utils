@@ -1,0 +1,42 @@
+From c09b7ac716e7723b2bc482975337572ebcf822a3 Mon Sep 17 00:00:00 2001
+From: Tanuj Tekriwal <tanuj.tekriwal@intel.com>
+Date: Thu, 18 Mar 2021 23:24:02 +0530
+Subject: [PATCH] Renamed usb related properties
+
+Few usb related properties have been renamed.
+So renaming them in INTEL code as well.
+
+Signed-off-by: Tanuj Tekriwal <tanuj.tekriwal@intel.com>
+---
+ load_modules/load_modules.te    | 2 +-
+ usb-gadget/configfs/recovery.te | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/load_modules/load_modules.te b/load_modules/load_modules.te
+index bcdc111..9173be4 100644
+--- a/load_modules/load_modules.te
++++ b/load_modules/load_modules.te
+@@ -23,7 +23,7 @@ allow load_modules debugfs_tracing_instances:dir search;
+ 
+ # load_modules cannot set & get sys.usb.config now, it
+ # would better move these operations to init.rc
+-dontaudit load_modules exported_system_radio_prop:file *;
++dontaudit load_modules usb_control_prop:file *;
+ dontaudit coredomain load_modules:key view;
+ 
+ not_full_treble(`
+diff --git a/usb-gadget/configfs/recovery.te b/usb-gadget/configfs/recovery.te
+index 847b6df..a6e689b 100644
+--- a/usb-gadget/configfs/recovery.te
++++ b/usb-gadget/configfs/recovery.te
+@@ -1,6 +1,6 @@
+ recovery_only(`
+   # set sys.usb.ffs.ready prop
+-  set_prop(recovery, ffs_prop)
++  set_prop(recovery, ffs_control_prop)
+ 
+   # rules needed to access GPU
+   allow recovery gpu_device:chr_file rw_file_perms;
+-- 
+2.17.1
+

@@ -1,0 +1,68 @@
+From d309b93784221f0b64a33b9a2f2f1d15775d3d19 Mon Sep 17 00:00:00 2001
+From: Tanuj Tekriwal <tanuj.tekriwal@intel.com>
+Date: Mon, 15 Mar 2021 18:06:49 +0530
+Subject: [PATCH] [REVERTME] - Removing the build for libgpu_buffer
+
+This needs to be checked by the Graphics team.
+
+Signed-off-by: Tanuj Tekriwal <tanuj.tekriwal@intel.com>
+Change-Id: I465f1d751726f93e5243d32404e59eb6f0f8d4d1
+---
+ apex/Android.bp | 45 ---------------------------------------------
+ 1 file changed, 45 deletions(-)
+ delete mode 100644 apex/Android.bp
+
+diff --git a/apex/Android.bp b/apex/Android.bp
+deleted file mode 100644
+index 0985577..0000000
+--- a/apex/Android.bp
++++ /dev/null
+@@ -1,45 +0,0 @@
+-package {
+-    default_applicable_licenses: ["Android-Apache-2.0"],
+-}
+-
+-apex {
+-    name: "com.android.virt",
+-
+-    // TODO(jiyong): make it updatable
+-    updatable: false,
+-
+-    manifest: "manifest.json",
+-
+-    key: "com.android.virt.key",
+-    certificate: ":com.android.virt.certificate",
+-
+-    // crosvm is enabled for only 64-bit targets on device
+-    arch: {
+-        arm64: {
+-            binaries: [
+-                "crosvm",
+-            ],
+-        },
+-        x86_64: {
+-            binaries: [
+-                "crosvm",
+-            ],
+-        },
+-    },
+-    binaries: [
+-        "assemble_cvd",
+-        "virtmanager",
+-    ],
+-    filesystems: ["microdroid"],
+-}
+-
+-apex_key {
+-    name: "com.android.virt.key",
+-    public_key: "com.android.virt.avbpubkey",
+-    private_key: "com.android.virt.pem",
+-}
+-
+-android_app_certificate {
+-    name: "com.android.virt.certificate",
+-    certificate: "com.android.virt",
+-}
+-- 
+2.17.1
+

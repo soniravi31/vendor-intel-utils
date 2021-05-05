@@ -1,16 +1,22 @@
-From 5ee3200d97722af1e49065bd01a2bb0faf887bbe Mon Sep 17 00:00:00 2001
-From: renchenglei <chenglei.ren@intel.com>
-Date: Fri, 25 Sep 2020 18:29:50 +0800
+From 1d70287f081f314643867f77403e4931f20e601d Mon Sep 17 00:00:00 2001
+From: Tanuj Tekriwal <tanuj.tekriwal@intel.com>
+Date: Mon, 15 Mar 2021 12:31:38 +0530
 Subject: [PATCH] Use BRGA as default format for only EFI FB rendering.
 
 As efifb only supports BGRA format, we need config up-level
 to support this when using software rendering.
+
+	From 5ee3200d97722af1e49065bd01a2bb0faf887bbe Mon Sep 17 00:00:00 2001
+	From: renchenglei <chenglei.ren@intel.com>
+	Date: Fri, 25 Sep 2020 18:29:50 +0800
+
+Change-Id: I1b17cae4f0e2a12038690f8228118b83d7773408
 ---
  .../CompositionEngine/src/RenderSurface.cpp       | 15 +++++++++++++--
  1 file changed, 13 insertions(+), 2 deletions(-)
 
 diff --git a/services/surfaceflinger/CompositionEngine/src/RenderSurface.cpp b/services/surfaceflinger/CompositionEngine/src/RenderSurface.cpp
-index 2773fd3a168a..0e8aa02c41e4 100644
+index 3bef77dde1..ed65be57a5 100644
 --- a/services/surfaceflinger/CompositionEngine/src/RenderSurface.cpp
 +++ b/services/surfaceflinger/CompositionEngine/src/RenderSurface.cpp
 @@ -32,6 +32,7 @@
@@ -21,7 +27,7 @@ index 2773fd3a168a..0e8aa02c41e4 100644
  
  // TODO(b/129481165): remove the #pragma below and fix conversion issues
  #pragma clang diagnostic push
-@@ -76,11 +77,21 @@ bool RenderSurface::isValid() const {
+@@ -78,11 +79,21 @@ bool RenderSurface::isValid() const {
  
  void RenderSurface::initialize() {
      ANativeWindow* const window = mNativeWindow.get();
@@ -42,7 +48,7 @@ index 2773fd3a168a..0e8aa02c41e4 100644
 +
 +    status = native_window_set_buffers_format(window, format);
 +    ALOGE_IF(status != NO_ERROR, "Unable to set BQ format to %d: %d", format, status);
-     status = native_window_set_usage(window, GRALLOC_USAGE_HW_RENDER);
+     status = native_window_set_usage(window, DEFAULT_USAGE);
      ALOGE_IF(status != NO_ERROR, "Unable to set BQ usage bits for GPU rendering: %d", status);
  }
 -- 

@@ -1,0 +1,45 @@
+From 9dd9926284af329718198426fa11e7790f68b9c6 Mon Sep 17 00:00:00 2001
+From: Tanuj Tekriwal <tanuj.tekriwal@intel.com>
+Date: Thu, 18 Mar 2021 09:43:10 +0530
+Subject: [PATCH 1/4] [Temporary] Fix build error for ELF file
+
+This will fix below error:
+1. out/target/product/caas/recovery/root/vendor/bin/sh:
+	error:found ELF file: device/intel/project-celadon/
+	caas/extra_files/vendor-partition/sh_recovery
+2. out/target/product/caas/recovery/root/vendor/bin/
+	toolbox_static: error: found ELF file: device/
+	intel/project-celadon/caas/extra_files/vendor-
+	partition/toolbox_recovery
+
+From Changes.md file:
+
+ELF prebuilts in `PRODUCT_COPY_FILES` that are installed into these paths are an
+error:
+
+* `<partition>/bin/*`
+* `<partition>/lib/*`
+* `<partition>/lib64/*`
+
+Define prebuilt modules and add them to `PRODUCT_PACKAGES` instead.
+To temporarily relax this check and restore the behavior prior to this change,
+set `BUILD_BROKEN_ELF_PREBUILT_PRODUCT_COPY_FILES := true` in `BoardConfig.mk`.
+
+Signed-off-by: Tanuj Tekriwal <tanuj.tekriwal@intel.com>
+---
+ groups/device-specific/caas/BoardConfig.mk | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/groups/device-specific/caas/BoardConfig.mk b/groups/device-specific/caas/BoardConfig.mk
+index fae31d0..8dd1d62 100644
+--- a/groups/device-specific/caas/BoardConfig.mk
++++ b/groups/device-specific/caas/BoardConfig.mk
+@@ -43,3 +43,5 @@ BUILD_BROKEN_USES_BUILD_HOST_STATIC_LIBRARY := true
+ BUILD_BROKEN_USES_BUILD_HOST_SHARED_LIBRARY := true
+ BUILD_BROKEN_USES_BUILD_HOST_EXECUTABLE := true
+ BUILD_BROKEN_USES_BUILD_COPY_HEADERS := true
++# PRODUCT_COPY_FILES directives.
++BUILD_BROKEN_ELF_PREBUILT_PRODUCT_COPY_FILES := true
+-- 
+2.17.1
+
