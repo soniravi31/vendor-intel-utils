@@ -1,6 +1,6 @@
-From 8f168d3d059514cfbac5674d161237c107c9c1dc Mon Sep 17 00:00:00 2001
-From: Tanuj Tekriwal <tanuj.tekriwal@intel.com>
-Date: Mon, 15 Mar 2021 11:54:04 +0530
+From 8c4337c5f97db9061bc80ff2fd6b492beec96f64 Mon Sep 17 00:00:00 2001
+From: bodapati <shalini.salomi.bodapati@intel.com>
+Date: Mon, 13 Apr 2020 16:05:19 +0530
 Subject: [PATCH] Add -lowerswitch to cflags
 
 Change-Id: I85a9ed171d2a6f8c78d3ee217db2518f1f204bdc
@@ -11,14 +11,14 @@ Signed-off-by: bodapati <shalini.salomi.bodapati@intel.com>
  1 file changed, 1 insertion(+)
 
 diff --git a/cc/config/global.go b/cc/config/global.go
-index ab95c3f58..7235d4715 100644
+index ab95c3f58..2faf38680 100644
 --- a/cc/config/global.go
 +++ b/cc/config/global.go
 @@ -46,6 +46,7 @@ var (
  
  		"-O2",
  		"-g",
-+		"-lowerswitch",
++                "-lowerswitch",
  		"-fdebug-info-for-profiling",
  
  		"-fno-strict-aliasing",

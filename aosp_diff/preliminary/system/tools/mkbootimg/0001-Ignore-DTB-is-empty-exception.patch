@@ -1,6 +1,6 @@
-From af9b10c59aa2428487c986c8134c5cd3dfecfd7e Mon Sep 17 00:00:00 2001
-From: Tanuj Tekriwal <tanuj.tekriwal@intel.com>
-Date: Mon, 15 Mar 2021 16:33:57 +0530
+From 4439fe41773f2f7ccc5453ac3a8545024d87a9c1 Mon Sep 17 00:00:00 2001
+From: Qiming Shi <qiming.shi@intel.com>
+Date: Thu, 26 Mar 2020 23:04:09 -0700
 Subject: [PATCH] Ignore DTB is empty exception
 
 Change-Id: I357994e7279c474e1dc349425d8ac8fcf90a984d

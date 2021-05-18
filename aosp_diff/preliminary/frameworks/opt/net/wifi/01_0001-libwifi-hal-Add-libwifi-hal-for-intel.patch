@@ -1,6 +1,6 @@
-From 5477c76ce11b62792330610f76a8baef96e6233d Mon Sep 17 00:00:00 2001
-From: Tanuj Tekriwal <tanuj.tekriwal@intel.com>
-Date: Mon, 15 Mar 2021 12:37:10 +0530
+From 55495f4a92219a92eb98d8b8f30a184ef6e0669b Mon Sep 17 00:00:00 2001
+From: Jeevaka Prabu Badrappan <jeevaka.badrappan@intel.com>
+Date: Tue, 8 Sep 2020 20:34:15 +0530
 Subject: [PATCH] libwifi-hal: Add libwifi-hal for intel
 
 Change-Id: Iba2d20c040baa5afde3e329a3abf584abfdc8d32

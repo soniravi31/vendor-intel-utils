@@ -20,9 +20,9 @@ index c1510f0ab3ea..e3d0f62819bf 100755
      --owner=0 --group=0 --numeric-owner --no-recursion \
 -    -I $XZ -cf $tarfile -C $cpio_dir/ -T - > /dev/null
 +    -J -cf $tarfile -C $cpio_dir/ -T - > /dev/null
-
+ 
  echo $headers_md5 > kernel/kheaders.md5
  echo "$this_file_md5" >> kernel/kheaders.md5
---
+-- 
 2.17.1
 
