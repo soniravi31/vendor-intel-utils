@@ -1,7 +1,7 @@
 From 8d5508b883f03c4542bf13fa62aa0fb1856896d6 Mon Sep 17 00:00:00 2001
 From: Tanuj Tekriwal <tanuj.tekriwal@intel.com>
 Date: Fri, 19 Mar 2021 19:14:56 +0530
-Subject: [PATCH] Update the clang version to 12.0.3
+Subject: [PATCH] Update the clang version to 12.0.5
 
 Signed-off-by: Tanuj Tekriwal <tanuj.tekriwal@intel.com>
 ---
@@ -17,10 +17,10 @@ index 51eeca3..d382730 100755
  EFI_OBJCOPY := $(IAFW_OBJCOPY)
  ifeq ($(TARGET_IAFW_ARCH),x86_64)
 -IAFW_LIBCLANG := $(IAFW_TOOLCHAIN_CLANG_ROOT)/../lib64/clang/11.0.2/lib/linux/libclang_rt.builtins-x86_64-android.a
-+IAFW_LIBCLANG := $(IAFW_TOOLCHAIN_CLANG_ROOT)/../lib64/clang/12.0.3/lib/linux/libclang_rt.builtins-x86_64-android.a
++IAFW_LIBCLANG := $(IAFW_TOOLCHAIN_CLANG_ROOT)/../lib64/clang/12.0.5/lib/linux/libclang_rt.builtins-x86_64-android.a
  else
 -IAFW_LIBCLANG := $(IAFW_TOOLCHAIN_CLANG_ROOT)/../lib64/clang/11.0.2/lib/linux/libclang_rt.builtins-i686-android.a
-+IAFW_LIBCLANG := $(IAFW_TOOLCHAIN_CLANG_ROOT)/../lib64/clang/12.0.3/lib/linux/libclang_rt.builtins-i686-android.a
++IAFW_LIBCLANG := $(IAFW_TOOLCHAIN_CLANG_ROOT)/../lib64/clang/12.0.5/lib/linux/libclang_rt.builtins-i686-android.a
  endif
  
  # Transformation definitions, ala build system's definitions.mk
