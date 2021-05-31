@@ -1,0 +1,313 @@
+From fc6358d0df49695a3ce9f1b251efe147541605f1 Mon Sep 17 00:00:00 2001
+From: "ji, zhenlong z" <zhenlong.z.ji@intel.com>
+Date: Thu, 27 May 2021 16:27:57 +0800
+Subject: [PATCH] Declare the property type by using AOSP sepolicy macro
+
+Signed-off-by: ji, zhenlong z <zhenlong.z.ji@intel.com>
+---
+ aafd/logwrapper.te                         |  2 +-
+ aafd/property.te                           | 12 ++++++------
+ aafd/property_contexts                     |  2 +-
+ aafd/vendor_init.te                        |  2 +-
+ abota/generic/no_vendor_prefix/property.te |  2 +-
+ abota/generic/vendor_prefix/property.te    |  2 +-
+ audio/property.te                          |  2 +-
+ autodetect/true/property.te                |  6 +++---
+ avx/property.te                            |  4 ++--
+ bluetooth/common/property.te               |  2 +-
+ boot-arch/common/property.te               |  6 +++---
+ camera/ipu2/property.te                    |  2 +-
+ camera/ipu4/property.te                    |  2 +-
+ camera/property.te                         |  2 +-
+ carplay/property.te                        |  4 +---
+ carplay/system_server.te                   |  1 +
+ crashlogd/property.te                      | 10 +++++-----
+ evs/property.te                            |  2 +-
+ graphics/mesa/property.te                  |  2 +-
+ kernel/dumpstate.te                        |  0
+ load_modules/property.te                   |  2 +-
+ low-mem/property.te                        |  2 +-
+ neuralnetworks/property.te                 |  2 +-
+ power/property.te                          |  2 +-
+ thermal/logwrapper.te                      |  1 +
+ thermal/property.te                        |  2 +-
+ usb-gadget/hal/property.te                 |  2 +-
+ usb-role-switch/property.te                |  2 +-
+ wlan/iwlwifi/hal_wifi_default.te           |  2 +-
+ wlan/iwlwifi/property.te                   |  2 +-
+ wlan/iwlwifi/property_contexts             |  4 ++--
+ 31 files changed, 45 insertions(+), 45 deletions(-)
+ create mode 100644 carplay/system_server.te
+ delete mode 100644 kernel/dumpstate.te
+ create mode 100644 thermal/logwrapper.te
+
+diff --git a/aafd/logwrapper.te b/aafd/logwrapper.te
+index c08fc8b..dce2049 100644
+--- a/aafd/logwrapper.te
++++ b/aafd/logwrapper.te
+@@ -19,4 +19,4 @@ set_prop(logwrapper, vendor_fixed_perf_prop)
+ 
+ allow logwrapper p9fs:file r_file_perms;
+ allow logwrapper p9fs:dir r_dir_perms;
+-set_prop(logwrapper, vendor_suspend)
++set_prop(logwrapper, vendor_suspend_prop)
+diff --git a/aafd/property.te b/aafd/property.te
+index 68c686f..448050a 100644
+--- a/aafd/property.te
++++ b/aafd/property.te
+@@ -1,6 +1,6 @@
+-type vendor_video_codec_prop, property_type;
+-type vendor_hwcomposer_prop, property_type;
+-type vendor_suspend, property_type;
+-type vendor_usb_controller_prop, property_type;
+-type vendor_fixed_perf_prop, property_type;
+-type vendor_mount_ep0_prop, property_type;
++vendor_internal_prop(vendor_video_codec_prop)
++vendor_internal_prop(vendor_hwcomposer_prop)
++vendor_internal_prop(vendor_suspend_prop)
++vendor_internal_prop(vendor_usb_controller_prop)
++vendor_internal_prop(vendor_fixed_perf_prop)
++vendor_internal_prop(vendor_mount_ep0_prop)
+diff --git a/aafd/property_contexts b/aafd/property_contexts
+index 55cf531..4b5f5e8 100644
+--- a/aafd/property_contexts
++++ b/aafd/property_contexts
+@@ -2,7 +2,7 @@ vendor.intel.video.codec u:object_r:vendor_video_codec_prop:s0
+ vendor.hwcomposer.set u:object_r:vendor_hwcomposer_prop:s0
+ vendor.gralloc.set u:object_r:vendor_hwcomposer_prop:s0
+ vendor.egl.set u:object_r:vendor_hwcomposer_prop:s0
+-vendor.suspend u:object_r:vendor_suspend:s0
++vendor.suspend u:object_r:vendor_suspend_prop:s0
+ vendor.usb.controller u:object_r:vendor_usb_controller_prop:s0
+ vendor.power.fixed_performance_scale_factor         u:object_r:vendor_fixed_perf_prop:s0
+ vendor.mount.ep0 u:object_r:vendor_mount_ep0_prop:s0
+diff --git a/aafd/vendor_init.te b/aafd/vendor_init.te
+index f8d90e6..4e4dc93 100644
+--- a/aafd/vendor_init.te
++++ b/aafd/vendor_init.te
+@@ -1,5 +1,5 @@
+ set_prop(vendor_init, vendor_video_codec_prop)
+-set_prop(vendor_init, vendor_suspend)
++set_prop(vendor_init, vendor_suspend_prop)
+ get_prop(vendor_init, vendor_hwcomposer_prop)
+ set_prop(vendor_init, vendor_usb_controller_prop)
+ get_prop(vendor_init, vendor_fixed_perf_prop)
+diff --git a/abota/generic/no_vendor_prefix/property.te b/abota/generic/no_vendor_prefix/property.te
+index 0b672d8..1f42ce9 100644
+--- a/abota/generic/no_vendor_prefix/property.te
++++ b/abota/generic/no_vendor_prefix/property.te
+@@ -1 +1 @@
+-type ota_prop, property_type;
++vendor_internal_prop(ota_prop)
+diff --git a/abota/generic/vendor_prefix/property.te b/abota/generic/vendor_prefix/property.te
+index fc36b08..c55b445 100644
+--- a/abota/generic/vendor_prefix/property.te
++++ b/abota/generic/vendor_prefix/property.te
+@@ -1 +1 @@
+-type vendor_ota_prop, property_type;
++vendor_internal_prop(vendor_ota_prop)
+diff --git a/audio/property.te b/audio/property.te
+index d48f830..d337f15 100644
+--- a/audio/property.te
++++ b/audio/property.te
+@@ -1 +1 @@
+-type vendor_audio_default_prop, property_type;
++vendor_internal_prop(vendor_audio_default_prop)
+diff --git a/autodetect/true/property.te b/autodetect/true/property.te
+index f1e0a61..e7f417d 100644
+--- a/autodetect/true/property.te
++++ b/autodetect/true/property.te
+@@ -1,11 +1,11 @@
+ # HAL
+ 
+-type hal_prop, property_type;
++vendor_internal_prop(hal_prop)
+ 
+ # LCD
+-type lcd_prop, property_type;
++vendor_internal_prop(lcd_prop)
+ 
+ # Sensors
+ # XXX Why here? I only see access from hald in sepolicy,
+ # but this should be in the proper mixin.
+-type sensor_prop, property_type;
++vendor_internal_prop(sensor_prop)
+diff --git a/avx/property.te b/avx/property.te
+index 94be8f6..41d0113 100644
+--- a/avx/property.te
++++ b/avx/property.te
+@@ -1,2 +1,2 @@
+-type vendor_dalvik_vm_isa_x86_variant_prop, property_type; 
+-type vendor_dalvik_vm_isa_x86_64_variant_prop, property_type; 
++vendor_internal_prop(vendor_dalvik_vm_isa_x86_variant_prop)
++vendor_internal_prop(vendor_dalvik_vm_isa_x86_64_variant_prop)
+diff --git a/bluetooth/common/property.te b/bluetooth/common/property.te
+index d114f39..2489384 100644
+--- a/bluetooth/common/property.te
++++ b/bluetooth/common/property.te
+@@ -1 +1 @@
+-type vendor_bluetooth_prop, property_type;
++vendor_internal_prop(vendor_bluetooth_prop)
+diff --git a/boot-arch/common/property.te b/boot-arch/common/property.te
+index 5600e96..bc91198 100644
+--- a/boot-arch/common/property.te
++++ b/boot-arch/common/property.te
+@@ -1,3 +1,3 @@
+-type msm_prop, property_type;
+-type rpc_default_prop, property_type;
+-type rpc_state_prop, property_type;
++vendor_internal_prop(msm_prop)
++vendor_internal_prop(rpc_default_prop)
++vendor_internal_prop(rpc_state_prop)
+diff --git a/camera/ipu2/property.te b/camera/ipu2/property.te
+index 5ff4657..2e23698 100644
+--- a/camera/ipu2/property.te
++++ b/camera/ipu2/property.te
+@@ -1 +1 @@
+-type vendor_cam_flash_thrtl_prop, property_type;
++vendor_restricted_prop(vendor_cam_flash_thrtl_prop)
+diff --git a/camera/ipu4/property.te b/camera/ipu4/property.te
+index 5ff4657..2e23698 100644
+--- a/camera/ipu4/property.te
++++ b/camera/ipu4/property.te
+@@ -1 +1 @@
+-type vendor_cam_flash_thrtl_prop, property_type;
++vendor_restricted_prop(vendor_cam_flash_thrtl_prop)
+diff --git a/camera/property.te b/camera/property.te
+index 028c77c..bb7a5b1 100644
+--- a/camera/property.te
++++ b/camera/property.te
+@@ -1 +1 @@
+-type vendor_camera_prop, property_type;
++vendor_internal_prop(vendor_camera_prop)
+diff --git a/carplay/property.te b/carplay/property.te
+index ef66114..2f9488a 100644
+--- a/carplay/property.te
++++ b/carplay/property.te
+@@ -1,3 +1 @@
+-type carplay_prop, property_type;
+-
+-allow system_server carplay_prop:file { getattr open read };
++vendor_public_prop(carplay_prop)
+diff --git a/carplay/system_server.te b/carplay/system_server.te
+new file mode 100644
+index 0000000..b921830
+--- /dev/null
++++ b/carplay/system_server.te
+@@ -0,0 +1 @@
++get_prop(system_server, carplay_prop)
+diff --git a/crashlogd/property.te b/crashlogd/property.te
+index bed13ea..7b4544f 100644
+--- a/crashlogd/property.te
++++ b/crashlogd/property.te
+@@ -1,5 +1,5 @@
+-type vendor_crashlogd_prop, property_type;
+-type vendor_core_prop, property_type;
+-type vendor_apklogfs_prop, property_type;
+-type vendor_aplogfs_prop, property_type;
+-type vendor_elogs_prop, property_type;
++vendor_restricted_prop(vendor_crashlogd_prop)
++vendor_internal_prop(vendor_core_prop)
++vendor_internal_prop(vendor_apklogfs_prop)
++vendor_internal_prop(vendor_aplogfs_prop)
++vendor_internal_prop(vendor_elogs_prop)
+diff --git a/evs/property.te b/evs/property.te
+index 37e1a31..8d02b53 100644
+--- a/evs/property.te
++++ b/evs/property.te
+@@ -1 +1 @@
+-type evs_park_prop, property_type;
++vendor_internal_prop(evs_park_prop)
+diff --git a/graphics/mesa/property.te b/graphics/mesa/property.te
+index c6ff5b4..3a52c86 100644
+--- a/graphics/mesa/property.te
++++ b/graphics/mesa/property.te
+@@ -1 +1 @@
+-type vendor_graphics_hwcomposer_prop, property_type;
++vendor_internal_prop(vendor_graphics_hwcomposer_prop)
+diff --git a/kernel/dumpstate.te b/kernel/dumpstate.te
+deleted file mode 100644
+index e69de29..0000000
+diff --git a/load_modules/property.te b/load_modules/property.te
+index 36cdab5..09b94dc 100644
+--- a/load_modules/property.te
++++ b/load_modules/property.te
+@@ -1 +1 @@
+-type vendor_modules_prop, property_type;
++vendor_internal_prop(vendor_modules_prop)
+diff --git a/low-mem/property.te b/low-mem/property.te
+index 949ea95..488c28a 100644
+--- a/low-mem/property.te
++++ b/low-mem/property.te
+@@ -1 +1 @@
+-type vendor_mem_prop, property_type;
++vendor_internal_prop(vendor_mem_prop)
+diff --git a/neuralnetworks/property.te b/neuralnetworks/property.te
+index 08b85c9..801a36e 100644
+--- a/neuralnetworks/property.te
++++ b/neuralnetworks/property.te
+@@ -1 +1 @@
+-type vendor_nnhal_prop, property_type;
++vendor_internal_prop(vendor_nnhal_prop)
+diff --git a/power/property.te b/power/property.te
+index 631ca3f..4e13d0f 100644
+--- a/power/property.te
++++ b/power/property.te
+@@ -1 +1 @@
+-type vendor_power_hal_prop, property_type;
++vendor_internal_prop(vendor_power_hal_prop)
+diff --git a/thermal/logwrapper.te b/thermal/logwrapper.te
+new file mode 100644
+index 0000000..565663c
+--- /dev/null
++++ b/thermal/logwrapper.te
+@@ -0,0 +1 @@
++set_prop(logwrapper, vendor_thermal_prop)
+diff --git a/thermal/property.te b/thermal/property.te
+index 8cab56f..1405680 100644
+--- a/thermal/property.te
++++ b/thermal/property.te
+@@ -1 +1 @@
+-type vendor_thermal_prop, property_type;
++vendor_internal_prop(vendor_thermal_prop)
+diff --git a/usb-gadget/hal/property.te b/usb-gadget/hal/property.te
+index 59fe5d9..fbda56e 100644
+--- a/usb-gadget/hal/property.te
++++ b/usb-gadget/hal/property.te
+@@ -1 +1 @@
+-type vendor_usbconfig_prop, property_type;
++vendor_internal_prop(vendor_usbconfig_prop)
+diff --git a/usb-role-switch/property.te b/usb-role-switch/property.te
+index 346f0cf..45a9b7d 100644
+--- a/usb-role-switch/property.te
++++ b/usb-role-switch/property.te
+@@ -1 +1 @@
+-type vendor_usbrole_prop, property_type;
++vendor_internal_prop(vendor_usbrole_prop)
+diff --git a/wlan/iwlwifi/hal_wifi_default.te b/wlan/iwlwifi/hal_wifi_default.te
+index 4fe1673..f2f2a85 100644
+--- a/wlan/iwlwifi/hal_wifi_default.te
++++ b/wlan/iwlwifi/hal_wifi_default.te
+@@ -1,2 +1,2 @@
+ # Write wlan driver/fw version into property
+-set_prop(hal_wifi_default, vendor_wifi_version)
++set_prop(hal_wifi_default, vendor_wifi_version_prop)
+diff --git a/wlan/iwlwifi/property.te b/wlan/iwlwifi/property.te
+index d90c603..8cd04b0 100644
+--- a/wlan/iwlwifi/property.te
++++ b/wlan/iwlwifi/property.te
+@@ -1 +1 @@
+-type vendor_wifi_version, property_type;
++vendor_internal_prop(vendor_wifi_version_prop)
+diff --git a/wlan/iwlwifi/property_contexts b/wlan/iwlwifi/property_contexts
+index 93701a7..22469a6 100644
+--- a/wlan/iwlwifi/property_contexts
++++ b/wlan/iwlwifi/property_contexts
+@@ -1,2 +1,2 @@
+-vendor.wlan.driver.version u:object_r:vendor_wifi_version:s0
+-vendor.wlan.firmware.version u:object_r:vendor_wifi_version:s0
++vendor.wlan.driver.version u:object_r:vendor_wifi_version_prop:s0
++vendor.wlan.firmware.version u:object_r:vendor_wifi_version_prop:s0
+-- 
+2.25.1
+

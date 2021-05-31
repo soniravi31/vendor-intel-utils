@@ -1,4 +1,4 @@
-From bb5da86493bd3c6e1209a4f0048ecd29dae33f00 Mon Sep 17 00:00:00 2001
+From 333eb681c925ad81c82f45d4f33a7a4e59adf7c5 Mon Sep 17 00:00:00 2001
 From: svenate <salini.venate@intel.com>
 Date: Wed, 5 May 2021 13:02:57 +0530
 Subject: [PATCH] Mixins-spec changes for Android 12 boot
@@ -6,20 +6,18 @@ Subject: [PATCH] Mixins-spec changes for Android 12 boot
 Tracked-On: None
 Signed-off-by: Tanuj Tekriwal <tanuj.tekriwal@intel.com>
 ---
- caas/mixins.spec | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+ caas/mixins.spec | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/caas/mixins.spec b/caas/mixins.spec
-index a687f98..7c37f08 100755
+index 38a1f05..6729e67 100755
 --- a/caas/mixins.spec
 +++ b/caas/mixins.spec
-@@ -10,8 +10,9 @@ product.mk: device.mk
- kernel: gmin64(useprebuilt=false,src_path=kernel/lts2019-chromium, loglevel=7, interactive_governor=false, relative_sleepstates=false, modules_in_bootimg=false, external_modules=,debug_modules=, use_bcmdhd=false, use_iwlwifi=false, extmod_platform=bxt, iwl_defconfig=, cfg_path=config-lts/lts2019-chromium, more_modules=true, yocto_src_path=kernel/lts2019-yocto, yocto_cfg_path=config-lts/lts2019-yocto, chromium_src_path=kernel/lts2019-chromium, chromium_cfg_path=config-lts/lts2019-chromium)
+@@ -11,7 +11,8 @@ kernel: gmin64(useprebuilt=false,src_path=kernel/lts2019-chromium, loglevel=7, i
  disk-bus: auto
  boot-arch: project-celadon(uefi_arch=x86_64,fastboot=efi,ignore_rsci=true,disable_watchdog=true,watchdog_parameters=10 30,verity_warning=false,txe_bind_root_of_trust=false,bootloader_block_size=4096,verity_mode=false,disk_encryption=false,file_encryption=true,metadata_encryption=true,fsverity=true,target=caas,ignore_not_applicable_reset=true,self_usb_device_mode_protocol=true,usb_storage=true,live_boot=true)
--sepolicy: enforcing
+ sepolicy: enforcing
 -bluetooth: btusb(ivi=false)
-+sepolicy: permissive
 +#bluetooth: btusb(ivi=false)
 +bluetooth:false
  audio: project-celadon
@@ -36,5 +34,5 @@ index a687f98..7c37f08 100755
  avb: true
  avx: auto
 -- 
-2.17.1
+2.25.1
 
