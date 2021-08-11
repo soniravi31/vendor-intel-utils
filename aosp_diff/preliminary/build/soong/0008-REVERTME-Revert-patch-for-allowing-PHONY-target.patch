@@ -1,6 +1,6 @@
-From 6c6038c470cc8df3095820090faf5f51a04844c4 Mon Sep 17 00:00:00 2001
+From 17ce45639ac428228be390da0b065b6009f2b73e Mon Sep 17 00:00:00 2001
 From: Tanuj Tekriwal <tanuj.tekriwal@intel.com>
-Date: Tue, 9 Mar 2021 17:17:58 +0530
+Date: Wed, 11 Aug 2021 21:45:15 +0530
 Subject: [PATCH] [REVERTME] Revert patch for allowing PHONY target
 
  commit 6587beddfa79ee06db08625a3673f6b97d7a68bd
@@ -36,7 +36,7 @@ Change-Id: I48bdf330cfc57e410c0ed0302e0d689fd0b642b2
  4 files changed, 7 insertions(+), 6 deletions(-)
 
 diff --git a/ui/build/build.go b/ui/build/build.go
-index c2ad0570b..830c5fe2c 100644
+index 8f050d9be..b49f43743 100644
 --- a/ui/build/build.go
 +++ b/ui/build/build.go
 @@ -60,6 +60,7 @@ builddir = {{.OutDir}}
@@ -44,11 +44,11 @@ index c2ad0570b..830c5fe2c 100644
  pool highmem_pool
   depth = {{.HighmemParallel}}
 +build _kati_always_build_: phony
- {{if .HasKatiSuffix}}subninja {{.KatiBuildNinjaFile}}
+ {{if and (not .SkipKatiNinja) .HasKatiSuffix}}subninja {{.KatiBuildNinjaFile}}
  subninja {{.KatiPackageNinjaFile}}
  {{end -}}
 diff --git a/ui/build/kati.go b/ui/build/kati.go
-index 2b7a8c32b..39b668de3 100644
+index fa5f2c5af..9ab97b288 100644
 --- a/ui/build/kati.go
 +++ b/ui/build/kati.go
 @@ -85,7 +85,7 @@ func runKati(ctx Context, config Config, extraSuffix string, args []string, envF
@@ -74,10 +74,10 @@ index 5961c4525..e3b59481e 100644
  		"-w", "missingdepfile=err")
  
 diff --git a/ui/build/soong.go b/ui/build/soong.go
-index a41dbe1b5..292e70102 100644
+index 87818e386..51e359400 100644
 --- a/ui/build/soong.go
 +++ b/ui/build/soong.go
-@@ -271,11 +271,11 @@ func runSoong(ctx Context, config Config) {
+@@ -272,11 +272,11 @@ func runSoong(ctx Context, config Config) {
  			config.PrebuiltBuildTool("ninja"),
  			"-d", "keepdepfile",
  			"-d", "stats",

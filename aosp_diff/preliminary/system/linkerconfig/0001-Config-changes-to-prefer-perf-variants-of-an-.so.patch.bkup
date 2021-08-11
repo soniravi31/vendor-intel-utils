@@ -1,6 +1,6 @@
-From 1a1143d34e3a6a9cd9b17f1c9dd2ecf7dcfb8ebe Mon Sep 17 00:00:00 2001
-From: Tanuj Tekriwal <tanuj.tekriwal@intel.com>
-Date: Fri, 16 Jul 2021 00:43:18 +0530
+From b83d6548eea84e65898d4044ef37038ceb009848 Mon Sep 17 00:00:00 2001
+From: Vinay Kompella <vinay.kompella@intel.com>
+Date: Mon, 24 May 2021 14:47:59 +0530
 Subject: [PATCH] Config changes to prefer perf variants of an .so
 
 This patch introduces changes in linkerconfig to
@@ -13,16 +13,29 @@ Change-Id: If614e5020980775f67dfb59a698a5889db3dc820
 Tracked-On: OAM-94488
 Signed-off-by: Vinay Kompella <vinay.kompella@intel.com>
 ---
+ contents/namespace/art.cc                  |  1 +
  contents/namespace/rs.cc                   |  6 ++++++
- contents/namespace/systemdefault.cc        |  7 +++++++
+ contents/namespace/systemdefault.cc        |  8 +++++++-
  contents/namespace/vndk.cc                 |  6 ++++++
  modules/environment.cc                     | 21 +++++++++++++++++++++
  modules/include/linkerconfig/environment.h |  2 ++
  modules/namespace.cc                       | 10 ++++++++++
- 6 files changed, 52 insertions(+)
+ 7 files changed, 53 insertions(+), 1 deletion(-)
 
+diff --git a/contents/namespace/art.cc b/contents/namespace/art.cc
+index c38390cc0e30..e826fba4e1a9 100644
+--- a/contents/namespace/art.cc
++++ b/contents/namespace/art.cc
+@@ -17,6 +17,7 @@
+ // This namespace exposes externally accessible libraries from the ART APEX.
+ // Keep in sync with the "art" namespace in art/build/apex/ld.config.txt.
+ 
++#include "linkerconfig/environment.h"
+ #include "linkerconfig/namespacebuilder.h"
+ 
+ using android::linkerconfig::modules::ApexInfo;
 diff --git a/contents/namespace/rs.cc b/contents/namespace/rs.cc
-index 2533467..f5526d6 100644
+index 253346746f6e..f5526d6f60f1 100644
 --- a/contents/namespace/rs.cc
 +++ b/contents/namespace/rs.cc
 @@ -19,6 +19,7 @@
@@ -46,39 +59,40 @@ index 2533467..f5526d6 100644
                     "/${LIB}");
    ns.AddSearchPath("/odm/${LIB}");
 diff --git a/contents/namespace/systemdefault.cc b/contents/namespace/systemdefault.cc
-index 0d5c42b..a2f4d54 100644
+index d28cc21aa5c5..9162d89a9616 100644
 --- a/contents/namespace/systemdefault.cc
 +++ b/contents/namespace/systemdefault.cc
-@@ -74,6 +74,10 @@ void SetupSystemPermittedPaths(Namespace* ns) {
-       "/system/${LIB}/bootstrap",
-   };
- 
-+  if (modules::PlatformSupportsISAFeature("avx2")) {
-+    ns->AddPermittedPath("/system/${LIB}" + modules::GetSearchPathForISAFeature("avx2"));
-+  }
-+
-   for (const std::string& path : permitted_paths) {
-     ns->AddPermittedPath(path);
-   }
-@@ -94,6 +98,9 @@ Namespace BuildSystemDefaultNamespace([[maybe_unused]] const Context& ctx) {
+@@ -38,7 +38,9 @@ Namespace BuildSystemDefaultNamespace([[maybe_unused]] const Context& ctx) {
+   Namespace ns("default",
                 /*is_isolated=*/is_fully_treblelized,
                 /*is_visible=*/true);
- 
+-
 +  if (modules::PlatformSupportsISAFeature("avx2")) {
 +    ns.AddSearchPath("/system/${LIB}" + modules::GetSearchPathForISAFeature("avx2"));
 +  }
    ns.AddSearchPath("/system/${LIB}");
    ns.AddSearchPath(system_ext + "/${LIB}");
    if (!IsProductVndkVersionDefined() || !is_fully_treblelized) {
+@@ -92,6 +94,10 @@ Namespace BuildSystemDefaultNamespace([[maybe_unused]] const Context& ctx) {
+         "/apex/com.android.runtime/${LIB}/bionic",
+         "/system/${LIB}/bootstrap"};
+ 
++    if (modules::PlatformSupportsISAFeature("avx2")) {
++      ns.AddPermittedPath("/system/${LIB}" + modules::GetSearchPathForISAFeature("avx2"));
++    }
++
+     for (const auto& path : permitted_paths) {
+       ns.AddPermittedPath(path);
+     }
 diff --git a/contents/namespace/vndk.cc b/contents/namespace/vndk.cc
-index 556dfed..f7d7712 100644
+index 556dfed99c42..90c582aca8aa 100644
 --- a/contents/namespace/vndk.cc
 +++ b/contents/namespace/vndk.cc
 @@ -75,6 +75,12 @@ Namespace BuildVndkNamespace([[maybe_unused]] const Context& ctx,
      }
    }
  
-+  if (modules::PlatformSupportsISAFeature("avx2")) {
++   if (modules::PlatformSupportsISAFeature("avx2")) {
 +    ns.AddSearchPath(
 +        "/apex/com.android.vndk.v" + vndk_version + "/${LIB}" +
 +         modules::GetSearchPathForISAFeature("avx2"));
@@ -88,7 +102,7 @@ index 556dfed..f7d7712 100644
    ns.AddSearchPath("/apex/com.android.vndk.v" + vndk_version + "/${LIB}");
  
 diff --git a/modules/environment.cc b/modules/environment.cc
-index 82801f3..4b8c4e1 100644
+index 82801f325624..4b8c4e112653 100644
 --- a/modules/environment.cc
 +++ b/modules/environment.cc
 @@ -23,6 +23,9 @@
@@ -127,7 +141,7 @@ index 82801f3..4b8c4e1 100644
  }  // namespace linkerconfig
  }  // namespace android
 diff --git a/modules/include/linkerconfig/environment.h b/modules/include/linkerconfig/environment.h
-index 3aa0d32..4a4b324 100644
+index 3aa0d324feb7..4a4b324532a1 100644
 --- a/modules/include/linkerconfig/environment.h
 +++ b/modules/include/linkerconfig/environment.h
 @@ -26,6 +26,8 @@ std::string GetVendorVndkVersion();
@@ -140,7 +154,7 @@ index 3aa0d32..4a4b324 100644
  }  // namespace linkerconfig
  }  // namespace android
 diff --git a/modules/namespace.cc b/modules/namespace.cc
-index 92fd878..6455316 100644
+index 230a0938ee15..e31b82095851 100644
 --- a/modules/namespace.cc
 +++ b/modules/namespace.cc
 @@ -20,6 +20,7 @@
@@ -151,7 +165,7 @@ index 92fd878..6455316 100644
  
  using android::base::Result;
  
-@@ -53,8 +54,17 @@ namespace linkerconfig {
+@@ -54,8 +55,17 @@ namespace linkerconfig {
  namespace modules {
  
  void InitializeWithApex(Namespace& ns, const ApexInfo& apex_info) {

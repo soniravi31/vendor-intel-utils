@@ -1,7 +1,7 @@
-From afbe327a99affa7a5be3a306fee5e97487064e04 Mon Sep 17 00:00:00 2001
+From a9f6c4e7312f80456854c52e8b2e95a01d04418a Mon Sep 17 00:00:00 2001
 From: Tanuj Tekriwal <tanuj.tekriwal@intel.com>
-Date: Wed, 20 Jan 2021 19:01:12 +0530
-Subject: [PATCH] Remove libgbm creation twice
+Date: Wed, 11 Aug 2021 21:50:00 +0530
+Subject: [PATCH 2/2] Remove libgbm creation twice
 
 Remove the libgbm creation as it is already created in
 hardware/intel/external/mesa3d-intel/src/gbm/Android.mk
@@ -13,10 +13,10 @@ Change-Id: I76a31dd686c5ff425cb45227dda771591be60358
  1 file changed, 26 deletions(-)
 
 diff --git a/Android.bp b/Android.bp
-index 458bcc9..c5b5775 100644
+index e7dfff8..12d1a20 100644
 --- a/Android.bp
 +++ b/Android.bp
-@@ -87,32 +87,6 @@ cc_defaults {
+@@ -121,32 +121,6 @@ cc_defaults {
      export_include_dirs: ["."],
  }
  
@@ -46,8 +46,8 @@ index 458bcc9..c5b5775 100644
 -    ],
 -}
 -
- cc_library_static {
-     name: "libminigbm_cros_gralloc",
+ cc_defaults {
+     name: "libminigbm_cros_gralloc_defaults",
      defaults: ["minigbm_cros_gralloc_defaults"],
 -- 
 2.17.1
