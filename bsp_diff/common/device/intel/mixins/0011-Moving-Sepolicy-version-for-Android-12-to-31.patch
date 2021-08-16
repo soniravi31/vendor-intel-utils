@@ -1,0 +1,26 @@
+From ea3df2b1d595ec73a6c143dc13614bf113fc0a03 Mon Sep 17 00:00:00 2001
+From: Tanuj Tekriwal <tanuj.tekriwal@intel.com>
+Date: Mon, 16 Aug 2021 19:04:50 +0530
+Subject: [PATCH] Moving Sepolicy version for Android 12 to 31
+
+Tracked-On: NA
+Signed-off-by: Tanuj Tekriwal <tanuj.tekriwal@intel.com>
+---
+ groups/device-specific/caas/manifest.xml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/groups/device-specific/caas/manifest.xml b/groups/device-specific/caas/manifest.xml
+index 9bd1c09..4a589e2 100644
+--- a/groups/device-specific/caas/manifest.xml
++++ b/groups/device-specific/caas/manifest.xml
+@@ -171,6 +171,6 @@
+     </hal>
+     <kernel target-level="5"/>
+     <sepolicy>
+-        <version>30.0</version>
++        <version>31.0</version>
+     </sepolicy>
+ </manifest>
+-- 
+2.17.1
+
