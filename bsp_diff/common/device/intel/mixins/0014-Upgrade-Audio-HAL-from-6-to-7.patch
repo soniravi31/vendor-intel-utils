@@ -1,0 +1,76 @@
+From 39fe75580a257117afb58e25568d8c16bfb8023c Mon Sep 17 00:00:00 2001
+From: pmandri <padmashree.mandri@intel.com>
+Date: Tue, 17 Aug 2021 14:42:03 +0530
+Subject: [PATCH] Upgrade Audio HAL from 6 to 7
+
+Updated files: product.mk, framework_manifest.xml and manifest.xml
+Tracked-On: OAM-97778
+Signed-off-by: pmandri <padmashree.mandri@intel.com>
+---
+ groups/audio/project-celadon/product.mk            | 4 ++--
+ groups/device-specific/caas/framework_manifest.xml | 4 ++--
+ groups/device-specific/caas/manifest.xml           | 4 ++--
+ 3 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/groups/audio/project-celadon/product.mk b/groups/audio/project-celadon/product.mk
+index bdc62a9..683f237 100755
+--- a/groups/audio/project-celadon/product.mk
++++ b/groups/audio/project-celadon/product.mk
+@@ -30,8 +30,8 @@ PRODUCT_PACKAGES += \
+ 
+ # Audio HAL
+ PRODUCT_PACKAGES += \
+-    android.hardware.audio.effect@6.0-impl \
+-    android.hardware.audio@6.0-impl \
++    android.hardware.audio.effect@7.0-impl \
++    android.hardware.audio@7.0-impl \
+     android.hardware.audio@2.0-service
+ 
+ #Audio policy engine configuration files
+diff --git a/groups/device-specific/caas/framework_manifest.xml b/groups/device-specific/caas/framework_manifest.xml
+index 3bae900..a2f57b0 100644
+--- a/groups/device-specific/caas/framework_manifest.xml
++++ b/groups/device-specific/caas/framework_manifest.xml
+@@ -53,7 +53,7 @@
+     <hal format="hidl">
+         <name>android.hardware.audio</name>
+         <transport>hwbinder</transport>
+-        <version>6.0</version>
++        <version>7.0</version>
+         <interface>
+             <name>IDevicesFactory</name>
+             <instance>default</instance>
+@@ -62,7 +62,7 @@
+     <hal format="hidl">
+         <name>android.hardware.audio.effect</name>
+         <transport>hwbinder</transport>
+-        <version>6.0</version>
++        <version>7.0</version>
+         <interface>
+             <name>IEffectsFactory</name>
+             <instance>default</instance>
+diff --git a/groups/device-specific/caas/manifest.xml b/groups/device-specific/caas/manifest.xml
+index ae7f38e..134b51f 100644
+--- a/groups/device-specific/caas/manifest.xml
++++ b/groups/device-specific/caas/manifest.xml
+@@ -44,7 +44,7 @@
+     <hal format="hidl">
+         <name>android.hardware.audio</name>
+         <transport>hwbinder</transport>
+-        <version>6.0</version>
++        <version>7.0</version>
+         <interface>
+             <name>IDevicesFactory</name>
+             <instance>default</instance>
+@@ -53,7 +53,7 @@
+     <hal format="hidl">
+         <name>android.hardware.audio.effect</name>
+         <transport>hwbinder</transport>
+-        <version>6.0</version>
++        <version>7.0</version>
+         <interface>
+             <name>IEffectsFactory</name>
+             <instance>default</instance>
+-- 
+2.17.1
+
