@@ -1,0 +1,60 @@
+From 66f762e5416c643607c95eca3390ba2e9bc37790 Mon Sep 17 00:00:00 2001
+From: "ji, zhenlong z" <zhenlong.z.ji@intel.com>
+Date: Tue, 21 Sep 2021 00:18:51 +0800
+Subject: [PATCH] Update bootctrl from v1.1 to v1.2
+
+Tracked-On: OAM-99215
+Signed-off-by: ji, zhenlong z <zhenlong.z.ji@intel.com>
+---
+ groups/device-specific/caas/framework_manifest.xml | 2 +-
+ groups/device-specific/caas/manifest.xml           | 2 +-
+ groups/slot-ab/true/product.mk                     | 7 ++++---
+ 3 files changed, 6 insertions(+), 5 deletions(-)
+
+diff --git a/groups/device-specific/caas/framework_manifest.xml b/groups/device-specific/caas/framework_manifest.xml
+index d2a05eb..7d7ce88 100644
+--- a/groups/device-specific/caas/framework_manifest.xml
++++ b/groups/device-specific/caas/framework_manifest.xml
+@@ -166,7 +166,7 @@
+     <hal format="hidl">
+         <name>android.hardware.boot</name>
+         <transport>hwbinder</transport>
+-        <version>1.1</version>
++        <version>1.2</version>
+         <interface>
+             <name>IBootControl</name>
+             <instance>default</instance>
+diff --git a/groups/device-specific/caas/manifest.xml b/groups/device-specific/caas/manifest.xml
+index 5d28424..0c4f7bf 100644
+--- a/groups/device-specific/caas/manifest.xml
++++ b/groups/device-specific/caas/manifest.xml
+@@ -127,7 +127,7 @@
+     <hal format="hidl">
+         <name>android.hardware.boot</name>
+         <transport>hwbinder</transport>
+-        <version>1.1</version>
++        <version>1.2</version>
+         <interface>
+             <name>IBootControl</name>
+             <instance>default</instance>
+diff --git a/groups/slot-ab/true/product.mk b/groups/slot-ab/true/product.mk
+index 2c8eae4..e4d6e82 100644
+--- a/groups/slot-ab/true/product.mk
++++ b/groups/slot-ab/true/product.mk
+@@ -5,9 +5,10 @@ PRODUCT_PACKAGES += \
+     libavb \
+     update_engine_sideload \
+     avbctl \
+-    android.hardware.boot@1.1-impl \
+-    android.hardware.boot@1.1-impl.recovery \
+-    android.hardware.boot@1.1-service
++    android.hardware.boot@1.2-impl-intel \
++    android.hardware.boot@1.2-impl-intel.recovery \
++    android.hardware.boot@1.2-service \
++    bootctrl.intel
+ 
+ PRODUCT_PROPERTY_OVERRIDES += \
+     ro.hardware.bootctrl=intel
+-- 
+2.25.1
+
