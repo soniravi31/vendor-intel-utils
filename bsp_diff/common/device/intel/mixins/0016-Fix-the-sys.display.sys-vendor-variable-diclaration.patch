@@ -1,0 +1,29 @@
+From dd18e17315135f099c1eae94e1d13a10288bc1e7 Mon Sep 17 00:00:00 2001
+From: Tanuj Tekriwal <tanuj.tekriwal@intel.com>
+Date: Thu, 23 Sep 2021 21:31:23 +0530
+Subject: [PATCH] Fix the sys.display.sys vendor variable diclaration
+
+vendor defined properties should start with vendor.***
+
+Tracked-On: NA
+Signed-off-by: Tanuj Tekriwal <tanuj.tekriwal@intel.com>
+---
+ groups/aaf/cfc/init.rc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/groups/aaf/cfc/init.rc b/groups/aaf/cfc/init.rc
+index dbbffb4..1b77062 100644
+--- a/groups/aaf/cfc/init.rc
++++ b/groups/aaf/cfc/init.rc
+@@ -3,7 +3,7 @@ on fs
+     mount 9p aaf /mnt/share
+     exec - system system -- /vendor/bin/logwrapper /vendor/bin/sh /vendor/bin/auto_detection.sh
+     setprop ro.hardware.hwcomposer remote
+-    setprop sys.display.size 540x960
++    setprop vendor.sys.display.size 540x960
+     setprop ro.hardware.gralloc ${vendor.gralloc.set}
+     setprop ro.power.fixed_performance_scale_factor ${vendor.power.fixed_performance_scale_factor}
+     setprop ro.media.xml_variant.codecs ${ro.vendor.media.target_variant}
+-- 
+2.17.1
+
