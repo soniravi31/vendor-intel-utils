@@ -1,0 +1,42 @@
+From f83541c4023e8cef1374f817e0d2cc1f13dbd647 Mon Sep 17 00:00:00 2001
+From: svenate <salini.venate@intel.com>
+Date: Fri, 24 Sep 2021 08:21:55 +0530
+Subject: [PATCH] Enable API level 31 and target level 6 for Android 12
+
+This patch changes the shipping api level to 31 and
+target-level to 6 for android 12
+
+Tracked-On: OAM-99300
+Signed-off-by: svenate <salini.venate@intel.com>
+---
+ groups/device-specific/caas/caas.mk      | 2 +-
+ groups/device-specific/caas/manifest.xml | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/groups/device-specific/caas/caas.mk b/groups/device-specific/caas/caas.mk
+index a3d92fb..5d48444 100644
+--- a/groups/device-specific/caas/caas.mk
++++ b/groups/device-specific/caas/caas.mk
+@@ -60,7 +60,7 @@ PRODUCT_AAPT_PREF_CONFIG := mdpi
+ 
+ PRODUCT_RESTRICT_VENDOR_FILES := false
+ {{^ota-update}}
+-PRODUCT_SHIPPING_API_LEVEL := 30
++PRODUCT_SHIPPING_API_LEVEL := 31
+ PRODUCT_OTA_ENFORCE_VINTF_KERNEL_REQUIREMENTS := true
+ {{/ota-update}}
+ {{#ota-update}}
+diff --git a/groups/device-specific/caas/manifest.xml b/groups/device-specific/caas/manifest.xml
+index 2c5e8d0..29b836d 100644
+--- a/groups/device-specific/caas/manifest.xml
++++ b/groups/device-specific/caas/manifest.xml
+@@ -1,5 +1,5 @@
+ {{^ota-update}}
+-<manifest version="1.0" type="device" target-level="5">
++<manifest version="1.0" type="device" target-level="6">
+ {{/ota-update}}
+ {{#ota-update}}
+ <manifest version="1.0" type="device">
+-- 
+2.17.1
+
