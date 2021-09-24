@@ -1,0 +1,30 @@
+From dafe28d16c10e23891126ab5ee01ebc00cce992f Mon Sep 17 00:00:00 2001
+From: Tanuj Tekriwal <tanuj.tekriwal@intel.com>
+Date: Fri, 24 Sep 2021 17:59:06 +0530
+Subject: [PATCH] [REVERTME] Disable Memtrack HAL
+
+Disable HIDL Memtrack HAL.
+Enable AIDL Hal later and merge.
+
+Tracked-On: NA
+Signed-off-by: Tanuj Tekriwal <tanuj.tekriwal@intel.com>
+---
+ caas/mixins.spec | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/caas/mixins.spec b/caas/mixins.spec
+index 23f7a1e..b6c2638 100755
+--- a/caas/mixins.spec
++++ b/caas/mixins.spec
+@@ -54,7 +54,7 @@ power: true(power_throttle=true)
+ debug-usb-config: true(source_dev=dvcith-0-msc0)
+ intel_prop: true
+ trusty: true(ref_target=celadon_64)
+-memtrack: true
++memtrack: false
+ avb: true
+ avx: auto
+ health: hal
+-- 
+2.17.1
+
