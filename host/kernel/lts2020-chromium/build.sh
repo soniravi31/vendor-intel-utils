@@ -3,11 +3,11 @@
 rm -rf host_kernel
 mkdir -p host_kernel
 cd host_kernel
-git clone https://github.com/projectceladon/linux-intel-lts2019-chromium.git
-cd linux-intel-lts2019-chromium
-git checkout b0e76b9546acfb24e42f910bf7b842de38f7ecea
-cp ../../x86_64_defconfig .config
-patch_list=`find ../../ -iname "*.patch" | sort -u`
+git clone https://github.com/projectceladon/vendor-intel-utils
+git clone https://github.com/projectceladon/linux-intel-lts2020-chromium.git
+cd linux-intel-lts2020-chromium
+cp ../vendor-intel-utils/host/kernel/lts2020-chromium/x86_64_defconfig .config
+patch_list=`find ../vendor-intel-utils/host/kernel/lts2020-chromium -iname "*.patch" | sort -u`
 for i in $patch_list
 do
   a=`grep "Date: " $i`
