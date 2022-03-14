@@ -1,0 +1,29 @@
+From 152c72d3d5e163969052cc72f6be784207499caf Mon Sep 17 00:00:00 2001
+From: "Senapati, Rasmiranjan" <rasmiranjan.senapati@intel.com>
+Date: Tue, 15 Mar 2022 04:22:06 +0000
+Subject: [PATCH] Updating the Sepolicy version to 32
+
+Updating the Sepolicy version to 32 to resolve the below error
+"Cannot override existing value 31.0 with
+BOARD_SEPOLICY_VERS (which is 32.0)."
+
+Signed-off-by: Senapati, Rasmiranjan <rasmiranjan.senapati@intel.com>
+---
+ groups/device-specific/caas/manifest.xml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/groups/device-specific/caas/manifest.xml b/groups/device-specific/caas/manifest.xml
+index be32a09..0fbe3e7 100644
+--- a/groups/device-specific/caas/manifest.xml
++++ b/groups/device-specific/caas/manifest.xml
+@@ -165,6 +165,6 @@
+     </hal>
+     <kernel target-level="5"/>
+     <sepolicy>
+-        <version>31.0</version>
++        <version>32.0</version>
+     </sepolicy>
+ </manifest>
+-- 
+2.33.1
+
