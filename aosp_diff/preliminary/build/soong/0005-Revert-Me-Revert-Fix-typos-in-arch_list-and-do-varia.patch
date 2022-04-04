@@ -1,0 +1,157 @@
+From a3ef3995fe34e2f8ca74b59df1ae31899e43986a Mon Sep 17 00:00:00 2001
+From: svenate <salini.venate@intel.com>
+Date: Tue, 29 Mar 2022 10:37:40 +0530
+Subject: [PATCH] [REVERTME] Revert "Fix typos in arch_list and do variant
+ validation"
+
+This reverts commit 2c2afe26ea3b22f03aa095620a1649e85cf4fa1d.
+
+This is a WA patch to fix below build issue:
+["x86"] unknown cpu variant "silvermont", support variants: []
+---
+ android/arch.go            | 16 ---------
+ android/arch_list.go       | 67 +++++++++++++++++---------------------
+ cc/config/x86_64_device.go |  2 +-
+ 3 files changed, 30 insertions(+), 55 deletions(-)
+
+diff --git a/android/arch.go b/android/arch.go
+index 8aa8d4043..a7f602979 100644
+--- a/android/arch.go
++++ b/android/arch.go
+@@ -865,10 +865,6 @@ func createArchPropTypeDesc(props reflect.Type) []archPropTypeDesc {
+ 				archVariant := variantReplacer.Replace(archVariant)
+ 				variants = append(variants, proptools.FieldNameForProperty(archVariant))
+ 			}
+-			for _, cpuVariant := range cpuVariants[arch] {
+-				cpuVariant := variantReplacer.Replace(cpuVariant)
+-				variants = append(variants, proptools.FieldNameForProperty(cpuVariant))
+-			}
+ 			for _, feature := range archFeatures[arch] {
+ 				feature := variantReplacer.Replace(feature)
+ 				variants = append(variants, proptools.FieldNameForProperty(feature))
+@@ -1775,18 +1771,6 @@ func decodeArch(os OsType, arch string, archVariant, cpuVariant *string, abi []s
+ 		a.CpuVariant = ""
+ 	}
+ 
+-	if a.ArchVariant != "" {
+-		if validArchVariants := archVariants[archType]; !InList(a.ArchVariant, validArchVariants) {
+-			return Arch{}, fmt.Errorf("[%q] unknown arch variant %q, support variants: %q", archType, a.ArchVariant, validArchVariants)
+-		}
+-	}
+-
+-	if a.CpuVariant != "" {
+-		if validCpuVariants := cpuVariants[archType]; !InList(a.CpuVariant, validCpuVariants) {
+-			return Arch{}, fmt.Errorf("[%q] unknown cpu variant %q, support variants: %q", archType, a.CpuVariant, validCpuVariants)
+-		}
+-	}
+-
+ 	// Filter empty ABIs out of the list.
+ 	for i := 0; i < len(a.Abi); i++ {
+ 		if a.Abi[i] == "" {
+diff --git a/android/arch_list.go b/android/arch_list.go
+index cbf8e7a02..06e09ad95 100644
+--- a/android/arch_list.go
++++ b/android/arch_list.go
+@@ -20,12 +20,38 @@ var archVariants = map[ArchType][]string{
+ 		"armv7-a-neon",
+ 		"armv8-a",
+ 		"armv8-2a",
++		"cortex-a7",
++		"cortex-a8",
++		"cortex-a9",
++		"cortex-a15",
++		"cortex-a53",
++		"cortex-a53-a57",
++		"cortex-a55",
++		"cortex-a72",
++		"cortex-a73",
++		"cortex-a75",
++		"cortex-a76",
++		"krait",
++		"kryo",
++		"kryo385",
++		"exynos-m1",
++		"exynos-m2",
+ 	},
+ 	Arm64: {
+-		"armv8-a",
+-		"armv8-a-branchprot",
+-		"armv8-2a",
++		"armv8_a",
++		"armv8_a_branchprot",
++		"armv8_2a",
+ 		"armv8-2a-dotprod",
++		"cortex-a53",
++		"cortex-a55",
++		"cortex-a72",
++		"cortex-a73",
++		"cortex-a75",
++		"cortex-a76",
++		"kryo",
++		"kryo385",
++		"exynos-m1",
++		"exynos-m2",
+ 	},
+ 	X86: {
+ 		"amberlake",
+@@ -59,41 +85,6 @@ var archVariants = map[ArchType][]string{
+ 	},
+ }
+ 
+-var cpuVariants = map[ArchType][]string{
+-	Arm: {
+-		"cortex-a7",
+-		"cortex-a8",
+-		"cortex-a9",
+-		"cortex-a15",
+-		"cortex-a53",
+-		"cortex-a53.a57",
+-		"cortex-a55",
+-		"cortex-a72",
+-		"cortex-a73",
+-		"cortex-a75",
+-		"cortex-a76",
+-		"krait",
+-		"kryo",
+-		"kryo385",
+-		"exynos-m1",
+-		"exynos-m2",
+-	},
+-	Arm64: {
+-		"cortex-a53",
+-		"cortex-a55",
+-		"cortex-a72",
+-		"cortex-a73",
+-		"cortex-a75",
+-		"cortex-a76",
+-		"kryo",
+-		"kryo385",
+-		"exynos-m1",
+-		"exynos-m2",
+-	},
+-	X86:    {},
+-	X86_64: {},
+-}
+-
+ var archFeatures = map[ArchType][]string{
+ 	Arm: {
+ 		"neon",
+diff --git a/cc/config/x86_64_device.go b/cc/config/x86_64_device.go
+index 164e7a67f..a8170ced8 100644
+--- a/cc/config/x86_64_device.go
++++ b/cc/config/x86_64_device.go
+@@ -37,10 +37,10 @@ var (
+ 		"": []string{
+ 			"-march=x86-64",
+ 		},
+-
+ 		"broadwell": []string{
+ 			"-march=broadwell",
+ 		},
++
+ 		"haswell": []string{
+ 			"-march=core-avx2",
+ 		},
+-- 
+2.17.1
+

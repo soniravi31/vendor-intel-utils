@@ -1,0 +1,27 @@
+From d2816dff34ec953144ad8f98e65ce472771cdc0a Mon Sep 17 00:00:00 2001
+From: svenate <salini.venate@intel.com>
+Date: Wed, 16 Mar 2022 00:46:57 +0530
+Subject: [PATCH] REVERT-ME: Remove sepolicy version for T bring-up
+
+Signed-off-by: svenate <salini.venate@intel.com>
+---
+ groups/device-specific/caas/manifest.xml | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/groups/device-specific/caas/manifest.xml b/groups/device-specific/caas/manifest.xml
+index d4d5041..43b127a 100644
+--- a/groups/device-specific/caas/manifest.xml
++++ b/groups/device-specific/caas/manifest.xml
+@@ -164,7 +164,7 @@
+         </interface>
+     </hal>
+     <kernel target-level="5"/>
+-    <sepolicy>
++    <!--<sepolicy>
+         <version>31.0</version>
+-    </sepolicy>
++    </sepolicy>-->
+ </manifest>
+-- 
+2.17.1
+

@@ -1,0 +1,611 @@
+From 6bdbe952d94491c8da482d0ca294b95390d994c9 Mon Sep 17 00:00:00 2001
+From: svenate <salini.venate@intel.com>
+Date: Tue, 29 Mar 2022 10:42:50 +0530
+Subject: [PATCH] [REVERTME] Revert "Export variant/features via
+ soong_injection"
+
+This is a WA patch to fix below build issue:
+["x86"] unknown cpu variant "silvermont", support variants: []
+
+This reverts commit e8303bd0ae8b631ad92a9c438b8cf23410d65526.
+---
+ android/arch.go             | 49 ++++----------------
+ android/arch_list.go        | 31 +++++++++----
+ android/arch_test.go        |  6 ++-
+ bp2build/conversion.go      |  2 -
+ bp2build/conversion_test.go |  4 --
+ cc/config/arm64_device.go   | 42 ++++++++---------
+ cc/config/arm_device.go     | 17 +++----
+ cc/config/bp2build.go       | 89 ++++++-------------------------------
+ cc/config/bp2build_test.go  | 47 +-------------------
+ cc/config/x86_64_device.go  | 10 +++++
+ 10 files changed, 83 insertions(+), 214 deletions(-)
+
+diff --git a/android/arch.go b/android/arch.go
+index 8aa8d4043..0f07b26c9 100644
+--- a/android/arch.go
++++ b/android/arch.go
+@@ -22,7 +22,6 @@ import (
+ 	"strings"
+ 
+ 	"android/soong/bazel"
+-	"android/soong/starlark_fmt"
+ 
+ 	"github.com/google/blueprint"
+ 	"github.com/google/blueprint/bootstrap"
+@@ -1795,9 +1794,14 @@ func decodeArch(os OsType, arch string, archVariant, cpuVariant *string, abi []s
+ 		}
+ 	}
+ 
+-	// Set ArchFeatures from the arch type. for Android OS, other os-es do not specify features
+-	if os == Android {
+-		if featureMap, ok := androidArchFeatureMap[archType]; ok {
++	if a.ArchVariant == "" {
++		// Set ArchFeatures from the default arch features.
++		if featureMap, ok := defaultArchFeatureMap[os]; ok {
++			a.ArchFeatures = featureMap[archType]
++		}
++	} else {
++		// Set ArchFeatures from the arch type.
++		if featureMap, ok := archFeatureMap[archType]; ok {
+ 			a.ArchFeatures = featureMap[a.ArchVariant]
+ 		}
+ 	}
+@@ -2235,40 +2239,3 @@ func mergeStructs(ctx ArchVariantContext, propertyStructs []reflect.Value, prope
+ 
+ 	return value
+ }
+-
+-func printArchTypeStarlarkDict(dict map[ArchType][]string) string {
+-	valDict := make(map[string]string, len(dict))
+-	for k, v := range dict {
+-		valDict[k.String()] = starlark_fmt.PrintStringList(v, 1)
+-	}
+-	return starlark_fmt.PrintDict(valDict, 0)
+-}
+-
+-func printArchTypeNestedStarlarkDict(dict map[ArchType]map[string][]string) string {
+-	valDict := make(map[string]string, len(dict))
+-	for k, v := range dict {
+-		valDict[k.String()] = starlark_fmt.PrintStringListDict(v, 1)
+-	}
+-	return starlark_fmt.PrintDict(valDict, 0)
+-}
+-
+-func StarlarkArchConfigurations() string {
+-	return fmt.Sprintf(`
+-_arch_to_variants = %s
+-
+-_arch_to_cpu_variants = %s
+-
+-_arch_to_features = %s
+-
+-_android_arch_feature_for_arch_variant = %s
+-
+-arch_to_variants = _arch_to_variants
+-arch_to_cpu_variants = _arch_to_cpu_variants
+-arch_to_features = _arch_to_features
+-android_arch_feature_for_arch_variants = _android_arch_feature_for_arch_variant
+-`, printArchTypeStarlarkDict(archVariants),
+-		printArchTypeStarlarkDict(cpuVariants),
+-		printArchTypeStarlarkDict(archFeatures),
+-		printArchTypeNestedStarlarkDict(androidArchFeatureMap),
+-	)
+-}
+diff --git a/android/arch_list.go b/android/arch_list.go
+index cbf8e7a02..79ad4afac 100644
+--- a/android/arch_list.go
++++ b/android/arch_list.go
+@@ -14,6 +14,8 @@
+ 
+ package android
+ 
++import "fmt"
++
+ var archVariants = map[ArchType][]string{
+ 	Arm: {
+ 		"armv7-a",
+@@ -126,7 +128,7 @@ var archFeatures = map[ArchType][]string{
+ 	},
+ }
+ 
+-var androidArchFeatureMap = map[ArchType]map[string][]string{
++var archFeatureMap = map[ArchType]map[string][]string{
+ 	Arm: {
+ 		"armv7-a-neon": {
+ 			"neon",
+@@ -277,13 +279,6 @@ var androidArchFeatureMap = map[ArchType]map[string][]string{
+ 		},
+ 	},
+ 	X86_64: {
+-		"" /*default */ : {
+-			"ssse3",
+-			"sse4",
+-			"sse4_1",
+-			"sse4_2",
+-			"popcnt",
+-		},
+ 		"amberlake": {
+ 			"ssse3",
+ 			"sse4",
+@@ -403,3 +398,23 @@ var androidArchFeatureMap = map[ArchType]map[string][]string{
+ 		},
+ 	},
+ }
++
++var defaultArchFeatureMap = map[OsType]map[ArchType][]string{}
++
++// RegisterDefaultArchVariantFeatures is called by files that define Toolchains to specify the
++// arch features that are available for the default arch variant.  It must be called from an
++// init() function.
++func RegisterDefaultArchVariantFeatures(os OsType, arch ArchType, features ...string) {
++	checkCalledFromInit()
++
++	for _, feature := range features {
++		if !InList(feature, archFeatures[arch]) {
++			panic(fmt.Errorf("Invalid feature %q for arch %q variant \"\"", feature, arch))
++		}
++	}
++
++	if defaultArchFeatureMap[os] == nil {
++		defaultArchFeatureMap[os] = make(map[ArchType][]string)
++	}
++	defaultArchFeatureMap[os][arch] = features
++}
+diff --git a/android/arch_test.go b/android/arch_test.go
+index 7caf8378f..a82832115 100644
+--- a/android/arch_test.go
++++ b/android/arch_test.go
+@@ -491,9 +491,11 @@ func TestArchProperties(t *testing.T) {
+ 			arch: {
+ 				arm: {
+ 					a:  ["arm"],
++					armv7_a_neon: { a: ["armv7_a_neon"] },
+ 				},
+ 				arm64: {
+ 					a:  ["arm64"],
++					armv8_a: { a: ["armv8_a"] },
+ 				},
+ 				x86: { a:  ["x86"] },
+ 				x86_64: { a:  ["x86_64"] },
+@@ -550,12 +552,12 @@ func TestArchProperties(t *testing.T) {
+ 				{
+ 					module:   "foo",
+ 					variant:  "android_arm64_armv8-a",
+-					property: []string{"root", "linux", "bionic", "android", "android64", "arm64", "lib64", "android_arm64"},
++					property: []string{"root", "linux", "bionic", "android", "android64", "arm64", "armv8_a", "lib64", "android_arm64"},
+ 				},
+ 				{
+ 					module:   "foo",
+ 					variant:  "android_arm_armv7-a-neon",
+-					property: []string{"root", "linux", "bionic", "android", "android64", "arm", "lib32", "android_arm"},
++					property: []string{"root", "linux", "bionic", "android", "android64", "arm", "armv7_a_neon", "lib32", "android_arm"},
+ 				},
+ 			},
+ 		},
+diff --git a/bp2build/conversion.go b/bp2build/conversion.go
+index 3ab846b41..96c12d3e1 100644
+--- a/bp2build/conversion.go
++++ b/bp2build/conversion.go
+@@ -28,8 +28,6 @@ func CreateSoongInjectionFiles(cfg android.Config, metrics CodegenMetrics) []Baz
+ 
+ 	files = append(files, newFile("product_config", "soong_config_variables.bzl", cfg.Bp2buildSoongConfigDefinitions.String()))
+ 
+-	files = append(files, newFile("product_config", "arch_configuration.bzl", android.StarlarkArchConfigurations()))
+-
+ 	apiLevelsContent, err := json.Marshal(android.GetApiLevelsMap(cfg))
+ 	if err != nil {
+ 		panic(err)
+diff --git a/bp2build/conversion_test.go b/bp2build/conversion_test.go
+index c94a9236e..629ca9bba 100644
+--- a/bp2build/conversion_test.go
++++ b/bp2build/conversion_test.go
+@@ -102,10 +102,6 @@ func TestCreateBazelFiles_Bp2Build_CreatesDefaultFiles(t *testing.T) {
+ 			dir:      "product_config",
+ 			basename: "soong_config_variables.bzl",
+ 		},
+-		{
+-			dir:      "product_config",
+-			basename: "arch_configuration.bzl",
+-		},
+ 		{
+ 			dir:      "api_levels",
+ 			basename: GeneratedBuildFileName,
+diff --git a/cc/config/arm64_device.go b/cc/config/arm64_device.go
+index 4d0ae1a12..979c82525 100644
+--- a/cc/config/arm64_device.go
++++ b/cc/config/arm64_device.go
+@@ -104,22 +104,19 @@ func init() {
+ 	exportStringListStaticVariable("Arm64Cflags", arm64Cflags)
+ 	exportStringListStaticVariable("Arm64Cppflags", arm64Cppflags)
+ 
+-	exportedVariableReferenceDictVars.Set("Arm64ArchVariantCflags", arm64ArchVariantCflagsVar)
+-	exportedVariableReferenceDictVars.Set("Arm64CpuVariantCflags", arm64CpuVariantCflagsVar)
+-	exportedVariableReferenceDictVars.Set("Arm64CpuVariantLdflags", arm64CpuVariantLdflags)
++	exportedStringListDictVars.Set("Arm64ArchVariantCflags", arm64ArchVariantCflags)
++	exportedStringListDictVars.Set("Arm64CpuVariantCflags", arm64CpuVariantCflags)
+ 
+-	exportStringListStaticVariable("Arm64Armv8ACflags", arm64ArchVariantCflags["armv8-a"])
+-	exportStringListStaticVariable("Arm64Armv8ABranchProtCflags", arm64ArchVariantCflags["armv8-a-branchprot"])
+-	exportStringListStaticVariable("Arm64Armv82ACflags", arm64ArchVariantCflags["armv8-2a"])
+-	exportStringListStaticVariable("Arm64Armv82ADotprodCflags", arm64ArchVariantCflags["armv8-2a-dotprod"])
++	pctx.StaticVariable("Arm64Armv8ACflags", strings.Join(arm64ArchVariantCflags["armv8-a"], " "))
++	pctx.StaticVariable("Arm64Armv8ABranchProtCflags", strings.Join(arm64ArchVariantCflags["armv8-a-branchprot"], " "))
++	pctx.StaticVariable("Arm64Armv82ACflags", strings.Join(arm64ArchVariantCflags["armv8-2a"], " "))
++	pctx.StaticVariable("Arm64Armv82ADotprodCflags", strings.Join(arm64ArchVariantCflags["armv8-2a-dotprod"], " "))
+ 
+-	exportStringListStaticVariable("Arm64CortexA53Cflags", arm64CpuVariantCflags["cortex-a53"])
+-	exportStringListStaticVariable("Arm64CortexA55Cflags", arm64CpuVariantCflags["cortex-a55"])
+-	exportStringListStaticVariable("Arm64KryoCflags", arm64CpuVariantCflags["kryo"])
+-	exportStringListStaticVariable("Arm64ExynosM1Cflags", arm64CpuVariantCflags["exynos-m1"])
+-	exportStringListStaticVariable("Arm64ExynosM2Cflags", arm64CpuVariantCflags["exynos-m2"])
+-
+-	exportStringListStaticVariable("Arm64FixCortexA53Ldflags", []string{"-Wl,--fix-cortex-a53-843419"})
++	pctx.StaticVariable("Arm64CortexA53Cflags", strings.Join(arm64CpuVariantCflags["cortex-a53"], " "))
++	pctx.StaticVariable("Arm64CortexA55Cflags", strings.Join(arm64CpuVariantCflags["cortex-a55"], " "))
++	pctx.StaticVariable("Arm64KryoCflags", strings.Join(arm64CpuVariantCflags["kryo"], " "))
++	pctx.StaticVariable("Arm64ExynosM1Cflags", strings.Join(arm64CpuVariantCflags["exynos-m1"], " "))
++	pctx.StaticVariable("Arm64ExynosM2Cflags", strings.Join(arm64CpuVariantCflags["exynos-m2"], " "))
+ }
+ 
+ var (
+@@ -131,6 +128,7 @@ var (
+ 	}
+ 
+ 	arm64CpuVariantCflagsVar = map[string]string{
++		"":           "",
+ 		"cortex-a53": "${config.Arm64CortexA53Cflags}",
+ 		"cortex-a55": "${config.Arm64CortexA55Cflags}",
+ 		"cortex-a72": "${config.Arm64CortexA53Cflags}",
+@@ -142,15 +140,6 @@ var (
+ 		"exynos-m1":  "${config.Arm64ExynosM1Cflags}",
+ 		"exynos-m2":  "${config.Arm64ExynosM2Cflags}",
+ 	}
+-
+-	arm64CpuVariantLdflags = map[string]string{
+-		"cortex-a53": "${config.Arm64FixCortexA53Ldflags}",
+-		"cortex-a72": "${config.Arm64FixCortexA53Ldflags}",
+-		"cortex-a73": "${config.Arm64FixCortexA53Ldflags}",
+-		"kryo":       "${config.Arm64FixCortexA53Ldflags}",
+-		"exynos-m1":  "${config.Arm64FixCortexA53Ldflags}",
+-		"exynos-m2":  "${config.Arm64FixCortexA53Ldflags}",
+-	}
+ )
+ 
+ type toolchainArm64 struct {
+@@ -225,7 +214,12 @@ func arm64ToolchainFactory(arch android.Arch) Toolchain {
+ 	toolchainCflags = append(toolchainCflags,
+ 		variantOrDefault(arm64CpuVariantCflagsVar, arch.CpuVariant))
+ 
+-	extraLdflags := variantOrDefault(arm64CpuVariantLdflags, arch.CpuVariant)
++	var extraLdflags string
++	switch arch.CpuVariant {
++	case "cortex-a53", "cortex-a72", "cortex-a73", "kryo", "exynos-m1", "exynos-m2":
++		extraLdflags = "-Wl,--fix-cortex-a53-843419"
++	}
++
+ 	return &toolchainArm64{
+ 		ldflags: strings.Join([]string{
+ 			"${config.Arm64Ldflags}",
+diff --git a/cc/config/arm_device.go b/cc/config/arm_device.go
+index 4466632ea..0fe5e6883 100644
+--- a/cc/config/arm_device.go
++++ b/cc/config/arm_device.go
+@@ -39,10 +39,6 @@ var (
+ 
+ 	armLldflags = armLdflags
+ 
+-	armFixCortexA8LdFlags = []string{"-Wl,--fix-cortex-a8"}
+-
+-	armNoFixCortexA8LdFlags = []string{"-Wl,--no-fix-cortex-a8"}
+-
+ 	armArmCflags = []string{
+ 		"-fstrict-aliasing",
+ 	}
+@@ -183,9 +179,6 @@ func init() {
+ 	exportStringListStaticVariable("ArmLdflags", armLdflags)
+ 	exportStringListStaticVariable("ArmLldflags", armLldflags)
+ 
+-	exportStringListStaticVariable("ArmFixCortexA8LdFlags", armFixCortexA8LdFlags)
+-	exportStringListStaticVariable("ArmNoFixCortexA8LdFlags", armNoFixCortexA8LdFlags)
+-
+ 	// Clang cflags
+ 	exportStringListStaticVariable("ArmToolchainCflags", armToolchainCflags)
+ 	exportStringListStaticVariable("ArmCflags", armCflags)
+@@ -195,8 +188,8 @@ func init() {
+ 	exportStringListStaticVariable("ArmArmCflags", armArmCflags)
+ 	exportStringListStaticVariable("ArmThumbCflags", armThumbCflags)
+ 
+-	exportedVariableReferenceDictVars.Set("ArmArchVariantCflags", armArchVariantCflagsVar)
+-	exportedVariableReferenceDictVars.Set("ArmCpuVariantCflags", armCpuVariantCflagsVar)
++	exportedStringListDictVars.Set("ArmArchVariantCflags", armArchVariantCflags)
++	exportedStringListDictVars.Set("ArmCpuVariantCflags", armCpuVariantCflags)
+ 
+ 	// Clang arch variant cflags
+ 	exportStringListStaticVariable("ArmArmv7ACflags", armArchVariantCflags["armv7-a"])
+@@ -331,12 +324,12 @@ func armToolchainFactory(arch android.Arch) Toolchain {
+ 		switch arch.CpuVariant {
+ 		case "cortex-a8", "":
+ 			// Generic ARM might be a Cortex A8 -- better safe than sorry
+-			fixCortexA8 = "${config.ArmFixCortexA8LdFlags}"
++			fixCortexA8 = "-Wl,--fix-cortex-a8"
+ 		default:
+-			fixCortexA8 = "${config.ArmNoFixCortexA8LdFlags}"
++			fixCortexA8 = "-Wl,--no-fix-cortex-a8"
+ 		}
+ 	case "armv7-a":
+-		fixCortexA8 = "${config.ArmFixCortexA8LdFlags}"
++		fixCortexA8 = "-Wl,--fix-cortex-a8"
+ 	case "armv8-a", "armv8-2a":
+ 		// Nothing extra for armv8-a/armv8-2a
+ 	default:
+diff --git a/cc/config/bp2build.go b/cc/config/bp2build.go
+index 73f65f539..eca516107 100644
+--- a/cc/config/bp2build.go
++++ b/cc/config/bp2build.go
+@@ -38,8 +38,6 @@ var (
+ 	exportedStringListVars     = exportedStringListVariables{}
+ 	exportedStringVars         = exportedStringVariables{}
+ 	exportedStringListDictVars = exportedStringListDictVariables{}
+-	// Note: these can only contain references to other variables and must be printed last
+-	exportedVariableReferenceDictVars = exportedVariableReferenceDictVariables{}
+ 
+ 	/// Maps containing variables that are dependent on the build config.
+ 	exportedConfigDependingVars = exportedConfigDependingVariables{}
+@@ -64,7 +62,6 @@ func validateCharacters(s string) string {
+ type bazelConstant struct {
+ 	variableName       string
+ 	internalDefinition string
+-	sortLast           bool
+ }
+ 
+ type exportedStringVariables map[string]string
+@@ -171,36 +168,6 @@ func (m exportedStringListDictVariables) asBazel(_ android.Config, _ exportedStr
+ 	return ret
+ }
+ 
+-type exportedVariableReferenceDictVariables map[string]map[string]string
+-
+-func (m exportedVariableReferenceDictVariables) Set(k string, v map[string]string) {
+-	m[k] = v
+-}
+-
+-func (m exportedVariableReferenceDictVariables) asBazel(_ android.Config, _ exportedStringVariables,
+-	_ exportedStringListVariables, _ exportedConfigDependingVariables) []bazelConstant {
+-	ret := make([]bazelConstant, 0, len(m))
+-	for n, dict := range m {
+-		for k, v := range dict {
+-			matches, err := variableReference(v)
+-			if err != nil {
+-				panic(err)
+-			} else if !matches.matches {
+-				panic(fmt.Errorf("Expected a variable reference, got %q", v))
+-			} else if len(matches.fullVariableReference) != len(v) {
+-				panic(fmt.Errorf("Expected only a variable reference, got %q", v))
+-			}
+-			dict[k] = "_" + matches.variable
+-		}
+-		ret = append(ret, bazelConstant{
+-			variableName:       n,
+-			internalDefinition: starlark_fmt.PrintDict(dict, 0),
+-			sortLast:           true,
+-		})
+-	}
+-	return ret
+-}
+-
+ // BazelCcToolchainVars generates bzl file content containing variables for
+ // Bazel's cc_toolchain configuration.
+ func BazelCcToolchainVars(config android.Config) string {
+@@ -208,8 +175,7 @@ func BazelCcToolchainVars(config android.Config) string {
+ 		config,
+ 		exportedStringListDictVars,
+ 		exportedStringListVars,
+-		exportedStringVars,
+-		exportedVariableReferenceDictVars)
++		exportedStringVars)
+ }
+ 
+ func bazelToolchainVars(config android.Config, vars ...bazelVarExporter) string {
+@@ -220,12 +186,7 @@ func bazelToolchainVars(config android.Config, vars ...bazelVarExporter) string
+ 		results = append(results, v.asBazel(config, exportedStringVars, exportedStringListVars, exportedConfigDependingVars)...)
+ 	}
+ 
+-	sort.Slice(results, func(i, j int) bool {
+-		if results[i].sortLast != results[j].sortLast {
+-			return !results[i].sortLast
+-		}
+-		return results[i].variableName < results[j].variableName
+-	})
++	sort.Slice(results, func(i, j int) bool { return results[i].variableName < results[j].variableName })
+ 
+ 	definitions := make([]string, 0, len(results))
+ 	constants := make([]string, 0, len(results))
+@@ -246,32 +207,6 @@ func bazelToolchainVars(config android.Config, vars ...bazelVarExporter) string
+ 	return ret
+ }
+ 
+-type match struct {
+-	matches               bool
+-	fullVariableReference string
+-	variable              string
+-}
+-
+-func variableReference(input string) (match, error) {
+-	// e.g. "${ExternalCflags}"
+-	r := regexp.MustCompile(`\${(?:config\.)?([a-zA-Z0-9_]+)}`)
+-
+-	matches := r.FindStringSubmatch(input)
+-	if len(matches) == 0 {
+-		return match{}, nil
+-	}
+-	if len(matches) != 2 {
+-		return match{}, fmt.Errorf("Expected to only match 1 subexpression in %s, got %d", input, len(matches)-1)
+-	}
+-	return match{
+-		matches:               true,
+-		fullVariableReference: matches[0],
+-		// Index 1 of FindStringSubmatch contains the subexpression match
+-		// (variable name) of the capture group.
+-		variable: matches[1],
+-	}, nil
+-}
+-
+ // expandVar recursively expand interpolated variables in the exportedVars scope.
+ //
+ // We're using a string slice to track the seen variables to avoid
+@@ -281,6 +216,8 @@ func variableReference(input string) (match, error) {
+ // interpolation stacks are deep (n > 1).
+ func expandVar(config android.Config, toExpand string, stringScope exportedStringVariables,
+ 	stringListScope exportedStringListVariables, exportedVars exportedConfigDependingVariables) ([]string, error) {
++	// e.g. "${ExternalCflags}"
++	r := regexp.MustCompile(`\${([a-zA-Z0-9_]+)}`)
+ 
+ 	// Internal recursive function.
+ 	var expandVarInternal func(string, map[string]bool) (string, error)
+@@ -288,18 +225,20 @@ func expandVar(config android.Config, toExpand string, stringScope exportedStrin
+ 		var ret string
+ 		remainingString := toExpand
+ 		for len(remainingString) > 0 {
+-			matches, err := variableReference(remainingString)
+-			if err != nil {
+-				panic(err)
+-			}
+-			if !matches.matches {
++			matches := r.FindStringSubmatch(remainingString)
++			if len(matches) == 0 {
+ 				return ret + remainingString, nil
+ 			}
+-			matchIndex := strings.Index(remainingString, matches.fullVariableReference)
++			if len(matches) != 2 {
++				panic(fmt.Errorf("Expected to only match 1 subexpression in %s, got %d", remainingString, len(matches)-1))
++			}
++			matchIndex := strings.Index(remainingString, matches[0])
+ 			ret += remainingString[:matchIndex]
+-			remainingString = remainingString[matchIndex+len(matches.fullVariableReference):]
++			remainingString = remainingString[matchIndex+len(matches[0]):]
+ 
+-			variable := matches.variable
++			// Index 1 of FindStringSubmatch contains the subexpression match
++			// (variable name) of the capture group.
++			variable := matches[1]
+ 			// toExpand contains a variable.
+ 			if _, ok := seenVars[variable]; ok {
+ 				return ret, fmt.Errorf(
+diff --git a/cc/config/bp2build_test.go b/cc/config/bp2build_test.go
+index 9a8178af6..4cbf0c6f3 100644
+--- a/cc/config/bp2build_test.go
++++ b/cc/config/bp2build_test.go
+@@ -47,14 +47,6 @@ func TestExpandVars(t *testing.T) {
+ 			toExpand:       "${foo}",
+ 			expectedValues: []string{"bar"},
+ 		},
+-		{
+-			description: "single level expansion with short-name for string var",
+-			stringScope: exportedStringVariables{
+-				"foo": "bar",
+-			},
+-			toExpand:       "${config.foo}",
+-			expectedValues: []string{"bar"},
+-		},
+ 		{
+ 			description: "single level expansion string list var",
+ 			stringListScope: exportedStringListVariables{
+@@ -232,30 +224,7 @@ constants = struct(
+ )`,
+ 		},
+ 		{
+-			name: "exports dict with var refs",
+-			vars: []bazelVarExporter{
+-				exportedVariableReferenceDictVariables{
+-					"a": map[string]string{"b1": "${b2}"},
+-					"c": map[string]string{"d1": "${config.d2}"},
+-				},
+-			},
+-			expectedOut: `# GENERATED FOR BAZEL FROM SOONG. DO NOT EDIT.
+-
+-_a = {
+-    "b1": _b2,
+-}
+-
+-_c = {
+-    "d1": _d2,
+-}
+-
+-constants = struct(
+-    a = _a,
+-    c = _c,
+-)`,
+-		},
+-		{
+-			name: "sorts across types with variable references last",
++			name: "sorts across types",
+ 			vars: []bazelVarExporter{
+ 				exportedStringVariables{
+ 					"b": "b-val",
+@@ -269,10 +238,6 @@ constants = struct(
+ 					"a": map[string][]string{"a1": []string{"a2"}},
+ 					"f": map[string][]string{"f1": []string{"f2"}},
+ 				},
+-				exportedVariableReferenceDictVariables{
+-					"aa": map[string]string{"b1": "${b}"},
+-					"cc": map[string]string{"d1": "${config.d}"},
+-				},
+ 			},
+ 			expectedOut: `# GENERATED FOR BAZEL FROM SOONG. DO NOT EDIT.
+ 
+@@ -292,14 +257,6 @@ _f = {
+     "f1": ["f2"],
+ }
+ 
+-_aa = {
+-    "b1": _b,
+-}
+-
+-_cc = {
+-    "d1": _d,
+-}
+-
+ constants = struct(
+     a = _a,
+     b = _b,
+@@ -307,8 +264,6 @@ constants = struct(
+     d = _d,
+     e = _e,
+     f = _f,
+-    aa = _aa,
+-    cc = _cc,
+ )`,
+ 		},
+ 	}
+diff --git a/cc/config/x86_64_device.go b/cc/config/x86_64_device.go
+index 164e7a67f..0da51cb4e 100644
+--- a/cc/config/x86_64_device.go
++++ b/cc/config/x86_64_device.go
+@@ -78,6 +78,14 @@ var (
+ 		"popcnt": []string{"-mpopcnt"},
+ 		"aes_ni": []string{"-maes"},
+ 	}
++
++	x86_64DefaultArchVariantFeatures = []string{
++		"ssse3",
++		"sse4",
++		"sse4_1",
++		"sse4_2",
++		"popcnt",
++	}
+ )
+ 
+ const (
+@@ -85,6 +93,8 @@ const (
+ )
+ 
+ func init() {
++	android.RegisterDefaultArchVariantFeatures(android.Android, android.X86_64, x86_64DefaultArchVariantFeatures...)
++	exportedStringListVars.Set("X86_64DefaultArchVariantFeatures", x86_64DefaultArchVariantFeatures)
+ 
+ 	pctx.StaticVariable("x86_64GccVersion", x86_64GccVersion)
+ 
+-- 
+2.17.1
+

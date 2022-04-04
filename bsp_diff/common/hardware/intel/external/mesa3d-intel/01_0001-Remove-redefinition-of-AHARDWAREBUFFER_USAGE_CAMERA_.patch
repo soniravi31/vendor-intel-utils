@@ -1,0 +1,32 @@
+From bf61d282b86b3122d45273daae2ff8b1e446bd12 Mon Sep 17 00:00:00 2001
+From: svenate <salini.venate@intel.com>
+Date: Fri, 4 Mar 2022 10:15:24 +0530
+Subject: [PATCH] Remove redefinition of AHARDWAREBUFFER_USAGE_CAMERA_MASK
+
+AHARDWAREBUFFER_USAGE_CAMERA_MASK is already defined in
+frameworks/native/libs/nativewindow/include/vndk/hardware_buffer.h
+
+Signed-off-by: svenate <salini.venate@intel.com>
+---
+ src/intel/vulkan/anv_android.c | 5 -----
+ 1 file changed, 5 deletions(-)
+
+diff --git a/src/intel/vulkan/anv_android.c b/src/intel/vulkan/anv_android.c
+index 420de7c4e61..2e34a9c3871 100644
+--- a/src/intel/vulkan/anv_android.c
++++ b/src/intel/vulkan/anv_android.c
+@@ -107,11 +107,6 @@ anv_hal_close(struct hw_device_t *dev)
+ /* See i915_private_android_types.h in minigbm. */
+ #define HAL_PIXEL_FORMAT_NV12_Y_TILED_INTEL 0x100
+ 
+-enum {
+-   /* Usage bit equal to GRALLOC_USAGE_HW_CAMERA_MASK */
+-   AHARDWAREBUFFER_USAGE_CAMERA_MASK = 0x00060000U,
+-};
+-
+ inline VkFormat
+ vk_format_from_android(unsigned android_format, unsigned android_usage)
+ {
+-- 
+2.17.1
+

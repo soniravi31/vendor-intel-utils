@@ -1,4 +1,4 @@
-From 2ce26d18ec97d81472afcec6e1c22ea1c333f5d8 Mon Sep 17 00:00:00 2001
+From 1e571e6739403b0262abad9ba76910f952725f06 Mon Sep 17 00:00:00 2001
 From: Tanuj Tekriwal <tanuj.tekriwal@intel.com>
 Date: Wed, 11 Aug 2021 21:48:40 +0530
 Subject: [PATCH] gralloc4: Remove gralloc4 build as it is not needed.
@@ -164,5 +164,5 @@ index b779704..0000000
 -    },
 -}
 -- 
-2.33.1
+2.17.1
 

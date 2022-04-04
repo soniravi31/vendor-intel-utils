@@ -1,4 +1,4 @@
-From 50670233eae0ed238155f765bd25ad72d80e837b Mon Sep 17 00:00:00 2001
+From 848f0d83612393ce7d5a2397be127e5987edf4fd Mon Sep 17 00:00:00 2001
 From: Tanuj Tekriwal <tanuj.tekriwal@intel.com>
 Date: Wed, 11 Aug 2021 21:50:00 +0530
 Subject: [PATCH] Remove libgbm creation twice
@@ -58,5 +58,5 @@ index 9eb75e5..52ac7bd 100644
  cc_library_shared {
      name: "libminigbm_gralloc",
 -- 
-2.33.1
+2.17.1
 

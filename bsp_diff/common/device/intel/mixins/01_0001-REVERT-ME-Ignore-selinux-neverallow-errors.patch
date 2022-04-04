@@ -1,0 +1,31 @@
+From 0d4ef70a184cdacdc32fb0ad2e0999aa3bdd58d6 Mon Sep 17 00:00:00 2001
+From: svenate <salini.venate@intel.com>
+Date: Wed, 16 Mar 2022 00:39:58 +0530
+Subject: [PATCH] REVERT-ME: Ignore selinux neverallow errors
+
+SELINUX_IGNORE_NEVERALLOWS flag helps to ignore the neverallow
+errors during build. This will not work for user builds and
+all the neverallow errors needs to be fixed properly.
+CTS compliance cannot be passed without the errors fixed.
+
+Security team needs to remove this flag and help resolve
+all the errors seen.
+
+Change-Id: I54a8d5e3138df799fefb2020c4b439af6d925f6e
+Signed-off-by: svenate <salini.venate@intel.com>
+---
+ groups/device-specific/caas/BoardConfig.mk | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/groups/device-specific/caas/BoardConfig.mk b/groups/device-specific/caas/BoardConfig.mk
+index 1d1ada6..d292aa2 100644
+--- a/groups/device-specific/caas/BoardConfig.mk
++++ b/groups/device-specific/caas/BoardConfig.mk
+@@ -44,3 +44,4 @@ BUILD_BROKEN_USES_BUILD_HOST_EXECUTABLE := true
+ BUILD_BROKEN_USES_BUILD_COPY_HEADERS := true
+ # PRODUCT_COPY_FILES directives.
+ BUILD_BROKEN_ELF_PREBUILT_PRODUCT_COPY_FILES := true
++SELINUX_IGNORE_NEVERALLOWS := true
+-- 
+2.17.1
+
