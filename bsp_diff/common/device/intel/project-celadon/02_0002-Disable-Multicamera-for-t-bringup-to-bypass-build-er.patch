@@ -1,4 +1,4 @@
-From 5634f854077c5936d87a9694d3d8e14976aae17c Mon Sep 17 00:00:00 2001
+From 20777ab0b8f25cfcdfbd16f24cc64d0add216fe5 Mon Sep 17 00:00:00 2001
 From: svenate <salini.venate@intel.com>
 Date: Wed, 16 Mar 2022 10:18:09 +0530
 Subject: [PATCH] REVERT-ME: Disable Multicamera for T bringup
@@ -11,18 +11,18 @@ Signed-off-by: svenate <salini.venate@intel.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/caas/mixins.spec b/caas/mixins.spec
-index d99dcf3..d5d3236 100755
+index ae380c1..37b16cb 100755
 --- a/caas/mixins.spec
 +++ b/caas/mixins.spec
-@@ -29,7 +29,7 @@ media: auto(add_sw_msdk=false, opensource_msdk=true, opensource_msdk_omx_il=true
- graphics: auto(gen9+=true,hwc2=true,vulkan=true,drmhwc=false,minigbm=true,gralloc1=true,enable_guc=false)
+@@ -29,7 +29,7 @@ media: auto(enable_msdk_omx=false, add_sw_msdk=false, opensource_msdk=true, open
+ graphics: auto(gen9+=true,vulkan=true,minigbm=true,gralloc1=true,enable_guc=false)
  storage: sdcard-mmc0-v-usb-sd-r(adoptablesd=false,adoptableusb=false)
  ethernet: dhcp
 -camera-ext: ext-camera-only
 +camera-ext: false
  rfkill: true(force_disable=)
  wlan: iwlwifi(libwifi-hal=true)
- codecs: configurable(hw_ve_h265=true, hw_vd_vp9=true, hw_vd_mp2=true, hw_vd_vc1=false, sw_omx_video=false, platform=tgl, profile_file=media_profiles_1080p.xml, gpu=gen12)
+ codecs: configurable(sw_omx_video=false, hw_omx_video=false, platform=tgl, profile_file=media_profiles_1080p.xml, gpu=gen12)
 -- 
-2.17.1
+2.33.1
 

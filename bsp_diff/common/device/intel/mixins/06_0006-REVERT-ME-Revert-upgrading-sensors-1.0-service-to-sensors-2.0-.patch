@@ -1,0 +1,102 @@
+From 540c7182197db46b7bb3a77156c657852f495846 Mon Sep 17 00:00:00 2001
+From: "Senapati, Rasmiranjan" <rasmiranjan.senapati@intel.com>
+Date: Thu, 26 May 2022 04:49:55 +0000
+Subject: [PATCH] Revert "upgrading sensors@1.0-service to sensors@2.0-service
+ in Android_S"
+
+This reverts commit 72c432b60568a03f6c5f76a2ae80dce2fd8d9f4d.
+---
+ groups/device-specific/caas/framework_manifest.xml | 9 +++++++++
+ groups/device-specific/caas/manifest.xml           | 9 +++++++++
+ groups/sensors/mediation/BoardConfig.mk            | 4 ----
+ groups/sensors/mediation/option.spec               | 2 --
+ groups/sensors/mediation/product.mk                | 8 +++++---
+ 5 files changed, 23 insertions(+), 9 deletions(-)
+ delete mode 100644 groups/sensors/mediation/option.spec
+
+diff --git a/groups/device-specific/caas/framework_manifest.xml b/groups/device-specific/caas/framework_manifest.xml
+index a59d4d7..1e0ef92 100644
+--- a/groups/device-specific/caas/framework_manifest.xml
++++ b/groups/device-specific/caas/framework_manifest.xml
+@@ -198,5 +198,14 @@
+             <instance>default</instance>
+         </interface>
+     </hal>
++    <hal format="hidl">
++        <name>android.hardware.sensors</name>
++        <transport>hwbinder</transport>
++        <version>1.0</version>
++        <interface>
++            <name>ISensors</name>
++            <instance>default</instance>
++        </interface>
++    </hal>
+ 
+ </manifest>
+diff --git a/groups/device-specific/caas/manifest.xml b/groups/device-specific/caas/manifest.xml
+index c5543f3..2b67707 100644
+--- a/groups/device-specific/caas/manifest.xml
++++ b/groups/device-specific/caas/manifest.xml
+@@ -155,6 +155,15 @@
+             <instance>default</instance>
+         </interface>
+     </hal>
++    <hal format="hidl">
++        <name>android.hardware.sensors</name>
++        <transport>hwbinder</transport>
++        <version>1.0</version>
++        <interface>
++            <name>ISensors</name>
++            <instance>default</instance>
++        </interface>
++    </hal>
+     <kernel target-level="5"/>
+     <!--<sepolicy>
+         <version>31.0</version>
+diff --git a/groups/sensors/mediation/BoardConfig.mk b/groups/sensors/mediation/BoardConfig.mk
+index 0adc828..7f6aba9 100644
+--- a/groups/sensors/mediation/BoardConfig.mk
++++ b/groups/sensors/mediation/BoardConfig.mk
+@@ -1,7 +1,3 @@
+ USE_SENSOR_MEDIATION_HAL := true
+ 
+-SOONG_CONFIG_NAMESPACES += senPlugin
+-SOONG_CONFIG_senPlugin  += SENSOR_LIST
+-SOONG_CONFIG_senPlugin_SENSOR_LIST := {{enable_sensor_list}}
+-
+ BOARD_SEPOLICY_DIRS += $(INTEL_PATH_SEPOLICY)/sensors/mediation
+diff --git a/groups/sensors/mediation/option.spec b/groups/sensors/mediation/option.spec
+deleted file mode 100644
+index ff58bdd..0000000
+--- a/groups/sensors/mediation/option.spec
++++ /dev/null
+@@ -1,2 +0,0 @@
+-[defaults]
+-enable_sensor_list = true
+diff --git a/groups/sensors/mediation/product.mk b/groups/sensors/mediation/product.mk
+index 3441167..f2d72e9 100644
+--- a/groups/sensors/mediation/product.mk
++++ b/groups/sensors/mediation/product.mk
+@@ -4,9 +4,12 @@ endif
+ 
+ # Sensors HAL modules
+ PRODUCT_PACKAGES += \
+-	android.hardware.sensors@2.0-service.intel
++        sensors.$(TARGET_BOARD_PLATFORM)
++
++PRODUCT_PACKAGES += \
++        android.hardware.sensors@1.0-service \
++        android.hardware.sensors@1.0-impl
+ 
+-{{#enable_sensor_list}}
+ PRODUCT_COPY_FILES += \
+         frameworks/native/data/etc/android.hardware.sensor.ambient_temperature.xml:vendor/etc/permissions/android.hardware.sensor.ambient_temperature.xml \
+         frameworks/native/data/etc/android.hardware.sensor.accelerometer.xml:vendor/etc/permissions/android.hardware.sensor.accelerometer.xml \
+@@ -15,4 +18,3 @@ PRODUCT_COPY_FILES += \
+         frameworks/native/data/etc/android.hardware.sensor.light.xml:vendor/etc/permissions/android.hardware.sensor.light.xml
+ 
+ AUTO_IN += $(TARGET_DEVICE_DIR)/{{_extra_dir}}/auto_hal.in
+-{{/enable_sensor_list}}
+-- 
+2.33.1
+
