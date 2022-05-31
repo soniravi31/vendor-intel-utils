@@ -1,0 +1,35 @@
+From cad233e19442c974a161d47559b1b20ee167dd60 Mon Sep 17 00:00:00 2001
+From: svenate <salini.venate@intel.com>
+Date: Wed, 18 May 2022 23:16:34 +0530
+Subject: [PATCH] REVERT-ME: Revert the clang version to 14.0.2
+
+This is a WA patch to use clang 14.0.2 instead of 14.0.6.
+There are additional android patches needed on top of
+lts2020-chromium to get the 5.10 kernel built using clang
+toolchain14.0.6. Those additional patches needs to be
+identified from google kernel.
+
+Change-Id: I49c86139f039235ef7273f6d6b166272cf8c88da
+Signed-off-by: svenate <salini.venate@intel.com>
+---
+ cc/config/global.go | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/cc/config/global.go b/cc/config/global.go
+index 9d38d8c2f..5f2c8129c 100644
+--- a/cc/config/global.go
++++ b/cc/config/global.go
+@@ -284,8 +284,8 @@ var (
+ 
+ 	// prebuilts/clang default settings.
+ 	ClangDefaultBase         = "prebuilts/clang/host"
+-	ClangDefaultVersion      = "clang-r450784d"
+-	ClangDefaultShortVersion = "14.0.6"
++	ClangDefaultVersion      = "clang-r445002"
++	ClangDefaultShortVersion = "14.0.2"
+ 
+ 	// Directories with warnings from Android.bp files.
+ 	WarningAllowedProjects = []string{
+-- 
+2.17.1
+

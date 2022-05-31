@@ -1,4 +1,4 @@
-From 1e571e6739403b0262abad9ba76910f952725f06 Mon Sep 17 00:00:00 2001
+From ae0c778131a978eb09e40285c464d52f21d4adaf Mon Sep 17 00:00:00 2001
 From: Tanuj Tekriwal <tanuj.tekriwal@intel.com>
 Date: Wed, 11 Aug 2021 21:48:40 +0530
 Subject: [PATCH] gralloc4: Remove gralloc4 build as it is not needed.
@@ -6,16 +6,16 @@ Subject: [PATCH] gralloc4: Remove gralloc4 build as it is not needed.
 Signed-off-by: Tanuj Tekriwal <tanuj.tekriwal@intel.com>
 Change-Id: I0323fef046689abd33fd74a2f58bed422142c684
 ---
- cros_gralloc/gralloc4/Android.bp | 147 -------------------------------
- 1 file changed, 147 deletions(-)
+ cros_gralloc/gralloc4/Android.bp | 162 -------------------------------
+ 1 file changed, 162 deletions(-)
  delete mode 100644 cros_gralloc/gralloc4/Android.bp
 
 diff --git a/cros_gralloc/gralloc4/Android.bp b/cros_gralloc/gralloc4/Android.bp
 deleted file mode 100644
-index b779704..0000000
+index fb6aca9..0000000
 --- a/cros_gralloc/gralloc4/Android.bp
 +++ /dev/null
-@@ -1,147 +0,0 @@
+@@ -1,162 +0,0 @@
 -//
 -// Copyright (C) 2020 The Android Open Source Project
 -//
@@ -55,6 +55,21 @@ index b779704..0000000
 -    srcs: [
 -        "CrosGralloc4Mapper.cc",
 -        "CrosGralloc4Utils.cc",
+-    ],
+-}
+-
+-cc_library {
+-    name: "libminigbm_gralloc4_utils",
+-    defaults: ["minigbm_cros_gralloc_defaults"],
+-    vendor: true,
+-    srcs: [
+-        "CrosGralloc4Utils.cc",
+-    ],
+-    shared_libs: [
+-        "android.hardware.graphics.mapper@4.0",
+-        "libgralloctypes",
+-        "libhidlbase",
+-        "libminigbm_gralloc",
 -    ],
 -}
 -
