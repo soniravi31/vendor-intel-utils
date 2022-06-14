@@ -1,0 +1,59 @@
+From 85396a70c4d55368b61c010bb104d43df5cfd626 Mon Sep 17 00:00:00 2001
+From: pmandri <padmashree.mandri@intel.com>
+Date: Tue, 14 Jun 2022 18:00:12 +0530
+Subject: [PATCH] Update Audio HAL Interface
+
+Update Audio HAL from 7.0 to 7.1
+Updated files: product.mk, framework_manifest.xml and manifest.xml
+
+Change-Id: I7cd1d12c65604a2990d9bf80c2dea28c1a537ba5
+Tracked-On: OAM-102157
+Signed-off-by: pmandri <padmashree.mandri@intel.com>
+---
+ groups/audio/project-celadon/product.mk            | 2 +-
+ groups/device-specific/caas/framework_manifest.xml | 2 +-
+ groups/device-specific/caas/manifest.xml           | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/groups/audio/project-celadon/product.mk b/groups/audio/project-celadon/product.mk
+index 0a41575..a853178 100755
+--- a/groups/audio/project-celadon/product.mk
++++ b/groups/audio/project-celadon/product.mk
+@@ -31,7 +31,7 @@ PRODUCT_PACKAGES += \
+ # Audio HAL
+ PRODUCT_PACKAGES += \
+     android.hardware.audio.effect@7.0-impl \
+-    android.hardware.audio@7.0-impl \
++    android.hardware.audio@7.1-impl \
+     android.hardware.audio@2.0-service
+ 
+ #Audio policy engine configuration files
+diff --git a/groups/device-specific/caas/framework_manifest.xml b/groups/device-specific/caas/framework_manifest.xml
+index 1e0ef92..06c980b 100644
+--- a/groups/device-specific/caas/framework_manifest.xml
++++ b/groups/device-specific/caas/framework_manifest.xml
+@@ -64,7 +64,7 @@
+     <hal format="hidl">
+         <name>android.hardware.audio</name>
+         <transport>hwbinder</transport>
+-        <version>7.0</version>
++        <version>7.1</version>
+         <interface>
+             <name>IDevicesFactory</name>
+             <instance>default</instance>
+diff --git a/groups/device-specific/caas/manifest.xml b/groups/device-specific/caas/manifest.xml
+index 2b67707..6c005bc 100644
+--- a/groups/device-specific/caas/manifest.xml
++++ b/groups/device-specific/caas/manifest.xml
+@@ -55,7 +55,7 @@
+     <hal format="hidl">
+         <name>android.hardware.audio</name>
+         <transport>hwbinder</transport>
+-        <version>7.0</version>
++        <version>7.1</version>
+         <interface>
+             <name>IDevicesFactory</name>
+             <instance>default</instance>
+-- 
+2.17.1
+
