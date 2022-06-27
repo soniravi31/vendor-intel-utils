@@ -1,10 +1,12 @@
-From 540c7182197db46b7bb3a77156c657852f495846 Mon Sep 17 00:00:00 2001
+From 07f8288057c1feb6e6b531e9c0331e78db90f6e6 Mon Sep 17 00:00:00 2001
 From: "Senapati, Rasmiranjan" <rasmiranjan.senapati@intel.com>
 Date: Thu, 26 May 2022 04:49:55 +0000
 Subject: [PATCH] Revert "upgrading sensors@1.0-service to sensors@2.0-service
  in Android_S"
 
 This reverts commit 72c432b60568a03f6c5f76a2ae80dce2fd8d9f4d.
+
+Change-Id: I96d7f7734a1ff96d568816effa38c5816cffc391
 ---
  groups/device-specific/caas/framework_manifest.xml | 9 +++++++++
  groups/device-specific/caas/manifest.xml           | 9 +++++++++
@@ -34,7 +36,7 @@ index a59d4d7..1e0ef92 100644
  
  </manifest>
 diff --git a/groups/device-specific/caas/manifest.xml b/groups/device-specific/caas/manifest.xml
-index c5543f3..2b67707 100644
+index 3a750f5..2b01a62 100644
 --- a/groups/device-specific/caas/manifest.xml
 +++ b/groups/device-specific/caas/manifest.xml
 @@ -155,6 +155,15 @@
@@ -51,8 +53,8 @@ index c5543f3..2b67707 100644
 +        </interface>
 +    </hal>
      <kernel target-level="5"/>
-     <!--<sepolicy>
-         <version>31.0</version>
+     <sepolicy>
+         <version>33.0</version>
 diff --git a/groups/sensors/mediation/BoardConfig.mk b/groups/sensors/mediation/BoardConfig.mk
 index 0adc828..7f6aba9 100644
 --- a/groups/sensors/mediation/BoardConfig.mk
@@ -98,5 +100,5 @@ index 3441167..f2d72e9 100644
  AUTO_IN += $(TARGET_DEVICE_DIR)/{{_extra_dir}}/auto_hal.in
 -{{/enable_sensor_list}}
 -- 
-2.33.1
+2.17.1
 
