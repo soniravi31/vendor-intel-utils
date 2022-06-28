@@ -1,0 +1,74 @@
+From d87d9d5bcac2cec19f8c8eb52bba65e8e1975170 Mon Sep 17 00:00:00 2001
+From: Vilas R K <vilas.r.k@intel.com>
+Date: Tue, 28 Jun 2022 10:06:56 +0530
+Subject: [PATCH] [Android-13]:Enable AIDL Health
+
+Google has enforced to convert Health HAL
+from HIDL to AIDL,this change will help
+to do the respective changes for the
+implementation.
+
+Tracked-On: OAM-102171
+Signed-off-by: Vilas R K <vilas.r.k@intel.com>
+---
+ groups/device-specific/caas/framework_manifest.xml | 10 +++-------
+ groups/device-specific/caas/manifest.xml           | 10 +++-------
+ groups/health/hal/product.mk                       |  4 ++--
+ 3 files changed, 8 insertions(+), 16 deletions(-)
+
+diff --git a/groups/device-specific/caas/framework_manifest.xml b/groups/device-specific/caas/framework_manifest.xml
+index a59d4d7..bfa0834 100644
+--- a/groups/device-specific/caas/framework_manifest.xml
++++ b/groups/device-specific/caas/framework_manifest.xml
+@@ -33,14 +33,10 @@
+             <instance>default</instance>
+         </interface>
+     </hal>
+-    <hal format="hidl">
++    <hal format="aidl">
+         <name>android.hardware.health</name>
+-        <transport>hwbinder</transport>
+-        <version>2.1</version>
+-        <interface>
+-            <name>IHealth</name>
+-            <instance>default</instance>
+-        </interface>
++        <version>1</version>
++        <fqname>IHealth/default</fqname>
+     </hal>
+     <hal format="hidl">
+         <name>android.hardware.thermal</name>
+diff --git a/groups/device-specific/caas/manifest.xml b/groups/device-specific/caas/manifest.xml
+index 9e949ce..195631d 100644
+--- a/groups/device-specific/caas/manifest.xml
++++ b/groups/device-specific/caas/manifest.xml
+@@ -33,14 +33,10 @@
+             <instance>default</instance>
+         </interface>
+     </hal>
+-    <hal format="hidl">
++    <hal format="aidl">
+         <name>android.hardware.health</name>
+-        <transport>hwbinder</transport>
+-        <version>2.1</version>
+-        <interface>
+-            <name>IHealth</name>
+-            <instance>default</instance>
+-        </interface>
++        <version>1</version>
++        <fqname>IHealth/default</fqname>
+     </hal>
+     <hal format="hidl">
+         <name>android.hardware.thermal</name>
+diff --git a/groups/health/hal/product.mk b/groups/health/hal/product.mk
+index 5fbe4cc..529ef0a 100644
+--- a/groups/health/hal/product.mk
++++ b/groups/health/hal/product.mk
+@@ -1,2 +1,2 @@
+-PRODUCT_PACKAGES += android.hardware.health@2.1-service \
+-                    android.hardware.health@2.1-impl-intel
++PRODUCT_PACKAGES +=   android.hardware.health-service.example \
++                      android.hardware.health@2.1-impl-intel
+-- 
+2.17.1
+
