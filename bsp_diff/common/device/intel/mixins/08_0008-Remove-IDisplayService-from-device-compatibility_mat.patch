@@ -1,0 +1,36 @@
+From 728e0a2948580b112b8600f2d724e45d99485f4d Mon Sep 17 00:00:00 2001
+From: svenate <salini.venate@intel.com>
+Date: Tue, 5 Jul 2022 05:43:55 +0530
+Subject: [PATCH] Remove IDisplayService from device compatibility_matrix
+
+IDisplayService is deprecated as per
+commit:fb91e8109d5ab6285634f5342becbb8cfc8a09bf
+(in system/hidl) with FCM 7. This patch is necessary for
+building Android T with API level 33 and FCM level 7.
+
+Change-Id: I35392018beb38eabe587d3112581bacc2e53d4d2
+Signed-off-by: svenate <salini.venate@intel.com>
+---
+ groups/device-specific/caas/compatibility_matrix.xml | 8 --------
+ 1 file changed, 8 deletions(-)
+
+diff --git a/groups/device-specific/caas/compatibility_matrix.xml b/groups/device-specific/caas/compatibility_matrix.xml
+index 336b344..9864aad 100644
+--- a/groups/device-specific/caas/compatibility_matrix.xml
++++ b/groups/device-specific/caas/compatibility_matrix.xml
+@@ -1,12 +1,4 @@
+ <compatibility-matrix version="1.0" type="device">
+-    <hal format="hidl" optional="false">
+-        <name>android.frameworks.displayservice</name>
+-        <version>1.0</version>
+-        <interface>
+-            <name>IDisplayService</name>
+-            <instance>default</instance>
+-        </interface>
+-    </hal>
+     <hal format="hidl" optional="false">
+         <name>android.frameworks.sensorservice</name>
+         <version>1.0</version>
+-- 
+2.17.1
+
