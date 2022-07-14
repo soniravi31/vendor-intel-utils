@@ -1,0 +1,44 @@
+From 777eb1838aa4232faaaf953128d7af2ceecb314f Mon Sep 17 00:00:00 2001
+From: Bharat B Panda <bharat.b.panda@intel.com>
+Date: Thu, 14 Jul 2022 21:49:55 +0530
+Subject: [PATCH] Update Supplicant HIDL HAL to AIDL
+
+From Android T onwards, supplicant HAL has been moved
+to aidl from hidl. The changes will address the req.
+
+Tracked-On: OAM-102196
+Signed-off-by: Bharat B Panda <bharat.b.panda@intel.com>
+Change-Id: I79957a39e366e64230d8fbe7d462f8fef78b4be6
+---
+ .../device-specific/caas/framework_manifest.xml   | 15 +++++++--------
+ 1 file changed, 7 insertions(+), 8 deletions(-)
+
+diff --git a/groups/device-specific/caas/framework_manifest.xml b/groups/device-specific/caas/framework_manifest.xml
+index 17fd2d4..0d70e23 100644
+--- a/groups/device-specific/caas/framework_manifest.xml
++++ b/groups/device-specific/caas/framework_manifest.xml
+@@ -112,14 +112,13 @@
+             <instance>default</instance>
+         </interface>
+     </hal>
+-    <hal format="hidl">
+-        <name>android.hardware.wifi.supplicant</name>
+-        <transport>hwbinder</transport>
+-        <version>1.3</version>
+-        <interface>
+-            <name>ISupplicant</name>
+-            <instance>default</instance>
+-        </interface>
++    <hal format="aidl" optional="true">
++         <name>android.hardware.wifi.supplicant</name>
++         <version>1</version>
++         <interface>
++             <name>ISupplicant</name>
++             <instance>default</instance>
++         </interface>
+     </hal>
+     <hal format="hidl">
+         <name>android.hardware.wifi</name>
+-- 
+2.37.0
+
