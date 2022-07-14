@@ -1,0 +1,28 @@
+From f75e7f330866cb40ba406346a30b62af4477d4a3 Mon Sep 17 00:00:00 2001
+From: "Cui, Yuxin" <yuxin.cui@intel.com>
+Date: Wed, 13 Jul 2022 16:53:38 +0800
+Subject: [PATCH] WA-Use init.rc script to set trusty-ipc-dev0 permissions
+
+Use init.rc configuration file to ensure that the trysty-
+ipc-dev0 permissions are applied as soon as the nood file
+gets created.
+
+Tracked-On: OAM-102810
+Signed-off-by: Cui, Yuxin <yuxin.cui@intel.com>
+Change-Id: Ieba0e662e4e7ab9ac0817c617cd9f4453cc6803b
+---
+ groups/trusty/true/init.rc | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/groups/trusty/true/init.rc b/groups/trusty/true/init.rc
+index 67fb9b1..22cee37 100644
+--- a/groups/trusty/true/init.rc
++++ b/groups/trusty/true/init.rc
+@@ -18,3 +18,4 @@ service keyboxd /vendor/bin/keybox_provisioning -d /dev/trusty-ipc-dev0 -p /dev/
+ on post-fs
+     wait_for_prop vendor.modules.trusty.ready true
+     chmod 666 /dev/vport0p1
++    chmod 666 /dev/trusty-ipc-dev0
+-- 
+2.33.0
+
