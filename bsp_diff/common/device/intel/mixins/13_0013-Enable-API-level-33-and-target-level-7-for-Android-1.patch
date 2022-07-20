@@ -1,0 +1,51 @@
+From 2c3b2ca4ab90ff30af97f29d8aaf61b34fe3dc20 Mon Sep 17 00:00:00 2001
+From: svenate <salini.venate@intel.com>
+Date: Wed, 20 Jul 2022 15:57:21 +0530
+Subject: [PATCH] Enable API level 33 and target level 7 for Android 13
+
+This patch changes the shipping api level to 33 and
+target-level to 7 for android 13
+
+Tracked-On: OAM-102156
+Signed-off-by: svenate <salini.venate@intel.com>
+---
+ groups/device-specific/caas/caas.mk      | 2 +-
+ groups/device-specific/caas/manifest.xml | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/groups/device-specific/caas/caas.mk b/groups/device-specific/caas/caas.mk
+index 7d65d9c..aad059a 100644
+--- a/groups/device-specific/caas/caas.mk
++++ b/groups/device-specific/caas/caas.mk
+@@ -64,7 +64,7 @@ PRODUCT_AAPT_PREF_CONFIG := mdpi
+ PRODUCT_RESTRICT_VENDOR_FILES := false
+ PRODUCT_SET_DEBUGFS_RESTRICTIONS := false
+ {{^ota-update}}
+-PRODUCT_SHIPPING_API_LEVEL := 31
++PRODUCT_SHIPPING_API_LEVEL := 33
+ PRODUCT_OTA_ENFORCE_VINTF_KERNEL_REQUIREMENTS := true
+ {{/ota-update}}
+ {{#ota-update}}
+diff --git a/groups/device-specific/caas/manifest.xml b/groups/device-specific/caas/manifest.xml
+index 48aff94..4ad50ce 100644
+--- a/groups/device-specific/caas/manifest.xml
++++ b/groups/device-specific/caas/manifest.xml
+@@ -1,5 +1,5 @@
+ {{^ota-update}}
+-<manifest version="1.0" type="device" target-level="6">
++<manifest version="1.0" type="device" target-level="7">
+ {{/ota-update}}
+ {{#ota-update}}
+ <manifest version="1.0" type="device">
+@@ -161,7 +161,7 @@
+             <instance>default</instance>
+         </interface>
+     </hal>
+-    <kernel target-level="5"/>
++    <!--<kernel target-level="5"/>-->
+     <sepolicy>
+         <version>33.0</version>
+     </sepolicy>
+-- 
+2.17.1
+
