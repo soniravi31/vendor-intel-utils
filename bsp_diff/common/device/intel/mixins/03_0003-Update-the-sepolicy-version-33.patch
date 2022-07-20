@@ -1,4 +1,4 @@
-From 5730c02835d1997c6bc29a424d4a89dd6c96bcea Mon Sep 17 00:00:00 2001
+From 7006c2d53ad86c9ae480c7f704e7681911dd10f8 Mon Sep 17 00:00:00 2001
 From: svenate <salini.venate@intel.com>
 Date: Mon, 27 Jun 2022 23:42:25 +0530
 Subject: [PATCH] Update the sepolicy version 33
@@ -10,12 +10,12 @@ Signed-off-by: svenate <salini.venate@intel.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/groups/device-specific/caas/manifest.xml b/groups/device-specific/caas/manifest.xml
-index 38d06e8..2b01a62 100644
+index f072c7b..d756376 100644
 --- a/groups/device-specific/caas/manifest.xml
 +++ b/groups/device-specific/caas/manifest.xml
-@@ -166,6 +166,6 @@
+@@ -153,6 +153,6 @@
+         </interface>
      </hal>
-     <kernel target-level="5"/>
      <sepolicy>
 -        <version>31.0</version>
 +        <version>33.0</version>

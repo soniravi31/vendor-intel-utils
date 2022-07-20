@@ -1,4 +1,4 @@
-From 0e3a51b8405a4c92b1b4ded25acbea7ca14d13c0 Mon Sep 17 00:00:00 2001
+From 9acf218d91672f811873f7ed960995cd578e9ee9 Mon Sep 17 00:00:00 2001
 From: "Badrappan, Jeevaka" <jeevaka.badrappan@intel.com>
 Date: Tue, 14 Jun 2022 09:51:17 +0530
 Subject: [PATCH] Update clang tool chain to r450784d
@@ -8,7 +8,7 @@ Change-Id: I6bfca77197e397d74e680f7e0dae5aa59620163c
 ---
  groups/kernel/AndroidBoard.mk                 |   2 +-
  .../lts2020-chromium/x86_64_defconfig         | 108 +++++++++---------
- 2 files changed, 56 insertions(+), 54 deletions(-)
+ 2 files changed, 57 insertions(+), 53 deletions(-)
 
 diff --git a/groups/kernel/AndroidBoard.mk b/groups/kernel/AndroidBoard.mk
 index 0adc123..cc6e389 100644
@@ -24,14 +24,12 @@ index 0adc123..cc6e389 100644
  
  ifneq ($(TARGET_KERNEL_CLANG_VERSION),)
 diff --git a/groups/kernel/gmin64/config-lts/lts2020-chromium/x86_64_defconfig b/groups/kernel/gmin64/config-lts/lts2020-chromium/x86_64_defconfig
-index 4b25658..062eb16 100644
+index 7a7ac2b..a8c7060 100644
 --- a/groups/kernel/gmin64/config-lts/lts2020-chromium/x86_64_defconfig
 +++ b/groups/kernel/gmin64/config-lts/lts2020-chromium/x86_64_defconfig
-@@ -1,14 +1,16 @@
- #
+@@ -2,13 +2,15 @@
  # Automatically generated file; DO NOT EDIT.
--# Linux/x86_64 5.10.101 Kernel Configuration
-+# Linux/x86_64 5.10.110 Kernel Configuration
+ # Linux/x86_64 5.10.118 Kernel Configuration
  #
 -CONFIG_CC_VERSION_TEXT="Android (7485623, based on r416183b1) clang version 12.0.7 (https://android.googlesource.com/toolchain/llvm-project c935d99d7cf2016289302412d708641d52d2f7ee)"
 +CONFIG_CC_VERSION_TEXT="Android (8490178, based on r450784d) clang version 14.0.6 (https://android.googlesource.com/toolchain/llvm-project 4c603efb0cca074e9238af8b4106c30add4418f6)"
@@ -67,7 +65,7 @@ index 4b25658..062eb16 100644
  # CONFIG_HZ_100 is not set
  # CONFIG_HZ_250 is not set
  # CONFIG_HZ_300 is not set
-@@ -603,54 +603,13 @@ CONFIG_COMPAT=y
+@@ -602,54 +602,13 @@ CONFIG_COMPAT=y
  CONFIG_COMPAT_FOR_U64_ALIGNMENT=y
  # end of Binary Emulations
  
@@ -123,7 +121,7 @@ index 4b25658..062eb16 100644
  
  #
  # General architecture-dependent options
-@@ -1660,6 +1619,46 @@ CONFIG_DMA_SHARED_BUFFER=y
+@@ -1663,6 +1622,46 @@ CONFIG_DMA_SHARED_BUFFER=y
  
  CONFIG_CONNECTOR=y
  CONFIG_PROC_EVENTS=y
@@ -170,7 +168,7 @@ index 4b25658..062eb16 100644
  # CONFIG_GNSS is not set
  # CONFIG_MTD is not set
  # CONFIG_OF is not set
-@@ -1733,7 +1732,6 @@ CONFIG_BLK_DEV_NVME=y
+@@ -1736,7 +1735,6 @@ CONFIG_BLK_DEV_NVME=y
  # CONFIG_XILINX_SDFEC is not set
  CONFIG_UID_SYS_STATS=y
  # CONFIG_UID_SYS_STATS_DEBUG is not set
@@ -178,7 +176,7 @@ index 4b25658..062eb16 100644
  # CONFIG_C2PORT is not set
  
  #
-@@ -1772,6 +1770,7 @@ CONFIG_INTEL_MEI_TXE=m
+@@ -1775,6 +1773,7 @@ CONFIG_INTEL_MEI_TXE=m
  # CONFIG_MISC_RTSX_USB is not set
  # CONFIG_HABANA_AI is not set
  # CONFIG_UACCE is not set
@@ -186,7 +184,7 @@ index 4b25658..062eb16 100644
  # end of Misc devices
  
  CONFIG_HAVE_IDE=y
-@@ -3318,6 +3317,7 @@ CONFIG_THERMAL_EMULATION=y
+@@ -3320,6 +3319,7 @@ CONFIG_THERMAL_EMULATION=y
  # Intel thermal drivers
  #
  # CONFIG_INTEL_POWERCLAMP is not set
@@ -194,7 +192,16 @@ index 4b25658..062eb16 100644
  CONFIG_X86_PKG_TEMP_THERMAL=y
  CONFIG_INTEL_SOC_DTS_IOSF_CORE=y
  CONFIG_INTEL_SOC_DTS_THERMAL=m
-@@ -6547,9 +6547,9 @@ CONFIG_LSM="selinux"
+@@ -4372,6 +4372,8 @@ CONFIG_SND_SOC_ACPI=m
+ # CONFIG_SND_ATMEL_SOC is not set
+ # CONFIG_SND_BCM63XX_I2S_WHISTLER is not set
+ # CONFIG_SND_DESIGNWARE_I2S is not set
++
++#
+ # SoC Audio for Freescale CPUs
+ #
+ 
+@@ -6552,9 +6554,9 @@ CONFIG_LSM="selinux"
  #
  CONFIG_CC_HAS_AUTO_VAR_INIT_PATTERN=y
  CONFIG_CC_HAS_AUTO_VAR_INIT_ZERO=y
@@ -206,7 +213,7 @@ index 4b25658..062eb16 100644
  CONFIG_INIT_ON_ALLOC_DEFAULT_ON=y
  # CONFIG_INIT_ON_FREE_DEFAULT_ON is not set
  # end of Memory initialization
-@@ -6686,6 +6686,8 @@ CONFIG_CRYPTO_SHA512=y
+@@ -6691,6 +6693,8 @@ CONFIG_CRYPTO_SHA512=y
  CONFIG_CRYPTO_AES=y
  # CONFIG_CRYPTO_AES_TI is not set
  CONFIG_CRYPTO_AES_NI_INTEL=y

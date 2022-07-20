@@ -1,29 +1,30 @@
-From 07f8288057c1feb6e6b531e9c0331e78db90f6e6 Mon Sep 17 00:00:00 2001
-From: "Senapati, Rasmiranjan" <rasmiranjan.senapati@intel.com>
-Date: Thu, 26 May 2022 04:49:55 +0000
+From 8ee6b8b25e8ff925506c8be826e0f128d6f422c8 Mon Sep 17 00:00:00 2001
+From: svenate <salini.venate@intel.com>
+Date: Tue, 19 Jul 2022 08:42:46 +0530
 Subject: [PATCH] Revert "upgrading sensors@1.0-service to sensors@2.0-service
  in Android_S"
 
 This reverts commit 72c432b60568a03f6c5f76a2ae80dce2fd8d9f4d.
-
-Change-Id: I96d7f7734a1ff96d568816effa38c5816cffc391
 ---
- groups/device-specific/caas/framework_manifest.xml | 9 +++++++++
- groups/device-specific/caas/manifest.xml           | 9 +++++++++
- groups/sensors/mediation/BoardConfig.mk            | 4 ----
- groups/sensors/mediation/option.spec               | 2 --
- groups/sensors/mediation/product.mk                | 8 +++++---
- 5 files changed, 23 insertions(+), 9 deletions(-)
+ groups/device-specific/caas/framework_manifest.xml | 12 +++++++++---
+ groups/device-specific/caas/manifest.xml           | 10 ++++++++++
+ groups/sensors/mediation/BoardConfig.mk            |  4 ----
+ groups/sensors/mediation/option.spec               |  2 --
+ groups/sensors/mediation/product.mk                |  8 +++++---
+ 5 files changed, 24 insertions(+), 12 deletions(-)
  delete mode 100644 groups/sensors/mediation/option.spec
 
 diff --git a/groups/device-specific/caas/framework_manifest.xml b/groups/device-specific/caas/framework_manifest.xml
-index a59d4d7..1e0ef92 100644
+index ec28769..1cae465 100644
 --- a/groups/device-specific/caas/framework_manifest.xml
 +++ b/groups/device-specific/caas/framework_manifest.xml
-@@ -198,5 +198,14 @@
+@@ -184,7 +184,13 @@
              <instance>default</instance>
          </interface>
      </hal>
+-    <vendor-ndk>
+-        <version>31</version>
+-    </vendor-ndk>
 +    <hal format="hidl">
 +        <name>android.hardware.sensors</name>
 +        <transport>hwbinder</transport>
@@ -33,13 +34,12 @@ index a59d4d7..1e0ef92 100644
 +            <instance>default</instance>
 +        </interface>
 +    </hal>
- 
  </manifest>
 diff --git a/groups/device-specific/caas/manifest.xml b/groups/device-specific/caas/manifest.xml
-index 3a750f5..2b01a62 100644
+index d756376..48aff94 100644
 --- a/groups/device-specific/caas/manifest.xml
 +++ b/groups/device-specific/caas/manifest.xml
-@@ -155,6 +155,15 @@
+@@ -152,6 +152,16 @@
              <instance>default</instance>
          </interface>
      </hal>
@@ -52,9 +52,10 @@ index 3a750f5..2b01a62 100644
 +            <instance>default</instance>
 +        </interface>
 +    </hal>
-     <kernel target-level="5"/>
++    <kernel target-level="5"/>
      <sepolicy>
          <version>33.0</version>
+     </sepolicy>
 diff --git a/groups/sensors/mediation/BoardConfig.mk b/groups/sensors/mediation/BoardConfig.mk
 index 0adc828..7f6aba9 100644
 --- a/groups/sensors/mediation/BoardConfig.mk
