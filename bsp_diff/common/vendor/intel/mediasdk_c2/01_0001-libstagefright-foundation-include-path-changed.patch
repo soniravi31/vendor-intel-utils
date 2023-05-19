@@ -1,0 +1,44 @@
+From e0ae50aa4eaa1d5596ea2df7dd1d4a27f91aa912 Mon Sep 17 00:00:00 2001
+From: Tanuj Tekriwal <tanuj.tekriwal@intel.com>
+Date: Tue, 21 Mar 2023 09:41:26 +0530
+Subject: [PATCH] libstagefright/foundation/include path changed
+
+libstagefright/foundation has been moved to module
+Updating the same.
+
+Tracked-On: NA
+Signed-off-by: Tanuj Tekriwal <tanuj.tekriwal@intel.com>
+---
+ Android.bp          | 2 +-
+ c2_utils/Android.mk | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Android.bp b/Android.bp
+index 03d58cc..077b75b 100644
+--- a/Android.bp
++++ b/Android.bp
+@@ -34,7 +34,7 @@ mfx_cc_defaults {
+ 
+     include_dirs: [
+         "hardware/intel/external/minigbm-intel/cros_gralloc", // remove then minigbm gets Android.bp
+-        "frameworks/av/media/libstagefright/foundation/include",
++        "frameworks/av/media/module/foundation/include",
+         "frameworks/av/media/bufferpool/2.0/include",
+         "frameworks/av/media/codec2/sfplugin/utils",
+         "frameworks/av/media/codec2/vndk/include",
+diff --git a/c2_utils/Android.mk b/c2_utils/Android.mk
+index 8ffaa9d..c2e0d2c 100644
+--- a/c2_utils/Android.mk
++++ b/c2_utils/Android.mk
+@@ -40,7 +40,7 @@ LOCAL_C_INCLUDES := \
+     frameworks/av/media/codec2/components/base/include \
+     frameworks/av/media/codec2/core/include \
+     frameworks/av/media/libstagefright/include \
+-    frameworks/av/media/libstagefright/foundation/include \
++    frameworks/av/media/module/foundation/include \
+     system/core/include/utils \
+     system/core/base/include \
+     $(MFX_C2_INCLUDES) \
+-- 
+2.17.1
+

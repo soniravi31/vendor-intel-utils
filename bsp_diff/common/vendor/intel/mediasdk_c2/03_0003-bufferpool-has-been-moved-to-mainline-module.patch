@@ -1,0 +1,29 @@
+From 0773464cbfbcb18e8317ce3ffd03016d7c5e3946 Mon Sep 17 00:00:00 2001
+From: Tanuj Tekriwal <tanuj.tekriwal@intel.com>
+Date: Tue, 21 Mar 2023 15:51:56 +0530
+Subject: [PATCH] bufferpool has been moved to mainline module
+
+update the path accordingly.
+
+Tracked-On: NA
+Signed-off-by: Tanuj Tekriwal <tanuj.tekriwal@intel.com>
+---
+ Android.bp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Android.bp b/Android.bp
+index 077b75b..ab346c2 100644
+--- a/Android.bp
++++ b/Android.bp
+@@ -35,7 +35,7 @@ mfx_cc_defaults {
+     include_dirs: [
+         "hardware/intel/external/minigbm-intel/cros_gralloc", // remove then minigbm gets Android.bp
+         "frameworks/av/media/module/foundation/include",
+-        "frameworks/av/media/bufferpool/2.0/include",
++        "frameworks/av/media/module/bufferpool/2.0/include",
+         "frameworks/av/media/codec2/sfplugin/utils",
+         "frameworks/av/media/codec2/vndk/include",
+         "frameworks/native/include",
+-- 
+2.17.1
+

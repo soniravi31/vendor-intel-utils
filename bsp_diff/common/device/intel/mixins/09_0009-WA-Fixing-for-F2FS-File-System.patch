@@ -1,0 +1,25 @@
+From 3065e0aced19b557a68abc50b19d7073e9954181 Mon Sep 17 00:00:00 2001
+From: Ankit Agrawal <ankit.agarwal@intel.com>
+Date: Thu, 18 May 2023 17:56:42 +0530
+Subject: [PATCH] WA-Fixing for F2FS File System.
+
+To enable F2FS file system updating mixins for now.
+Later will update at proper place.
+
+Tracked-On: OAM-106853
+Signed-off-by: Ankit Agrawal <ankit.agarwal@intel.com>
+---
+ groups/flashfiles/mixinfo.spec | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/groups/flashfiles/mixinfo.spec b/groups/flashfiles/mixinfo.spec
+index 1e7943e..b9687d1 100644
+--- a/groups/flashfiles/mixinfo.spec
++++ b/groups/flashfiles/mixinfo.spec
+@@ -1,2 +1,2 @@
+ [mixinfo]
+-deps = variants slot-ab dynamic-partitions boot-arch
++deps = variants slot-ab dynamic-partitions
+-- 
+2.17.1
+

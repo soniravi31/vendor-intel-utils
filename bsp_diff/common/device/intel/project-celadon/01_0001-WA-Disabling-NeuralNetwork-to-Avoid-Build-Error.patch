@@ -1,0 +1,31 @@
+From 706bd422769df6a3bf2bfb29bec3cad4ebf5842c Mon Sep 17 00:00:00 2001
+From: Ankit Agrawal <ankit.agarwal@intel.com>
+Date: Thu, 18 May 2023 19:13:56 +0530
+Subject: [PATCH] WA-Disabling NeuralNetwork to Avoid Build Error.
+
+Build Error-:
+ld.lld: error: undefined symbol: ruy::Pack8bitRowMajorForAvx(unsigned char const*, int, int, signed char*, int, int, int, int, int, int, int, int*)
+>>> referenced by pack_x86.h:369 (external/ruy/ruy/pack_x86.h:369)
+>>>               sse_tensor_utils.o:(void ruy::RunPack<(ruy::Path)16, ruy::FixedKernelLayout<(ruy::Order)0, 4, 8>, signed char, signed char>(ruy::Tuning, ruy::EMat const&, ruy::PEMat*, int, int)) in archive out/soong/.intermediates/packages/modules/NeuralNetworks/common/libneuralnetworks_common/android_vendor.34_x86_64_silvermont_static/libneuralnetworks_common.a
+
+Disabled NeuralNetwork mixin to avoid build error.
+
+Tracked-On: OAM-106853
+Signed-off-by: Ankit Agrawal <ankit.agarwal@intel.com>
+---
+ caas/mixins.spec | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/caas/mixins.spec b/caas/mixins.spec
+index 5b9d713..0966dc2 100755
+--- a/caas/mixins.spec
++++ b/caas/mixins.spec
+@@ -89,4 +89,4 @@ sensors: mediation(enable_sensor_list=true)
+ bugreport: true
+ mainline-mod: true
+ houdini: true
+-neuralnetworks: true(vsock-remote-infer=true)
++neuralnetworks: false(vsock-remote-infer=true)
+-- 
+2.17.1
+

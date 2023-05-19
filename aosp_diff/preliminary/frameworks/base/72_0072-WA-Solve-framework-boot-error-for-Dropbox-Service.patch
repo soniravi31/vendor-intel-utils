@@ -1,0 +1,56 @@
+From 73156d1229c03f519b39778487ffcf6f26ffe297 Mon Sep 17 00:00:00 2001
+From: Ankit Agrawal <ankit.agarwal@intel.com>
+Date: Thu, 18 May 2023 15:05:27 +0530
+Subject: [PATCH] WA - Solve framework boot error for Dropbox Service.
+
+Boot error:
+E SystemServiceRegistry: No service published for: dropbox
+E SystemServiceRegistry: android.os.ServiceManager$ServiceNotFoundException: No service published for: dropbox
+E SystemServiceRegistry: 	at android.os.ServiceManager.getServiceOrThrow(ServiceManager.java:166)
+E SystemServiceRegistry: 	at android.app.SystemServiceRegistry$25.createService(SystemServiceRegistry.java:491)
+E SystemServiceRegistry: 	at android.app.SystemServiceRegistry$25.createService(SystemServiceRegistry.java:488)
+E SystemServiceRegistry: 	at android.app.SystemServiceRegistry$CachedServiceFetcher.getService(SystemServiceRegistry.java:1971)
+E SystemServiceRegistry: 	at android.app.SystemServiceRegistry.getSystemService(SystemServiceRegistry.java:1645)
+E SystemServiceRegistry: 	at android.app.ContextImpl.getSystemService(ContextImpl.java:2212)
+E SystemServiceRegistry: 	at android.content.Context.getSystemService(Context.java:4420)
+E SystemServiceRegistry: 	at com.android.server.am.ActivityManagerService.addErrorToDropBox(ActivityManagerService.java:9146)
+E SystemServiceRegistry: 	at com.android.server.am.ActivityManagerService.handleApplicationWtfInner(ActivityManagerService.java:8963)
+E SystemServiceRegistry: 	at com.android.server.am.ActivityManagerService$15.run(ActivityManagerService.java:8929)
+E SystemServiceRegistry: 	at android.os.Handler.handleCallback(Handler.java:958)
+E SystemServiceRegistry: 	at android.os.Handler.dispatchMessage(Handler.java:99)
+E SystemServiceRegistry: 	at android.os.Looper.loopOnce(Looper.java:205)
+E SystemServiceRegistry: 	at android.os.Looper.loop(Looper.java:294)
+E SystemServiceRegistry: 	at android.os.HandlerThread.run(HandlerThread.java:67)
+E SystemServiceRegistry: 	at com.android.server.ServiceThread.run(ServiceThread.java:46)
+E SystemServiceRegistry: Manager wrapper not available: dropbox
+
+Adding null check before calling getSystemService.
+
+Tracked-On: OAM-106853
+Signed-off-by: Ankit Agrawal <ankit.agarwal@intel.com>
+---
+ .../com/android/server/am/ActivityManagerService.java     | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
+
+diff --git a/services/core/java/com/android/server/am/ActivityManagerService.java b/services/core/java/com/android/server/am/ActivityManagerService.java
+index 48898a6393db..6c72a8c6689f 100644
+--- a/services/core/java/com/android/server/am/ActivityManagerService.java
++++ b/services/core/java/com/android/server/am/ActivityManagerService.java
+@@ -9141,12 +9141,8 @@ public class ActivityManagerService extends IActivityManager.Stub
+         // otherwise the watchdog may be prevented from resetting the system.
+ 
+         // Bail early if not published yet
+-        final DropBoxManager dbox;
+-        try {
+-            dbox = mContext.getSystemService(DropBoxManager.class);
+-        } catch (Exception e) {
+-            return;
+-        }
++        if (ServiceManager.getService(Context.DROPBOX_SERVICE) == null) return;
++        final DropBoxManager dbox = mContext.getSystemService(DropBoxManager.class);
+ 
+         // Exit early if the dropbox isn't configured to accept this report type.
+         final String dropboxTag = processClass(process) + "_" + eventType;
+-- 
+2.17.1
+
