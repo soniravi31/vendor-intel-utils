@@ -1,0 +1,37 @@
+From be36bbdc05ddf40628604e75ddc39396e8edfb58 Mon Sep 17 00:00:00 2001
+From: Jeevaka Prabu Badrappan <jeevaka.badrappan@intel.com>
+Date: Thu, 18 May 2023 21:03:19 +0530
+Subject: [PATCH] [WA] fix for depmod error due to dependency cycles
+
+Kernel build fails with error "depmod: error: cycle detected:
+drm_display_helper -> drm_kms_helper -> drm_display_helper".
+
+For the time being comment out the code causing dependency cycles.
+
+Signed-off-by: Jeevaka Prabu Badrappan <jeevaka.badrappan@intel.com>
+---
+ drivers/gpu/drm/drm_bridge_connector.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/drivers/gpu/drm/drm_bridge_connector.c b/drivers/gpu/drm/drm_bridge_connector.c
+index 4147c6240110..d4ffd1d56d82 100644
+--- a/drivers/gpu/drm/drm_bridge_connector.c
++++ b/drivers/gpu/drm/drm_bridge_connector.c
+@@ -403,9 +403,14 @@ struct drm_connector *drm_bridge_connector_init(struct drm_device *drm,
+ 	if (panel_bridge)
+ 		drm_panel_bridge_set_orientation(connector, panel_bridge);
+ 
++	/*
++	 * Enable once following circular dependency issue is addressed
++	 * drm_display_helper -> drm_kms_helper -> drm_display_helper
++	 *
+ 	if (support_hdcp && IS_REACHABLE(CONFIG_DRM_DISPLAY_HELPER) &&
+ 	    IS_ENABLED(CONFIG_DRM_DISPLAY_HDCP_HELPER))
+ 		drm_connector_attach_content_protection_property(connector, true);
++	*/
+ 
+ 	return connector;
+ }
+-- 
+2.40.1
+
