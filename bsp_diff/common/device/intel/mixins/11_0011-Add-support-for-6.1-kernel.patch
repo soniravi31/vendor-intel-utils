@@ -1,4 +1,4 @@
-From a94e3dfd6c2b9809d80a9428d0ac29251a9e1d86 Mon Sep 17 00:00:00 2001
+From 8629370418bb1fe943d6142f2ea7f5f55b50fd11 Mon Sep 17 00:00:00 2001
 From: "Badrappan, Jeevaka" <jeevaka.badrappan@intel.com>
 Date: Thu, 1 Jun 2023 15:57:56 +0530
 Subject: [PATCH] Add support for 6.1 kernel
@@ -15,9 +15,9 @@ Signed-off-by: Badrappan, Jeevaka <jeevaka.badrappan@intel.com>
  groups/kernel/AndroidBoard.mk                 |    3 +
  .../lts2022-chromium/caas_diffconfig          |   28 +
  .../lts2022-chromium/debug_diffconfig         |   92 +
- .../lts2022-chromium/x86_64_defconfig         | 7730 +++++++++++++++++
+ .../lts2022-chromium/x86_64_defconfig         | 7731 +++++++++++++++++
  groups/kernel/option.spec-gmin                |    2 +
- 6 files changed, 7856 insertions(+)
+ 6 files changed, 7857 insertions(+)
  create mode 100644 groups/kernel/gmin64/config-lts/lts2022-chromium/caas_diffconfig
  create mode 100644 groups/kernel/gmin64/config-lts/lts2022-chromium/debug_diffconfig
  create mode 100644 groups/kernel/gmin64/config-lts/lts2022-chromium/x86_64_defconfig
@@ -35,7 +35,7 @@ index 8277f73..30f894b 100644
  _EXTRA_FW_ += $(I915_FW)
  
 diff --git a/groups/kernel/AndroidBoard.mk b/groups/kernel/AndroidBoard.mk
-index 72228d3..8999494 100644
+index 0c4225e..786537b 100644
 --- a/groups/kernel/AndroidBoard.mk
 +++ b/groups/kernel/AndroidBoard.mk
 @@ -60,6 +60,9 @@ ifeq ($(BASE_LTS2021_CHROMIUM_KERNEL), true)
@@ -182,13 +182,13 @@ index 0000000..32bd5ca
 +CONFIG_SCHED_STACK_END_CHECK=y
 diff --git a/groups/kernel/gmin64/config-lts/lts2022-chromium/x86_64_defconfig b/groups/kernel/gmin64/config-lts/lts2022-chromium/x86_64_defconfig
 new file mode 100644
-index 0000000..19f7a91
+index 0000000..0268a87
 --- /dev/null
 +++ b/groups/kernel/gmin64/config-lts/lts2022-chromium/x86_64_defconfig
-@@ -0,0 +1,7730 @@
+@@ -0,0 +1,7731 @@
 +#
 +# Automatically generated file; DO NOT EDIT.
-+# Linux/x86_64 6.1.25 Kernel Configuration
++# Linux/x86_64 6.1.34 Kernel Configuration
 +#
 +CONFIG_CC_VERSION_TEXT="Android (9796371, based on r487747) clang version 17.0.0 (https://android.googlesource.com/toolchain/llvm-project d9f89f4d16663d5012e5c09495f3b30ece3d2362)"
 +CONFIG_GCC_VERSION=0
@@ -1134,6 +1134,7 @@ index 0000000..19f7a91
 +# CONFIG_CMA_DEBUG is not set
 +# CONFIG_CMA_SYSFS is not set
 +CONFIG_CMA_AREAS=16
++CONFIG_ZSMALLOC_CHAIN_SIZE=8
 +CONFIG_GENERIC_EARLY_IOREMAP=y
 +# CONFIG_DEFERRED_STRUCT_PAGE_INIT is not set
 +# CONFIG_IDLE_PAGE_TRACKING is not set
@@ -2048,6 +2049,7 @@ index 0000000..19f7a91
 +# CONFIG_INTEL_MEI_GSC is not set
 +# CONFIG_INTEL_MEI_HDCP is not set
 +# CONFIG_INTEL_MEI_PXP is not set
++# CONFIG_INTEL_MEI_GSC_PROXY is not set
 +# CONFIG_VMWARE_VMCI is not set
 +# CONFIG_GENWQE is not set
 +# CONFIG_ECHO is not set
@@ -4146,6 +4148,7 @@ index 0000000..19f7a91
 +# CONFIG_VIDEO_OG01A1B is not set
 +# CONFIG_VIDEO_OV02A10 is not set
 +# CONFIG_VIDEO_OV08D10 is not set
++# CONFIG_VIDEO_OV08X40 is not set
 +# CONFIG_VIDEO_OV13858 is not set
 +# CONFIG_VIDEO_OV13B10 is not set
 +# CONFIG_VIDEO_OV2640 is not set
@@ -4447,6 +4450,7 @@ index 0000000..19f7a91
 +
 +# CONFIG_DRM_VGEM is not set
 +# CONFIG_DRM_VKMS is not set
++# CONFIG_DRM_EVDI is not set
 +# CONFIG_DRM_VMWGFX is not set
 +# CONFIG_DRM_GMA500 is not set
 +# CONFIG_DRM_UDL is not set
@@ -4963,6 +4967,8 @@ index 0000000..19f7a91
 +# CONFIG_SND_SOC_CS35L41_I2C is not set
 +# CONFIG_SND_SOC_CS35L45_SPI is not set
 +# CONFIG_SND_SOC_CS35L45_I2C is not set
++# CONFIG_SND_SOC_CS35L56_I2C is not set
++# CONFIG_SND_SOC_CS35L56_SPI is not set
 +# CONFIG_SND_SOC_CS42L42 is not set
 +# CONFIG_SND_SOC_CS42L51_I2C is not set
 +# CONFIG_SND_SOC_CS42L52 is not set
@@ -5084,6 +5090,7 @@ index 0000000..19f7a91
 +# CONFIG_SND_SOC_WM8904 is not set
 +# CONFIG_SND_SOC_WM8940 is not set
 +# CONFIG_SND_SOC_WM8960 is not set
++# CONFIG_SND_SOC_WM8961 is not set
 +# CONFIG_SND_SOC_WM8962 is not set
 +# CONFIG_SND_SOC_WM8974 is not set
 +# CONFIG_SND_SOC_WM8978 is not set
@@ -6028,9 +6035,8 @@ index 0000000..19f7a91
 +# CONFIG_FUJITSU_LAPTOP is not set
 +# CONFIG_FUJITSU_TABLET is not set
 +# CONFIG_GPD_POCKET_FAN is not set
-+# CONFIG_HP_ACCEL is not set
++# CONFIG_X86_PLATFORM_DRIVERS_HP is not set
 +# CONFIG_WIRELESS_HOTKEY is not set
-+# CONFIG_HP_WMI is not set
 +# CONFIG_IBM_RTL is not set
 +# CONFIG_IDEAPAD_LAPTOP is not set
 +# CONFIG_SENSORS_HDAPS is not set
@@ -6089,6 +6095,7 @@ index 0000000..19f7a91
 +# CONFIG_INTEL_SCU_PLATFORM is not set
 +# CONFIG_SIEMENS_SIMATIC_IPC is not set
 +# CONFIG_WINMATE_FM07_KEYS is not set
++# CONFIG_VIRT_PMC is not set
 +CONFIG_P2SB=y
 +CONFIG_HAVE_CLK=y
 +CONFIG_HAVE_CLK_PREPARE=y
@@ -7246,7 +7253,6 @@ index 0000000..19f7a91
 +#
 +CONFIG_CRYPTO_AES=y
 +# CONFIG_CRYPTO_AES_TI is not set
-+# CONFIG_CRYPTO_ANUBIS is not set
 +# CONFIG_CRYPTO_ARIA is not set
 +CONFIG_CRYPTO_BLOWFISH=y
 +CONFIG_CRYPTO_BLOWFISH_COMMON=y
@@ -7255,11 +7261,8 @@ index 0000000..19f7a91
 +# CONFIG_CRYPTO_CAST6 is not set
 +CONFIG_CRYPTO_DES=y
 +# CONFIG_CRYPTO_FCRYPT is not set
-+# CONFIG_CRYPTO_KHAZAD is not set
-+# CONFIG_CRYPTO_SEED is not set
 +# CONFIG_CRYPTO_SERPENT is not set
 +# CONFIG_CRYPTO_SM4_GENERIC is not set
-+# CONFIG_CRYPTO_TEA is not set
 +CONFIG_CRYPTO_TWOFISH=y
 +CONFIG_CRYPTO_TWOFISH_COMMON=y
 +# end of Block ciphers
@@ -7355,12 +7358,10 @@ index 0000000..19f7a91
 +#
 +# Userspace interface
 +#
-+CONFIG_CRYPTO_USER_API=m
 +# CONFIG_CRYPTO_USER_API_HASH is not set
 +# CONFIG_CRYPTO_USER_API_SKCIPHER is not set
 +# CONFIG_CRYPTO_USER_API_RNG is not set
 +# CONFIG_CRYPTO_USER_API_AEAD is not set
-+CONFIG_CRYPTO_USER_API_ENABLE_OBSOLETE=y
 +# end of Userspace interface
 +
 +CONFIG_CRYPTO_HASH_INFO=y
