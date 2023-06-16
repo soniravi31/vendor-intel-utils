@@ -1,4 +1,4 @@
-From 4c129d7a16f229efc7353d92d9baebfefa8accd1 Mon Sep 17 00:00:00 2001
+From c374506a809457a51298edaf14098947e5997ab4 Mon Sep 17 00:00:00 2001
 From: Zhi Jin <zhi.jin@intel.com>
 Date: Mon, 22 Jul 2019 18:20:28 +0800
 Subject: [PATCH] make vmmouse report relative values
@@ -11,7 +11,7 @@ Signed-off-by: Zhi Jin <zhi.jin@intel.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/drivers/input/mouse/vmmouse.c b/drivers/input/mouse/vmmouse.c
-index 42443ffba7c4..55ab6c9ea6ae 100644
+index ea9eff7c8099..d9f1f86d6f40 100644
 --- a/drivers/input/mouse/vmmouse.c
 +++ b/drivers/input/mouse/vmmouse.c
 @@ -304,7 +304,7 @@ static int vmmouse_enable(struct psmouse *psmouse)
@@ -24,5 +24,5 @@ index 42443ffba7c4..55ab6c9ea6ae 100644
  
  	return 0;
 -- 
-2.37.0
+2.40.1
 

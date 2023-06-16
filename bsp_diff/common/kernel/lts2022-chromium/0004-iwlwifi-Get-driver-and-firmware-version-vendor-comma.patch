@@ -1,4 +1,4 @@
-From a09fdc9e60c36f38a7be513985397768ef00ffce Mon Sep 17 00:00:00 2001
+From 04a3a2374a2bfa27f42a6c94e527283ad3731f9f Mon Sep 17 00:00:00 2001
 From: Jeevaka Prabu Badrappan <jeevaka.badrappan@intel.com>
 Date: Thu, 18 May 2023 00:23:49 +0530
 Subject: [PATCH] iwlwifi: Get driver and firmware version vendor command
@@ -139,7 +139,7 @@ index 8668a1b46d68..a2e93c81cfed 100644
  	NUM_IWL_MVM_VENDOR_ATTR,
  	MAX_IWL_MVM_VENDOR_ATTR = NUM_IWL_MVM_VENDOR_ATTR - 1,
 diff --git a/drivers/net/wireless/iwl7000/iwlwifi/mvm/vendor-cmd.c b/drivers/net/wireless/iwl7000/iwlwifi/mvm/vendor-cmd.c
-index f8439ba9bd35..add76ec0d5f2 100644
+index 67d67e0638eb..5ab40249ee24 100644
 --- a/drivers/net/wireless/iwl7000/iwlwifi/mvm/vendor-cmd.c
 +++ b/drivers/net/wireless/iwl7000/iwlwifi/mvm/vendor-cmd.c
 @@ -6,6 +6,8 @@
@@ -160,7 +160,7 @@ index f8439ba9bd35..add76ec0d5f2 100644
  };
  
  static struct nlattr **iwl_mvm_parse_vendor_data(const void *data, int data_len)
-@@ -1672,6 +1676,48 @@ static int iwl_mvm_vendor_host_get_ownership(struct wiphy *wiphy,
+@@ -1673,6 +1677,48 @@ static int iwl_mvm_vendor_host_get_ownership(struct wiphy *wiphy,
  	return ret;
  }
  
@@ -209,7 +209,7 @@ index f8439ba9bd35..add76ec0d5f2 100644
  static const struct wiphy_vendor_command iwl_mvm_vendor_commands[] = {
  	{
  		.info = {
-@@ -2072,6 +2118,28 @@ static const struct wiphy_vendor_command iwl_mvm_vendor_commands[] = {
+@@ -2073,6 +2119,28 @@ static const struct wiphy_vendor_command iwl_mvm_vendor_commands[] = {
  		.maxattr = MAX_IWL_MVM_VENDOR_ATTR,
  #endif
  	},

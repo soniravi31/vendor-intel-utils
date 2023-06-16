@@ -1,4 +1,4 @@
-From 9ce9036bd49f021c8b35f6720effd4bb5c4b4a8e Mon Sep 17 00:00:00 2001
+From 11647f8af63f16d8608b53d914fb6304e7e8f453 Mon Sep 17 00:00:00 2001
 From: yaravapa <yasoda.aravapalli@intel.com>
 Date: Wed, 17 Feb 2021 12:38:36 +0530
 Subject: [PATCH] Prebuilts tar doesnot support -I option. So replaced with -J
@@ -11,7 +11,7 @@ Signed-off-by: yaravapa <yasoda.aravapalli@intel.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/kernel/gen_kheaders.sh b/kernel/gen_kheaders.sh
-index 0c78e64f747d..7e19026b5d78 100755
+index 473036b43c83..69556f136a79 100755
 --- a/kernel/gen_kheaders.sh
 +++ b/kernel/gen_kheaders.sh
 @@ -86,7 +86,7 @@ find $cpio_dir -type f -print0 |
@@ -24,5 +24,5 @@ index 0c78e64f747d..7e19026b5d78 100755
  echo $headers_md5 > kernel/kheaders.md5
  echo "$this_file_md5" >> kernel/kheaders.md5
 -- 
-2.37.0
+2.40.1
 
