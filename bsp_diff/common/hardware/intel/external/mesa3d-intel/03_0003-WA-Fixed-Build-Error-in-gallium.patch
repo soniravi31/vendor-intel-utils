@@ -1,4 +1,4 @@
-From 599d81835f7c7b130cf38c0b61c5f27b3164283b Mon Sep 17 00:00:00 2001
+From 96eef8dfabe9f0361a3e6837d831967a15db7d38 Mon Sep 17 00:00:00 2001
 From: Ankit Agrawal <ankit.agarwal@intel.com>
 Date: Thu, 18 May 2023 15:53:48 +0530
 Subject: [PATCH] WA-Fixed Build Error in gallium.
@@ -22,7 +22,7 @@ Signed-off-by: Ankit Agrawal <ankit.agarwal@intel.com>
  1 file changed, 6 deletions(-)
 
 diff --git a/src/gallium/targets/dri/dri.sym b/src/gallium/targets/dri/dri.sym
-index 7f7a93b02ff..13df604d1d9 100644
+index d4ffb588e05..13df604d1d9 100644
 --- a/src/gallium/targets/dri/dri.sym
 +++ b/src/gallium/targets/dri/dri.sym
 @@ -1,12 +1,6 @@
@@ -33,11 +33,11 @@ index 7f7a93b02ff..13df604d1d9 100644
 -		nouveau_drm_screen_create;
 -		radeon_drm_winsys_create;
 -		amdgpu_winsys_create;
--		fd_drm_screen_create;
+-		fd_drm_screen_create_renderonly;
 -		ac_init_shared_llvm_once;
  	local:
  		*;
  };
 -- 
-2.17.1
+2.40.0
 

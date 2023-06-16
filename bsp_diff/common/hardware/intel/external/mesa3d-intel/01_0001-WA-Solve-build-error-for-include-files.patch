@@ -1,4 +1,4 @@
-From c12624f5fd4f15c5d612793d9480419e12baf83c Mon Sep 17 00:00:00 2001
+From 549fb5acb4074a568d601c4092f0caa9cfb33937 Mon Sep 17 00:00:00 2001
 From: Tanuj Tekriwal <tanuj.tekriwal@intel.com>
 Date: Tue, 28 Mar 2023 09:37:39 +0530
 Subject: [PATCH] WA - Solve build error for include files
@@ -15,8 +15,8 @@ Tracked-On: NA
 Signed-off-by: Tanuj Tekriwal <tanuj.tekriwal@intel.com>
 ---
  include/android_stub/backtrace/Backtrace.h | 4 ++--
- src/util/u_debug_stack_android.cpp         | 2 +-
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ src/util/u_debug_stack_android.cpp         | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/include/android_stub/backtrace/Backtrace.h b/include/android_stub/backtrace/Backtrace.h
 index 664b531fb2b..1a69d346e69 100644
@@ -34,18 +34,25 @@ index 664b531fb2b..1a69d346e69 100644
  #if defined(__LP64__)
  #define PRIPTR "016" PRIx64
 diff --git a/src/util/u_debug_stack_android.cpp b/src/util/u_debug_stack_android.cpp
-index 061707c6790..a1886ee95ef 100644
+index 4481771baf9..d9dd6d84ace 100644
 --- a/src/util/u_debug_stack_android.cpp
 +++ b/src/util/u_debug_stack_android.cpp
-@@ -21,7 +21,7 @@
-  * IN THE SOFTWARE.
-  */
+@@ -25,7 +25,7 @@
+ 
+ #if WITH_LIBBACKTRACE
  
 -#include <backtrace/Backtrace.h>
 +#include <android_stub/backtrace/Backtrace.h>
  
+ #include "util/simple_mtx.h"
  #include "util/u_debug.h"
- #include "u_debug_stack.h"
+@@ -146,4 +146,4 @@ debug_backtrace_print(FILE *f,
+ {
+ }
+ 
+-#endif // WITH_LIBBACKTRACE
+\ No newline at end of file
++#endif // WITH_LIBBACKTRACE
 -- 
-2.17.1
+2.40.0
 

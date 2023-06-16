@@ -1,4 +1,4 @@
-From 919fce03fc2c7302a4fdede78bf4f25c36aa4785 Mon Sep 17 00:00:00 2001
+From d4cf4fcda89d5fb5fa24f6603641496d72a5cae7 Mon Sep 17 00:00:00 2001
 From: Tanuj Tekriwal <tanuj.tekriwal@intel.com>
 Date: Mon, 27 Mar 2023 14:45:11 +0530
 Subject: [PATCH] Add macro for Android U
@@ -7,11 +7,11 @@ Tracked-On: NA
 Signed-off-by: Tanuj Tekriwal <tanuj.tekriwal@intel.com>
 ---
  android/include/mfx_android_config.h | 7 ++++---
- android/mfx_defs.mk                  | 3 +++
- 2 files changed, 7 insertions(+), 3 deletions(-)
+ android/mfx_defs.mk                  | 5 ++++-
+ 2 files changed, 8 insertions(+), 4 deletions(-)
 
 diff --git a/android/include/mfx_android_config.h b/android/include/mfx_android_config.h
-index 8325077..1ee3135 100644
+index 83250777..1ee3135b 100644
 --- a/android/include/mfx_android_config.h
 +++ b/android/include/mfx_android_config.h
 @@ -16,8 +16,9 @@ Copyright(c) 2011-2018 Intel Corporation. All Rights Reserved.
@@ -28,19 +28,21 @@ index 8325077..1ee3135 100644
  
  #endif // #ifndef __MFX_CONFIG_H__
 diff --git a/android/mfx_defs.mk b/android/mfx_defs.mk
-index 0670475..85f7827 100644
+index 5e1ea544..2f93b8b9 100644
 --- a/android/mfx_defs.mk
 +++ b/android/mfx_defs.mk
-@@ -21,6 +21,9 @@ MEDIA_VERSION_ALL := $(MEDIA_VERSION).pre$(MEDIA_VERSION_EXTRA)
- MFX_CFLAGS += -DMEDIA_VERSION_STR=\"\\\"${MEDIA_VERSION_ALL}\\\"\"
+@@ -22,7 +22,10 @@ MFX_CFLAGS += -DMEDIA_VERSION_STR=\"\\\"${MEDIA_VERSION}\\\"\"
+ MFX_CFLAGS += -DONEVPL_EXPERIMENTAL
  
  # Android version preference:
+-ifneq ($(filter 13 13.% S ,$(PLATFORM_VERSION)),)
 +ifneq ($(filter 14 14.% U% ,$(PLATFORM_VERSION)),)
 +  MFX_ANDROID_VERSION:= MFX_U
 +endif
- ifneq ($(filter 13 13.% T% ,$(PLATFORM_VERSION)),)
++ifneq ($(filter 13 13.% T% ,$(PLATFORM_VERSION)),)
    MFX_ANDROID_VERSION:= MFX_T
  endif
+ ifneq ($(filter 12 12.% S ,$(PLATFORM_VERSION)),)
 -- 
-2.17.1
+2.40.0
 
