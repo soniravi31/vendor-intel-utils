@@ -1,0 +1,47 @@
+From 3369e5a9c7a45fcf6db98231e2873b2c1f4cb17e Mon Sep 17 00:00:00 2001
+From: "Badrappan, Jeevaka" <jeevaka.badrappan@intel.com>
+Date: Tue, 4 Jul 2023 22:03:53 +0530
+Subject: [PATCH] [REVERT ME] Disable kernel compatibility check
+
+Once device is booted up, error dialog "There\'s an internal problem
+with your device. Contact  your manufacturer for details." is shown.
+
+Kernel compatibility check fails because of kernel version and
+target level incompatibility. As per Android 14, target-level needs to
+be set to 8. Since not all vendor HALs are compatible as per
+target-level 8, target-level is set to 7 in device manifest.
+
+Disable the kernel compatibility check until the HALs are compatible
+with target-level 8 and target-level is changed to 8.
+
+Tracked-On: OAM-111022
+Change-Id: I8a8e50e19b1ebe812bb15abf1a45f94d18b7b20b
+Signed-off-by: Badrappan, Jeevaka <jeevaka.badrappan@intel.com>
+---
+ RuntimeInfo.cpp | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/RuntimeInfo.cpp b/RuntimeInfo.cpp
+index 3b5860b..ab2056f 100644
+--- a/RuntimeInfo.cpp
++++ b/RuntimeInfo.cpp
+@@ -97,7 +97,7 @@ bool RuntimeInfo::checkCompatibility(const CompatibilityMatrix& mat, std::string
+ 
+     // mat.mSepolicy.sepolicyVersion() is checked against static
+     // HalManifest.device.mSepolicyVersion in HalManifest::checkCompatibility.
+-
++#if 0
+     if (flags.isKernelEnabled()) {
+         if (!isMainlineKernel() &&
+             mKernel.getMatchedKernelRequirements(mat.framework.mKernels, kernelLevel(), error)
+@@ -105,6 +105,7 @@ bool RuntimeInfo::checkCompatibility(const CompatibilityMatrix& mat, std::string
+             return false;
+         }
+     }
++#endif
+ 
+     if (flags.isAvbEnabled()) {
+         const Version& matAvb = mat.framework.mAvbMetaVersion;
+-- 
+2.40.0
+

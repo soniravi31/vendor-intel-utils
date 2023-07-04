@@ -1,0 +1,37 @@
+From 21c1d522fdfdafd92f2226a7db5b2ccf14687909 Mon Sep 17 00:00:00 2001
+From: "Badrappan, Jeevaka" <jeevaka.badrappan@intel.com>
+Date: Wed, 5 Jul 2023 17:54:40 +0530
+Subject: [PATCH] [REVERT ME] Skip checking kernel vintf requirements
+
+Inorder for kernel vintf requirements to succeed, target level needs to
+be set to 8 and kernel requirements needs to be met.
+
+As the HAL requirements are not set, target level can't be set to 8.
+If PRODUCT_OTA_ENFORCE_VINTF_KERNEL_REQUIREMENTS is set to true, build
+will fail due to requirements not met.
+
+Fix the issue by setting PRODUCT_OTA_ENFORCE_VINTF_KERNEL_REQUIREMENTS
+to false.
+
+Tracked-On: OAM-111022
+Signed-off-by: Badrappan, Jeevaka <jeevaka.badrappan@intel.com>
+---
+ groups/device-specific/caas/caas.mk | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/groups/device-specific/caas/caas.mk b/groups/device-specific/caas/caas.mk
+index aad059a..0843d7b 100644
+--- a/groups/device-specific/caas/caas.mk
++++ b/groups/device-specific/caas/caas.mk
+@@ -65,7 +65,7 @@ PRODUCT_RESTRICT_VENDOR_FILES := false
+ PRODUCT_SET_DEBUGFS_RESTRICTIONS := false
+ {{^ota-update}}
+ PRODUCT_SHIPPING_API_LEVEL := 33
+-PRODUCT_OTA_ENFORCE_VINTF_KERNEL_REQUIREMENTS := true
++PRODUCT_OTA_ENFORCE_VINTF_KERNEL_REQUIREMENTS := false
+ {{/ota-update}}
+ {{#ota-update}}
+ PRODUCT_SHIPPING_API_LEVEL := 27
+-- 
+2.40.0
+
