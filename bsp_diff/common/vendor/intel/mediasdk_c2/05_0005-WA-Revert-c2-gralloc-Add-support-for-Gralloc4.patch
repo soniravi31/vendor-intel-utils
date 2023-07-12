@@ -1,0 +1,1127 @@
+From 8a059574a802bd148489112eacb355dfeb1ede2b Mon Sep 17 00:00:00 2001
+From: Ankit Agrawal <ankit.agarwal@intel.com>
+Date: Fri, 14 Jul 2023 11:34:34 +0530
+Subject: [PATCH] [WA]-Revert "[c2][gralloc] Add support for Gralloc4"
+
+This reverts commit 16901798e638669ab741af388fb6916ff0bc113f.
+---
+ c2_components/Android.mk                      |   5 -
+ .../include/mfx_c2_decoder_component.h        |   3 +-
+ .../src/mfx_c2_decoder_component.cpp          |  14 +-
+ .../src/mfx_c2_encoder_component.cpp          |   1 +
+ c2_utils/Android.bp                           |  14 +-
+ c2_utils/Android.mk                           |   6 +-
+ c2_utils/include/mfx_defs.h                   |   9 +-
+ c2_utils/include/mfx_gralloc4.h               |  64 -----
+ ...mfx_gralloc1.h => mfx_gralloc_allocator.h} |  74 ++++--
+ c2_utils/include/mfx_gralloc_instance.h       |  38 ---
+ c2_utils/include/mfx_gralloc_interface.h      |  60 -----
+ c2_utils/include/mfx_va_allocator.h           |   7 +-
+ .../include/mfx_va_frame_pool_allocator.h     |   2 +
+ c2_utils/src/mfx_gralloc4.cpp                 | 221 ------------------
+ ...gralloc1.cpp => mfx_gralloc_allocator.cpp} |  99 ++++++--
+ c2_utils/src/mfx_gralloc_instance.cpp         |  56 -----
+ c2_utils/src/mfx_va_allocator.cpp             |  29 ++-
+ c2_utils/src/mfx_va_frame_pool_allocator.cpp  |  15 +-
+ 18 files changed, 192 insertions(+), 525 deletions(-)
+ delete mode 100644 c2_utils/include/mfx_gralloc4.h
+ rename c2_utils/include/{mfx_gralloc1.h => mfx_gralloc_allocator.h} (77%)
+ delete mode 100644 c2_utils/include/mfx_gralloc_instance.h
+ delete mode 100644 c2_utils/include/mfx_gralloc_interface.h
+ delete mode 100644 c2_utils/src/mfx_gralloc4.cpp
+ rename c2_utils/src/{mfx_gralloc1.cpp => mfx_gralloc_allocator.cpp} (74%)
+ delete mode 100644 c2_utils/src/mfx_gralloc_instance.cpp
+
+diff --git a/c2_components/Android.mk b/c2_components/Android.mk
+index ce9ac7b..3591245 100644
+--- a/c2_components/Android.mk
++++ b/c2_components/Android.mk
+@@ -25,16 +25,11 @@ define build_components
+     libhardware libdl liblog libcutils\
+     $(MFX_C2_SHARED_LIBS) \
+         libexpat \
+-        libsync \
+-        libdrm \
+-        libutils \
+-        libhidlbase \
+         libgralloctypes \
+         libstagefright_foundation \
+         android.hardware.media.bufferpool@2.0 \
+         android.hardware.graphics.bufferqueue@2.0 \
+         android.hardware.graphics.common@1.2 \
+-        android.hardware.graphics.mapper@4.0 \
+         libsfplugin_ccodec_utils
+ 
+   LOCAL_STATIC_LIBRARIES := \
+diff --git a/c2_components/include/mfx_c2_decoder_component.h b/c2_components/include/mfx_c2_decoder_component.h
+index a020291..9e1b9a4 100755
+--- a/c2_components/include/mfx_c2_decoder_component.h
++++ b/c2_components/include/mfx_c2_decoder_component.h
+@@ -27,7 +27,7 @@
+ #include "mfx_c2_frame_out.h"
+ #include "mfx_c2_bitstream_in.h"
+ #include "mfx_frame_pool_allocator.h"
+-#include "mfx_gralloc_instance.h"
++#include "mfx_gralloc_allocator.h"
+ #include "mfx_c2_color_aspects_wrapper.h"
+ #include "mfx_c2_setters.h"
+ #include <cutils/properties.h>
+@@ -226,6 +226,7 @@ private:
+     // for pre-allocation when Video memory is chosen and always when System memory output
+     std::shared_ptr<C2BlockPool> m_c2Allocator;
+     C2BlockPool::local_id_t m_outputPoolId = C2BlockPool::BASIC_GRAPHIC;
++    std::unique_ptr<MfxGrallocAllocator> m_grallocAllocator;
+     std::atomic<bool> m_bFlushing{false};
+ 
+     std::list<std::unique_ptr<C2Work>> m_flushedWorks;
+diff --git a/c2_components/src/mfx_c2_decoder_component.cpp b/c2_components/src/mfx_c2_decoder_component.cpp
+index c2e6484..8e6b240 100755
+--- a/c2_components/src/mfx_c2_decoder_component.cpp
++++ b/c2_components/src/mfx_c2_decoder_component.cpp
+@@ -29,6 +29,7 @@
+ #include "mfx_c2_allocator_id.h"
+ #include "mfx_c2_buffer_queue.h"
+ #include "C2PlatformSupport.h"
++#include "mfx_gralloc_allocator.h"
+ 
+ #include <C2AllocatorGralloc.h>
+ #include <Codec2Mapper.h>
+@@ -1761,8 +1762,7 @@ c2_status_t MfxC2DecoderComponent::AllocateC2Block(uint32_t width, uint32_t heig
+                     android::UnwrapNativeCodec2GrallocHandle((*out_block)->handle()), hndl_deleter);
+ 
+                 uint64_t id;
+-                if (C2_OK != MfxGrallocInstance::getInstance()->GetBackingStore(hndl.get(), &id))
+-                    return C2_CORRUPTED;
++                c2_status_t sts = m_grallocAllocator->GetBackingStore(hndl.get(), &id);
+                 if (m_allocator && !m_allocator->InCache(id)) {
+                     res = C2_BLOCKING;
+                     usleep(1000);
+@@ -1829,8 +1829,7 @@ c2_status_t MfxC2DecoderComponent::AllocateFrame(MfxC2FrameOut* frame_out)
+         if (m_mfxVideoParams.IOPattern == MFX_IOPATTERN_OUT_VIDEO_MEMORY) {
+ 
+             uint64_t id;
+-            if (C2_OK != MfxGrallocInstance::getInstance()->GetBackingStore(hndl.get(), &id))
+-                return C2_CORRUPTED;
++            c2_status_t sts = m_grallocAllocator->GetBackingStore(hndl.get(), &id);
+ 
+             it = m_surfaces.find(id);
+             if (it == m_surfaces.end()){
+@@ -2047,6 +2046,13 @@ void MfxC2DecoderComponent::DoWork(std::unique_ptr<C2Work>&& work)
+             }
+         }
+ 
++        if (!m_grallocAllocator) {
++            res = MfxGrallocAllocator::Create(&m_grallocAllocator);
++            if(C2_OK != res) {
++                break;
++            }
++        }
++
+         // loop repeats DecodeFrame on the same frame
+         // if DecodeFrame returns error which is repairable, like resolution change
+         bool resolution_change = false;
+diff --git a/c2_components/src/mfx_c2_encoder_component.cpp b/c2_components/src/mfx_c2_encoder_component.cpp
+index 3912583..b84a26b 100755
+--- a/c2_components/src/mfx_c2_encoder_component.cpp
++++ b/c2_components/src/mfx_c2_encoder_component.cpp
+@@ -27,6 +27,7 @@
+ #include "mfx_c2_utils.h"
+ #include "mfx_defaults.h"
+ #include "C2PlatformSupport.h"
++#include "mfx_gralloc_allocator.h"
+ 
+ #include <limits>
+ #include <thread>
+diff --git a/c2_utils/Android.bp b/c2_utils/Android.bp
+index 5020873..0bab8f2 100644
+--- a/c2_utils/Android.bp
++++ b/c2_utils/Android.bp
+@@ -8,19 +8,7 @@ cc_library_static {
+ 
+     defaults: ["mfx_c2_defaults"],
+ 
+-    srcs: [
+-        "src/mfx_c2_debug.cpp",
+-        "src/mfx_c2_defs.cpp",
+-        "src/mfx_c2_utils.cpp",
+-        "src/mfx_c2_xml_parser.cpp",
+-        "src/mfx_cmd_queue.cpp",
+-        "src/mfx_debug.cpp",
+-        "src/mfx_defaults.cpp",
+-        "src/mfx_defs.cpp",
+-        "src/mfx_dev_android.cpp",
+-        "src/mfx_dev.cpp",
+-        "src/mfx_msdk_debug.cpp"
+-    ],
++    srcs: ["src/*.cpp"],
+ 
+     cflags: [
+         //"-DMFX_BUFFER_QUEUE"
+diff --git a/c2_utils/Android.mk b/c2_utils/Android.mk
+index 06a2088..c2e0d2c 100644
+--- a/c2_utils/Android.mk
++++ b/c2_utils/Android.mk
+@@ -17,7 +17,6 @@ LOCAL_SHARED_LIBRARIES := \
+     android.hardware.media.bufferpool@2.0 \
+     android.hardware.graphics.bufferqueue@2.0 \
+     android.hardware.graphics.common@1.2 \
+-    android.hardware.graphics.mapper@4.0 \
+     $(MFX_C2_SHARED_LIBRARIES)
+ 
+ LOCAL_STATIC_LIBRARIES := \
+@@ -46,10 +45,7 @@ LOCAL_C_INCLUDES := \
+     system/core/base/include \
+     $(MFX_C2_INCLUDES) \
+     $(MFX_C2_HOME)/c2_utils/include \
+-    $(MFX_C2_HOME)/plugin_store/include \
+-    frameworks/native/libs/gralloc/types/include \
+-    hardware/intel/external/minigbm-intel \
+-    external/libdrm/include/drm
++    $(MFX_C2_HOME)/plugin_store/include
+ 
+ LOCAL_EXPORT_C_INCLUDE_DIRS := \
+     include
+diff --git a/c2_utils/include/mfx_defs.h b/c2_utils/include/mfx_defs.h
+index e1ce4e1..46bdb01 100755
+--- a/c2_utils/include/mfx_defs.h
++++ b/c2_utils/include/mfx_defs.h
+@@ -33,19 +33,12 @@
+ #endif
+ 
+ // includes below are to get Intel color formats
+-
+-#define HAVE_GRALLOC4 // We use gralloc4 but keep supporting gralloc1
+-
+-#ifdef HAVE_GRALLOC4
+-    #define USE_GRALLOC4
+-#else // HAVE_GRALLOC4
+ #ifdef MFX_C2_USE_PRIME
+     // USE_GRALLOC1 required for using PRIME buffer descriptor -
+     // opens definition GRALLOC1_PFN_GET_PRIME in
+     // i915_private_android_types.h
+     #define USE_GRALLOC1
+-#endif // MFX_C2_USE_PRIME
+-#endif // HAVE_GRALLOC4
++#endif
+ #define DRV_I915
+ #include <i915_private_android_types.h>
+ 
+diff --git a/c2_utils/include/mfx_gralloc4.h b/c2_utils/include/mfx_gralloc4.h
+deleted file mode 100644
+index 01b938e..0000000
+--- a/c2_utils/include/mfx_gralloc4.h
++++ /dev/null
+@@ -1,64 +0,0 @@
+-// Copyright (c) 2017-2021 Intel Corporation
+-//
+-// Permission is hereby granted, free of charge, to any person obtaining a copy
+-// of this software and associated documentation files (the "Software"), to deal
+-// in the Software without restriction, including without limitation the rights
+-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+-// copies of the Software, and to permit persons to whom the Software is
+-// furnished to do so, subject to the following conditions:
+-//
+-// The above copyright notice and this permission notice shall be included in all
+-// copies or substantial portions of the Software.
+-//
+-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+-// SOFTWARE.
+-
+-#pragma once
+-
+-#include <mfx_defs.h>
+-#include <utils/Errors.h>
+-#include "mfx_gralloc_interface.h"
+-
+-#ifdef USE_GRALLOC4
+-// #include <android/hardware/graphics/allocator/4.0/IAllocator.h>
+-#include "gralloctypes/Gralloc4.h"
+-#include <android/hardware/graphics/mapper/4.0/IMapper.h>
+-
+-using namespace android;
+-using hardware::hidl_vec;
+-using hardware::hidl_handle;
+-using IMapper4 = ::android::hardware::graphics::mapper::V4_0::IMapper;
+-using Error4 = ::android::hardware::graphics::mapper::V4_0::Error;
+-// using IAllocator4 = ::android::hardware::graphics::allocator::V4_0::IAllocator;
+-
+-class MfxGralloc4Module : public IMfxGrallocModule
+-{
+-public:
+-    virtual c2_status_t Init() override;
+-
+-    virtual ~MfxGralloc4Module();
+-
+-    // Wrapper for IMapper::get
+-    virtual Error4 get(const native_handle_t* bufferHandle, const IMapper4::MetadataType& metadataType,
+-                    hidl_vec<uint8_t>& outVec);
+-
+-    virtual c2_status_t GetBufferDetails(const buffer_handle_t handle, BufferDetails* details) override;
+-    virtual c2_status_t GetBackingStore(const buffer_handle_t rawHandle, uint64_t *id) override;
+-
+-    // TODO: not fully tested
+-    virtual c2_status_t LockFrame(buffer_handle_t handle, uint8_t** data, C2PlanarLayout *layout);
+-    virtual c2_status_t UnlockFrame(buffer_handle_t handle);
+-
+-protected:
+-    inline bool IsFailed(Error4 err) { return (err != Error4::NONE); }
+-
+-private:
+-    sp<IMapper4> m_mapper;
+-};
+-
+-#endif
+\ No newline at end of file
+diff --git a/c2_utils/include/mfx_gralloc1.h b/c2_utils/include/mfx_gralloc_allocator.h
+similarity index 77%
+rename from c2_utils/include/mfx_gralloc1.h
+rename to c2_utils/include/mfx_gralloc_allocator.h
+index 3adaa7e..98fcd7a 100755
+--- a/c2_utils/include/mfx_gralloc1.h
++++ b/c2_utils/include/mfx_gralloc_allocator.h
+@@ -22,24 +22,48 @@
+ 
+ #include <mfx_defs.h>
+ #include <utils/Errors.h>
++#include <C2Buffer.h>
+ #include <hardware/gralloc1.h>
+-#include "mfx_gralloc_interface.h"
+ 
+-class MfxGralloc1Module : public IMfxGrallocModule
++class MfxGrallocModule
+ {
+ public:
+-    virtual ~MfxGralloc1Module();
++    static c2_status_t Create(std::unique_ptr<MfxGrallocModule>* module);
+ 
+-    virtual c2_status_t Init() override;
++    virtual ~MfxGrallocModule();
+ 
+-    virtual c2_status_t GetBackingStore(const buffer_handle_t rawHandle, uint64_t *id) override;
+-    virtual c2_status_t GetBufferDetails(const buffer_handle_t handle, BufferDetails* details) override;
++public:
++    struct BufferDetails
++    {
++        buffer_handle_t handle;
++        int32_t prime;
++        int width;
++        int height;
++        int format;
++        uint32_t planes_count;
++        uint32_t pitches[C2PlanarLayout::MAX_NUM_PLANES];// pitch for each plane
++        uint32_t allocWidth;
++        uint32_t allocHeight;
++        BufferDetails():
++            handle(nullptr),
++            prime(-1),
++            width(0),
++            height(0),
++            format(0),
++            planes_count(0),
++            pitches{},
++            allocWidth(0),
++            allocHeight(0)
++        {}
++    };
+ 
+-    virtual c2_status_t Alloc(const uint16_t width, const uint16_t height, buffer_handle_t* handle);
+-    virtual c2_status_t Free(const buffer_handle_t handle);
+-    virtual c2_status_t LockFrame(buffer_handle_t handle, uint8_t** data, C2PlanarLayout *layout);
+-    virtual c2_status_t UnlockFrame(buffer_handle_t handle);
+-    virtual c2_status_t ImportBuffer(const buffer_handle_t rawHandle, buffer_handle_t *outBuffer);
++public:
++    c2_status_t GetBufferDetails(const buffer_handle_t handle, BufferDetails* details);
++
++protected:
++    MfxGrallocModule() = default;
++
++    c2_status_t Init();
+ 
+ protected:
+     hw_module_t const* m_hwModule {};
+@@ -65,6 +89,29 @@ protected:
+     Gralloc1Func<GRALLOC1_PFN_GET_DIMENSIONS, GRALLOC1_FUNCTION_GET_DIMENSIONS> m_grGetDimensionsFunc;
+     Gralloc1Func<GRALLOC1_PFN_GET_NUM_FLEX_PLANES, GRALLOC1_FUNCTION_GET_NUM_FLEX_PLANES> m_grGetNumFlexPlanesFunc;
+     Gralloc1Func<GRALLOC1_PFN_GET_BYTE_STRIDE, (gralloc1_function_descriptor_t)GRALLOC1_FUNCTION_GET_BYTE_STRIDE> m_grGetByteStrideFunc;
++#ifdef MFX_C2_USE_PRIME
++    Gralloc1Func<GRALLOC1_PFN_GET_PRIME, (gralloc1_function_descriptor_t)GRALLOC1_FUNCTION_GET_PRIME> m_grGetPrimeFunc;
++#endif
++};
++
++class MfxGrallocAllocator : public MfxGrallocModule
++{
++public:
++    static c2_status_t Create(std::unique_ptr<MfxGrallocAllocator>* allocator);
++
++    virtual c2_status_t Alloc(const uint16_t width, const uint16_t height, buffer_handle_t* handle);
++    virtual c2_status_t Free(const buffer_handle_t handle);
++    virtual c2_status_t LockFrame(buffer_handle_t handle, uint8_t** data, C2PlanarLayout *layout);
++    virtual c2_status_t UnlockFrame(buffer_handle_t handle);
++    virtual c2_status_t ImportBuffer(const buffer_handle_t rawHandle, buffer_handle_t *outBuffer);
++    virtual c2_status_t GetBackingStore(const buffer_handle_t rawHandle, uint64_t *id);
++
++private:
++    MfxGrallocAllocator() = default;
++
++    c2_status_t Init();
++
++protected:
+     Gralloc1Func<GRALLOC1_PFN_ALLOCATE, GRALLOC1_FUNCTION_ALLOCATE> m_grAllocateFunc;
+     Gralloc1Func<GRALLOC1_PFN_RELEASE, GRALLOC1_FUNCTION_RELEASE> m_grReleaseFunc;
+     Gralloc1Func<GRALLOC1_PFN_LOCK, GRALLOC1_FUNCTION_LOCK> m_grLockFunc;
+@@ -77,7 +124,6 @@ protected:
+     Gralloc1Func<GRALLOC1_PFN_DESTROY_DESCRIPTOR, GRALLOC1_FUNCTION_DESTROY_DESCRIPTOR> m_grDestroyDescriptorFunc;
+     Gralloc1Func<GRALLOC1_PFN_IMPORT_BUFFER, GRALLOC1_FUNCTION_IMPORT_BUFFER> m_grImportBufferFunc;
+     Gralloc1Func<GRALLOC1_PFN_GET_BACKING_STORE, GRALLOC1_FUNCTION_GET_BACKING_STORE> m_grGetBackingStoreFunc;
+-#ifdef MFX_C2_USE_PRIME
+-    Gralloc1Func<GRALLOC1_PFN_GET_PRIME, (gralloc1_function_descriptor_t)GRALLOC1_FUNCTION_GET_PRIME> m_grGetPrimeFunc;
+-#endif
++
++    MFX_CLASS_NO_COPY(MfxGrallocAllocator)
+ };
+diff --git a/c2_utils/include/mfx_gralloc_instance.h b/c2_utils/include/mfx_gralloc_instance.h
+deleted file mode 100644
+index aeed37c..0000000
+--- a/c2_utils/include/mfx_gralloc_instance.h
++++ /dev/null
+@@ -1,38 +0,0 @@
+-// Copyright (c) 2017-2021 Intel Corporation
+-//
+-// Permission is hereby granted, free of charge, to any person obtaining a copy
+-// of this software and associated documentation files (the "Software"), to deal
+-// in the Software without restriction, including without limitation the rights
+-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+-// copies of the Software, and to permit persons to whom the Software is
+-// furnished to do so, subject to the following conditions:
+-//
+-// The above copyright notice and this permission notice shall be included in all
+-// copies or substantial portions of the Software.
+-//
+-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+-// SOFTWARE.
+-
+-#pragma once
+-#include <mutex>
+-#include "mfx_gralloc_interface.h"
+-#include "mfx_gralloc1.h"
+-#include "mfx_gralloc4.h"
+-
+-class MfxGrallocInstance
+-{
+-public:
+-    MfxGrallocInstance() = delete;
+-    MfxGrallocInstance(const MfxGrallocInstance&) = delete;
+-    MfxGrallocInstance& operator=(const MfxGrallocInstance&) = delete;
+-
+-    static std::shared_ptr<IMfxGrallocModule> getInstance();
+-private:
+-    static std::mutex m_mutex;
+-    static std::shared_ptr<IMfxGrallocModule> m_instance;
+-};
+\ No newline at end of file
+diff --git a/c2_utils/include/mfx_gralloc_interface.h b/c2_utils/include/mfx_gralloc_interface.h
+deleted file mode 100644
+index e5ce356..0000000
+--- a/c2_utils/include/mfx_gralloc_interface.h
++++ /dev/null
+@@ -1,60 +0,0 @@
+-// Copyright (c) 2017-2021 Intel Corporation
+-//
+-// Permission is hereby granted, free of charge, to any person obtaining a copy
+-// of this software and associated documentation files (the "Software"), to deal
+-// in the Software without restriction, including without limitation the rights
+-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+-// copies of the Software, and to permit persons to whom the Software is
+-// furnished to do so, subject to the following conditions:
+-//
+-// The above copyright notice and this permission notice shall be included in all
+-// copies or substantial portions of the Software.
+-//
+-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+-// SOFTWARE.
+-
+-#pragma once
+-#include <mfx_defs.h>
+-#include <C2Buffer.h>
+-
+-class IMfxGrallocModule
+-{
+-public:
+-    virtual ~IMfxGrallocModule() = default;
+-
+-    virtual c2_status_t Init() = 0;
+-
+-    struct BufferDetails
+-    {
+-        buffer_handle_t handle;
+-        int32_t prime;
+-        int width;
+-        int height;
+-        int format;
+-        uint32_t planes_count;
+-        uint32_t pitches[C2PlanarLayout::MAX_NUM_PLANES];// pitch for each plane
+-        uint32_t allocWidth;
+-        uint32_t allocHeight;
+-        BufferDetails():
+-            handle(nullptr),
+-            prime(-1),
+-            width(0),
+-            height(0),
+-            format(0),
+-            planes_count(0),
+-            pitches{},
+-            allocWidth(0),
+-            allocHeight(0)
+-        {}
+-    };
+-
+-    virtual c2_status_t GetBufferDetails(const buffer_handle_t handle, BufferDetails* details) = 0;
+-    virtual c2_status_t GetBackingStore(const buffer_handle_t rawHandle, uint64_t *id) = 0;
+-
+-
+-};
+\ No newline at end of file
+diff --git a/c2_utils/include/mfx_va_allocator.h b/c2_utils/include/mfx_va_allocator.h
+index f0c722e..b0f5676 100755
+--- a/c2_utils/include/mfx_va_allocator.h
++++ b/c2_utils/include/mfx_va_allocator.h
+@@ -25,7 +25,7 @@
+ #include "mfx_defs.h"
+ #include "mfx_allocator.h"
+ #include "mfx_frame_converter.h"
+-#include "mfx_gralloc_instance.h"
++#include "mfx_gralloc_allocator.h"
+ 
+ #include <mutex>
+ #include <map>
+@@ -63,7 +63,7 @@ private:
+     mfxStatus MapGrallocBufferToSurface(buffer_handle_t gralloc_buffer, bool decode_target,
+         mfxU32* fourcc, VASurfaceID* surface);
+ 
+-    mfxStatus CreateSurfaceFromGralloc(const IMfxGrallocModule::BufferDetails& buffer_details,
++    mfxStatus CreateSurfaceFromGralloc(const MfxGrallocModule::BufferDetails& buffer_details,
+         bool decode_target,
+         VASurfaceID* surface);
+ 
+@@ -85,6 +85,9 @@ private:
+ 
+     std::mutex m_mutex;
+ 
++    std::unique_ptr<MfxGrallocModule> m_grallocModule; // lazy init
++    std::unique_ptr<MfxGrallocAllocator> m_grallocAllocator;
++
+     std::map<uint64_t, std::unique_ptr<VaMemIdAllocated, VaMemIdDeleter>>
+         m_mappedVaSurfaces;
+ 
+diff --git a/c2_utils/include/mfx_va_frame_pool_allocator.h b/c2_utils/include/mfx_va_frame_pool_allocator.h
+index 6066af9..7d35304 100755
+--- a/c2_utils/include/mfx_va_frame_pool_allocator.h
++++ b/c2_utils/include/mfx_va_frame_pool_allocator.h
+@@ -96,6 +96,8 @@ private:
+ 
+     std::unique_ptr<MfxPool<C2GraphicBlock>> m_pool;
+ 
++    std::unique_ptr<MfxGrallocAllocator> m_grallocAllocator;
++
+     std::map<uint64_t, int> m_cachedBufferId;
+ 
+     unsigned int m_uSuggestBufferCnt = 0;
+diff --git a/c2_utils/src/mfx_gralloc4.cpp b/c2_utils/src/mfx_gralloc4.cpp
+deleted file mode 100644
+index ba31e28..0000000
+--- a/c2_utils/src/mfx_gralloc4.cpp
++++ /dev/null
+@@ -1,221 +0,0 @@
+-// Copyright (c) 2017-2021 Intel Corporation
+-//
+-// Permission is hereby granted, free of charge, to any person obtaining a copy
+-// of this software and associated documentation files (the "Software"), to deal
+-// in the Software without restriction, including without limitation the rights
+-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+-// copies of the Software, and to permit persons to whom the Software is
+-// furnished to do so, subject to the following conditions:
+-//
+-// The above copyright notice and this permission notice shall be included in all
+-// copies or substantial portions of the Software.
+-//
+-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+-// SOFTWARE.
+-
+-#include "mfx_gralloc4.h"
+-#include "cros_gralloc/cros_gralloc_helpers.h"
+-#include "mfx_c2_utils.h"
+-#include "mfx_debug.h"
+-#include "mfx_c2_debug.h"
+-
+-#undef MFX_DEBUG_MODULE_NAME
+-#define MFX_DEBUG_MODULE_NAME "mfx_gralloc4"
+-
+-using aidl::android::hardware::graphics::common::PlaneLayout;
+-
+-c2_status_t MfxGralloc4Module::Init()
+-{
+-    MFX_DEBUG_TRACE_FUNC;
+-
+-    sp<IMapper4> mapper = IMapper4::getService();
+-    if (nullptr == mapper)
+-    {
+-        return C2_CORRUPTED;
+-    }
+-
+-    m_mapper = mapper;
+-    
+-    return C2_OK;
+-}
+-
+-MfxGralloc4Module::~MfxGralloc4Module()
+-{
+-
+-}
+-
+-Error4 MfxGralloc4Module::get(const native_handle_t* handle, const IMapper4::MetadataType& metadataType,
+-                    hidl_vec<uint8_t>& outVec)
+-{
+-    Error4 err;
+-    if (nullptr == m_mapper)
+-        return Error4::NO_RESOURCES;
+-    m_mapper->get(const_cast<native_handle_t*>(handle), metadataType,
+-                [&](const auto& tmpError, const hidl_vec<uint8_t>& tmpVec)
+-                {
+-                    err = tmpError;
+-                    outVec = tmpVec;
+-                });
+-    return err;
+-}
+-
+-c2_status_t MfxGralloc4Module::GetBufferDetails(const buffer_handle_t handle, BufferDetails *details)
+-{
+-    MFX_DEBUG_TRACE_FUNC;
+-    c2_status_t res = C2_OK;
+-
+-    do
+-    {
+-        details->handle = handle;
+-
+-        details->prime = handle->data[0];
+-        MFX_DEBUG_TRACE_I32(details->prime);
+-
+-        hidl_vec<uint8_t> vec;
+-
+-        if (IsFailed(get(handle, gralloc4::MetadataType_Width, vec)))
+-        {
+-            res = C2_CORRUPTED;
+-            break;
+-        }
+-
+-        uint64_t width = 0;
+-        gralloc4::decodeWidth(vec, &width);
+-        details->width = details->allocWidth = width;
+-        MFX_DEBUG_TRACE_I32(details->width);
+-
+-        if (IsFailed(get(handle, gralloc4::MetadataType_Height, vec)))
+-        {
+-            res = C2_CORRUPTED;
+-            break;
+-        }
+-
+-        uint64_t height = 0;
+-        gralloc4::decodeHeight(vec, &height);
+-        details->height = details->allocHeight = height;
+-        MFX_DEBUG_TRACE_I32(details->width);
+-
+-        hardware::graphics::common::V1_2::PixelFormat pixelFormat;
+-        if (IsFailed(get(handle, gralloc4::MetadataType_PixelFormatRequested, vec)))
+-        {
+-            res = C2_CORRUPTED;
+-            break;
+-        }
+-        gralloc4::decodePixelFormatRequested(vec, &pixelFormat);
+-        details->format = static_cast<int>(pixelFormat);
+-        MFX_DEBUG_TRACE_I32(details->format);
+-
+-        if(IsFailed(get(handle, gralloc4::MetadataType_PlaneLayouts, vec)))
+-        {
+-            res = C2_CORRUPTED;
+-            break;
+-        }
+-
+-        std::vector<PlaneLayout> planeLayouts;
+-        if (NO_ERROR != gralloc4::decodePlaneLayouts(vec, &planeLayouts))
+-        {
+-            res = C2_CORRUPTED;
+-            break;
+-        }
+-
+-        details->planes_count = planeLayouts.size();
+-        MFX_DEBUG_TRACE_I32(details->planes_count);
+-
+-        for(int i = 0; i < planeLayouts.size(); i++)
+-        {
+-            details->pitches[i] = planeLayouts[i].strideInBytes;
+-            MFX_DEBUG_TRACE_STREAM("details->pitches[" << i << "] = " << details->pitches[i]);
+-        }
+-    } while (false);
+-    MFX_DEBUG_TRACE__android_c2_status_t(res);
+-    return res;
+-}
+-
+-c2_status_t MfxGralloc4Module::GetBackingStore(const buffer_handle_t handle, uint64_t *id)
+-{
+-    MFX_DEBUG_TRACE_FUNC;
+-    c2_status_t res = C2_OK;
+-
+-    hidl_vec<uint8_t> vec;
+-    if(IsFailed(get(handle, android::gralloc4::MetadataType_BufferId, vec)))
+-        res = C2_CORRUPTED;
+-    gralloc4::decodeBufferId(vec, id);
+-
+-    MFX_DEBUG_TRACE__android_c2_status_t(res);
+-    return res;
+-}
+-
+-c2_status_t MfxGralloc4Module::LockFrame(buffer_handle_t handle, uint8_t** data, C2PlanarLayout *layout)
+-{
+-    MFX_DEBUG_TRACE_FUNC;
+-    c2_status_t res = C2_OK;
+-
+-    if (!layout)
+-        return C2_BAD_VALUE;
+-
+-    if (nullptr == m_mapper)
+-        return C2_NO_INIT;
+-
+-    BufferDetails details;
+-
+-    if (C2_OK != GetBufferDetails(handle, &details))
+-        return C2_BAD_VALUE;
+-
+-    native_handle_t *native_handle = const_cast<native_handle_t *>(handle);
+-
+-    IMapper4::Rect rect;
+-    rect.left = 0;
+-    rect.top = 0;
+-    rect.width = details.width;
+-    rect.height = details.height;
+-
+-    hidl_handle empty_fence_handle;
+-
+-    Error4 error;
+-    void **img = nullptr;
+-    m_mapper->lock(native_handle,
+-                    AHardwareBuffer_UsageFlags::AHARDWAREBUFFER_USAGE_CPU_READ_MASK |
+-                    AHardwareBuffer_UsageFlags::AHARDWAREBUFFER_USAGE_CPU_WRITE_MASK,
+-                    rect, empty_fence_handle,
+-                    [&](const auto &tmp_err, const auto &tmp_vaddr) {
+-                        error = tmp_err;
+-                        if(tmp_err == Error4::NONE)
+-                        {
+-                            *img = tmp_vaddr;
+-                        }
+-                    });
+-    res = error == Error4::NONE ? C2_OK : C2_CORRUPTED;
+-
+-    if (C2_OK == res) {
+-        InitNV12PlaneLayout(details.pitches, layout);
+-        InitNV12PlaneData(details.pitches[C2PlanarLayout::PLANE_Y], details.allocHeight, (uint8_t*)*img, data);
+-    }
+-
+-    return res;
+-}
+-
+-c2_status_t MfxGralloc4Module::UnlockFrame(buffer_handle_t handle)
+-{
+-    MFX_DEBUG_TRACE_FUNC;
+-    c2_status_t res = C2_OK;
+-
+-    if (nullptr == m_mapper)
+-        return C2_NO_INIT;
+-
+-    native_handle_t *native_handle = const_cast<native_handle_t *>(handle);
+-
+-    Error4 error;
+-    m_mapper->unlock(native_handle,
+-                    [&](const auto &tmp_err, const auto &) {
+-                        error = tmp_err;
+-                    });
+-    res = error == Error4::NONE ? C2_OK : C2_CORRUPTED;
+-
+-    MFX_DEBUG_TRACE__android_c2_status_t(res);
+-    return res;
+-}
+\ No newline at end of file
+diff --git a/c2_utils/src/mfx_gralloc1.cpp b/c2_utils/src/mfx_gralloc_allocator.cpp
+similarity index 74%
+rename from c2_utils/src/mfx_gralloc1.cpp
+rename to c2_utils/src/mfx_gralloc_allocator.cpp
+index 0dc6036..94b38d7 100755
+--- a/c2_utils/src/mfx_gralloc1.cpp
++++ b/c2_utils/src/mfx_gralloc_allocator.cpp
+@@ -18,7 +18,7 @@
+ // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ // SOFTWARE.
+ 
+-#include "mfx_gralloc1.h"
++#include "mfx_gralloc_allocator.h"
+ 
+ #include "mfx_debug.h"
+ #include "mfx_c2_debug.h"
+@@ -27,16 +27,33 @@
+ using namespace android;
+ 
+ #undef MFX_DEBUG_MODULE_NAME
+-#define MFX_DEBUG_MODULE_NAME "mfx_gralloc1"
++#define MFX_DEBUG_MODULE_NAME "mfx_gralloc_allocator"
+ 
+-MfxGralloc1Module::~MfxGralloc1Module()
++c2_status_t MfxGrallocModule::Create(std::unique_ptr<MfxGrallocModule>* allocator)
++{
++    c2_status_t res = C2_OK;
++    if (allocator) {
++        std::unique_ptr<MfxGrallocModule> alloc(new (std::nothrow)MfxGrallocModule());
++        if (alloc) {
++            res = alloc->Init();
++            if (res == C2_OK) *allocator = std::move(alloc);
++        } else {
++            res = C2_NO_MEMORY;
++        }
++    } else {
++        res = C2_BAD_VALUE;
++    }
++    return res;
++}
++
++MfxGrallocModule::~MfxGrallocModule()
+ {
+     MFX_DEBUG_TRACE_FUNC;
+ 
+     if (m_gralloc1_dev) gralloc1_close(m_gralloc1_dev);
+ }
+ 
+-c2_status_t MfxGralloc1Module::Init()
++c2_status_t MfxGrallocModule::Init()
+ {
+     MFX_DEBUG_TRACE_FUNC;
+ 
+@@ -60,18 +77,6 @@ c2_status_t MfxGralloc1Module::Init()
+                 m_grGetDimensionsFunc.Acquire(m_gralloc1_dev) &&
+                 m_grGetNumFlexPlanesFunc.Acquire(m_gralloc1_dev) &&
+                 m_grGetByteStrideFunc.Acquire(m_gralloc1_dev);
+-                m_grAllocateFunc.Acquire(m_gralloc1_dev) &&
+-                m_grReleaseFunc.Acquire(m_gralloc1_dev) &&
+-                m_grLockFunc.Acquire(m_gralloc1_dev) &&
+-                m_grUnlockFunc.Acquire(m_gralloc1_dev) &&
+-                m_grCreateDescriptorFunc.Acquire(m_gralloc1_dev) &&
+-                m_grSetConsumerUsageFunc.Acquire(m_gralloc1_dev) &&
+-                m_grSetProducerUsageFunc.Acquire(m_gralloc1_dev) &&
+-                m_grSetDimensionsFunc.Acquire(m_gralloc1_dev) &&
+-                m_grSetFormatFunc.Acquire(m_gralloc1_dev) &&
+-                m_grDestroyDescriptorFunc.Acquire(m_gralloc1_dev) &&
+-                m_grImportBufferFunc.Acquire(m_gralloc1_dev) &&
+-                m_grGetBackingStoreFunc.Acquire(m_gralloc1_dev);
+ #ifdef MFX_C2_USE_PRIME
+             if (m_grGetPrimeFunc.Acquire(m_gralloc1_dev)) {
+                 MFX_DEBUG_TRACE_MSG("Use PRIME");
+@@ -92,8 +97,8 @@ c2_status_t MfxGralloc1Module::Init()
+     return res;
+ }
+ 
+-c2_status_t MfxGralloc1Module::GetBufferDetails(const buffer_handle_t handle,
+-                                                MfxGralloc1Module::BufferDetails *details)
++c2_status_t MfxGrallocModule::GetBufferDetails(const buffer_handle_t handle,
++    MfxGrallocModule::BufferDetails* details)
+ {
+     MFX_DEBUG_TRACE_FUNC;
+ 
+@@ -143,7 +148,53 @@ c2_status_t MfxGralloc1Module::GetBufferDetails(const buffer_handle_t handle,
+     return res;
+ }
+ 
+-c2_status_t MfxGralloc1Module::Alloc(const uint16_t width, const uint16_t height, buffer_handle_t* handle)
++c2_status_t MfxGrallocAllocator::Create(std::unique_ptr<MfxGrallocAllocator>* allocator)
++{
++    c2_status_t res = C2_OK;
++    if (allocator) {
++        std::unique_ptr<MfxGrallocAllocator> alloc(new (std::nothrow)MfxGrallocAllocator());
++        if (alloc) {
++            res = alloc->Init();
++            if (res == C2_OK) *allocator = std::move(alloc);
++        } else {
++            res = C2_NO_MEMORY;
++        }
++    } else {
++        res = C2_BAD_VALUE;
++    }
++    return res;
++}
++
++c2_status_t MfxGrallocAllocator::Init()
++{
++    MFX_DEBUG_TRACE_FUNC;
++    c2_status_t res = MfxGrallocModule::Init();
++
++    if (C2_OK == res) {
++        bool functions_acquired =
++            m_grAllocateFunc.Acquire(m_gralloc1_dev) &&
++            m_grReleaseFunc.Acquire(m_gralloc1_dev) &&
++            m_grLockFunc.Acquire(m_gralloc1_dev) &&
++            m_grUnlockFunc.Acquire(m_gralloc1_dev) &&
++            m_grCreateDescriptorFunc.Acquire(m_gralloc1_dev) &&
++            m_grSetConsumerUsageFunc.Acquire(m_gralloc1_dev) &&
++            m_grSetProducerUsageFunc.Acquire(m_gralloc1_dev) &&
++            m_grSetDimensionsFunc.Acquire(m_gralloc1_dev) &&
++            m_grSetFormatFunc.Acquire(m_gralloc1_dev) &&
++            m_grDestroyDescriptorFunc.Acquire(m_gralloc1_dev) &&
++            m_grImportBufferFunc.Acquire(m_gralloc1_dev) &&
++            m_grGetBackingStoreFunc.Acquire(m_gralloc1_dev);
++
++        if (!functions_acquired) {
++            res = C2_CORRUPTED;
++            // if MfxGrallocModule::Init allocated some resources
++            // its destructor is responsible to free them.
++        }
++    }
++    return res;
++}
++
++c2_status_t MfxGrallocAllocator::Alloc(const uint16_t width, const uint16_t height, buffer_handle_t* handle)
+ {
+     MFX_DEBUG_TRACE_FUNC;
+     c2_status_t res = C2_OK;
+@@ -190,7 +241,7 @@ c2_status_t MfxGralloc1Module::Alloc(const uint16_t width, const uint16_t height
+     return res;
+ }
+ 
+-c2_status_t MfxGralloc1Module::Free(const buffer_handle_t handle)
++c2_status_t MfxGrallocAllocator::Free(const buffer_handle_t handle)
+ {
+     MFX_DEBUG_TRACE_FUNC;
+     c2_status_t res = C2_OK;
+@@ -210,7 +261,7 @@ c2_status_t MfxGralloc1Module::Free(const buffer_handle_t handle)
+     return res;
+ }
+ 
+-c2_status_t MfxGralloc1Module::LockFrame(buffer_handle_t handle, uint8_t** data, C2PlanarLayout *layout)
++c2_status_t MfxGrallocAllocator::LockFrame(buffer_handle_t handle, uint8_t** data, C2PlanarLayout *layout)
+ {
+     MFX_DEBUG_TRACE_FUNC;
+     MFX_DEBUG_TRACE_P(handle);
+@@ -256,7 +307,7 @@ c2_status_t MfxGralloc1Module::LockFrame(buffer_handle_t handle, uint8_t** data,
+     return res;
+ }
+ 
+-c2_status_t MfxGralloc1Module::UnlockFrame(buffer_handle_t handle)
++c2_status_t MfxGrallocAllocator::UnlockFrame(buffer_handle_t handle)
+ {
+     MFX_DEBUG_TRACE_FUNC;
+     MFX_DEBUG_TRACE_P(handle);
+@@ -273,7 +324,7 @@ c2_status_t MfxGralloc1Module::UnlockFrame(buffer_handle_t handle)
+     return res;
+ }
+ 
+-c2_status_t MfxGralloc1Module::ImportBuffer(const buffer_handle_t rawHandle, buffer_handle_t *outBuffer)
++c2_status_t MfxGrallocAllocator::ImportBuffer(const buffer_handle_t rawHandle, buffer_handle_t *outBuffer)
+ {
+     MFX_DEBUG_TRACE_FUNC;
+     c2_status_t res = C2_OK;
+@@ -288,7 +339,7 @@ c2_status_t MfxGralloc1Module::ImportBuffer(const buffer_handle_t rawHandle, buf
+     return res;
+ }
+ 
+-c2_status_t MfxGralloc1Module::GetBackingStore(const buffer_handle_t rawHandle, uint64_t *id)
++c2_status_t MfxGrallocAllocator::GetBackingStore(const buffer_handle_t rawHandle, uint64_t *id)
+ {
+     MFX_DEBUG_TRACE_FUNC;
+     c2_status_t res = C2_OK;
+diff --git a/c2_utils/src/mfx_gralloc_instance.cpp b/c2_utils/src/mfx_gralloc_instance.cpp
+deleted file mode 100644
+index 6a39580..0000000
+--- a/c2_utils/src/mfx_gralloc_instance.cpp
++++ /dev/null
+@@ -1,56 +0,0 @@
+-// Copyright (c) 2017-2021 Intel Corporation
+-//
+-// Permission is hereby granted, free of charge, to any person obtaining a copy
+-// of this software and associated documentation files (the "Software"), to deal
+-// in the Software without restriction, including without limitation the rights
+-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+-// copies of the Software, and to permit persons to whom the Software is
+-// furnished to do so, subject to the following conditions:
+-//
+-// The above copyright notice and this permission notice shall be included in all
+-// copies or substantial portions of the Software.
+-//
+-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+-// SOFTWARE.
+-
+-#include "mfx_gralloc_instance.h"
+-#include "mfx_c2_debug.h"
+-#include "mfx_c2_utils.h"
+-
+-#undef MFX_DEBUG_MODULE_NAME
+-#define MFX_DEBUG_MODULE_NAME "mfx_gralloc_instance"
+-
+-
+-std::shared_ptr<IMfxGrallocModule> MfxGrallocInstance::m_instance = nullptr;
+-std::mutex MfxGrallocInstance::m_mutex;
+-
+-std::shared_ptr<IMfxGrallocModule> MfxGrallocInstance::getInstance()
+-{
+-    MFX_DEBUG_TRACE_FUNC;
+-
+-    if (nullptr == m_instance)
+-    {
+-        std::lock_guard<std::mutex> lock(m_mutex);
+-        if (nullptr == m_instance)
+-        {
+-#ifdef USE_GRALLOC4
+-            m_instance = std::make_shared<MfxGralloc4Module>();
+-#else 
+-            m_instance = std::make_shared<MfxGralloc1Module>();
+-#endif
+-            if(C2_OK != m_instance->Init())
+-            {
+-                MFX_DEBUG_TRACE_MSG("MfxGrallocInstance initailization failed.");
+-                return nullptr;
+-            }
+-        }
+-    }
+-
+-    return m_instance;
+-
+-}
+\ No newline at end of file
+diff --git a/c2_utils/src/mfx_va_allocator.cpp b/c2_utils/src/mfx_va_allocator.cpp
+index f7ba471..741b38d 100755
+--- a/c2_utils/src/mfx_va_allocator.cpp
++++ b/c2_utils/src/mfx_va_allocator.cpp
+@@ -421,13 +421,23 @@ mfxStatus MfxVaFrameAllocator::ConvertGrallocToVa(buffer_handle_t gralloc_buffer
+     VASurfaceID surface { VA_INVALID_ID };
+ 
+     do {
++        if (!m_grallocAllocator) {
++            c2_status_t sts = MfxGrallocAllocator::Create(&m_grallocAllocator);
++            if(C2_OK != sts) {
++                mfx_res = MFX_ERR_MEMORY_ALLOC;
++                break;
++            }
++        }
++
+         if (!gralloc_buffer) {
+             mfx_res = MFX_ERR_INVALID_HANDLE;
+             break;
+         }
+ 
++
+         uint64_t id;
+-        if(C2_OK != MfxGrallocInstance::getInstance()->GetBackingStore(gralloc_buffer, &id)) {
++        c2_status_t sts = m_grallocAllocator->GetBackingStore(gralloc_buffer, &id);
++        if(C2_OK != sts) {
+             mfx_res = MFX_ERR_INVALID_HANDLE;
+             break;
+         }
+@@ -498,7 +508,7 @@ void MfxVaFrameAllocator::FreeAllMappings()
+     m_mappedVaSurfaces.clear();
+ }
+ 
+-mfxStatus MfxVaFrameAllocator::CreateSurfaceFromGralloc(const IMfxGrallocModule::BufferDetails& buffer_details,
++mfxStatus MfxVaFrameAllocator::CreateSurfaceFromGralloc(const MfxGrallocModule::BufferDetails& buffer_details,
+     bool decode_target,
+     VASurfaceID* surface)
+ {
+@@ -506,7 +516,7 @@ mfxStatus MfxVaFrameAllocator::CreateSurfaceFromGralloc(const IMfxGrallocModule:
+ 
+     mfxStatus mfx_res = MFX_ERR_NONE;
+ 
+-    const IMfxGrallocModule::BufferDetails & info = buffer_details;
++    const MfxGrallocModule::BufferDetails & info = buffer_details;
+     MFX_DEBUG_TRACE_P(info.handle);
+     MFX_DEBUG_TRACE_I32(info.prime);
+     MFX_DEBUG_TRACE_I32(info.width);
+@@ -597,8 +607,17 @@ mfxStatus MfxVaFrameAllocator::MapGrallocBufferToSurface(buffer_handle_t gralloc
+     MFX_DEBUG_TRACE_P(gralloc_buffer);
+ 
+     do {
+-        IMfxGrallocModule::BufferDetails buffer_details;
+-        c2_status_t sts = MfxGrallocInstance::getInstance()->GetBufferDetails(gralloc_buffer, &buffer_details);
++
++        if (!m_grallocModule) {
++            c2_status_t sts = MfxGrallocModule::Create(&m_grallocModule);
++            if(C2_OK != sts) {
++                mfx_res = MFX_ERR_MEMORY_ALLOC;
++                break;
++            }
++        }
++
++        MfxGrallocModule::BufferDetails buffer_details;
++        c2_status_t sts = m_grallocModule->GetBufferDetails(gralloc_buffer, &buffer_details);
+         if(C2_OK != sts) {
+             mfx_res = MFX_ERR_INVALID_HANDLE;
+             break;
+diff --git a/c2_utils/src/mfx_va_frame_pool_allocator.cpp b/c2_utils/src/mfx_va_frame_pool_allocator.cpp
+index ba1c8ef..cdfae04 100755
+--- a/c2_utils/src/mfx_va_frame_pool_allocator.cpp
++++ b/c2_utils/src/mfx_va_frame_pool_allocator.cpp
+@@ -73,6 +73,14 @@ mfxStatus MfxVaFramePoolAllocator::AllocFrames(mfxFrameAllocRequest *request,
+     if (request->Type & MFX_MEMTYPE_VIDEO_MEMORY_DECODER_TARGET) {
+ 
+         do {
++            if (!m_grallocAllocator) {
++                res = MfxGrallocAllocator::Create(&m_grallocAllocator);
++                if(C2_OK != res) {
++                    mfx_res = MFX_ERR_NOT_INITIALIZED;
++                    break;
++                }
++            }
++
+             if (!m_c2Allocator) {
+                 mfx_res = MFX_ERR_NOT_INITIALIZED;
+                 break;
+@@ -95,6 +103,7 @@ mfxStatus MfxVaFramePoolAllocator::AllocFrames(mfxFrameAllocRequest *request,
+                 break;
+             }
+ #endif
++
+             response->NumFrameActual = 0;
+ #define RETRY_TIMES 5
+             for (int i = 0; i < opt_buffers; ++i) {
+@@ -123,11 +132,7 @@ mfxStatus MfxVaFramePoolAllocator::AllocFrames(mfxFrameAllocRequest *request,
+ 
+                 uint64_t id;
+                 native_handle_t *hndl = android::UnwrapNativeCodec2GrallocHandle(new_block->handle());
+-                if (C2_OK != MfxGrallocInstance::getInstance()->GetBackingStore(hndl, &id)) {
+-                    mfx_res = MFX_ERR_INVALID_HANDLE;
+-                    break;
+-                }
+-
++                m_grallocAllocator->GetBackingStore(hndl, &id);
+                 m_cachedBufferId.emplace(id, i);
+                 // if (C2_OK != res) { //TODO dead code not need.
+                 //     native_handle_delete(hndl);
+-- 
+2.17.1
+
