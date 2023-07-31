@@ -1,4 +1,4 @@
-From 04a3a2374a2bfa27f42a6c94e527283ad3731f9f Mon Sep 17 00:00:00 2001
+From 78de125a9ca6817c249fa72efdbb370b624ea1ce Mon Sep 17 00:00:00 2001
 From: Jeevaka Prabu Badrappan <jeevaka.badrappan@intel.com>
 Date: Thu, 18 May 2023 00:23:49 +0530
 Subject: [PATCH] iwlwifi: Get driver and firmware version vendor command
@@ -8,6 +8,7 @@ Adding vendor command support for querying driver & firmware
 version.
 
 Tracked-On: OAM-94267
+Change-Id: Ic6df370a4f2c42ea41434096c4ac302270df410b
 Signed-off-by: Jeevaka Prabu Badrappan <jeevaka.badrappan@intel.com>
 ---
  .../wireless/intel/iwlwifi/mvm/vendor-cmd.c   | 66 ++++++++++++++++++
@@ -108,15 +109,15 @@ index 080a1587caa5..ba864fdb1e70 100644
  
  enum iwl_mvm_vendor_events_idx {
 diff --git a/drivers/net/wireless/iwl7000/iwlwifi/iwl-vendor-cmd.h b/drivers/net/wireless/iwl7000/iwlwifi/iwl-vendor-cmd.h
-index 8668a1b46d68..a2e93c81cfed 100644
+index 8668a1b46d68..818700ba6b78 100644
 --- a/drivers/net/wireless/iwl7000/iwlwifi/iwl-vendor-cmd.h
 +++ b/drivers/net/wireless/iwl7000/iwlwifi/iwl-vendor-cmd.h
 @@ -166,6 +166,8 @@ enum iwl_mvm_vendor_cmd {
  	IWL_MVM_VENDOR_CMD_SAR_GET_TABLE                        = 0x34,
  	IWL_MVM_VENDOR_CMD_GEO_SAR_GET_TABLE                    = 0x35,
  	IWL_MVM_VENDOR_CMD_SGOM_GET_TABLE			= 0x36,
-+	IWL_MVM_VENDOR_CMD_GET_FW_VERSION			= 0x37,
-+	IWL_MVM_VENDOR_CMD_GET_DRV_VERSION			= 0x38,
++	IWL_MVM_VENDOR_CMD_GET_FW_VERSION			= 0x41,
++	IWL_MVM_VENDOR_CMD_GET_DRV_VERSION			= 0x42,
  };
  
  /**
@@ -133,8 +134,8 @@ index 8668a1b46d68..a2e93c81cfed 100644
  	IWL_MVM_VENDOR_ATTR_GEO_SAR_TABLE                       = 0x76,
  	IWL_MVM_VENDOR_ATTR_GEO_SAR_VER                         = 0x77,
  	IWL_MVM_VENDOR_ATTR_SGOM_TABLE				= 0x78,
-+	IWL_MVM_VENDOR_ATTR_FW_VER				= 0x79,
-+	IWL_MVM_VENDOR_ATTR_DRV_VER				= 0x80,
++	IWL_MVM_VENDOR_ATTR_FW_VER				= 0x81,
++	IWL_MVM_VENDOR_ATTR_DRV_VER				= 0x82,
  
  	NUM_IWL_MVM_VENDOR_ATTR,
  	MAX_IWL_MVM_VENDOR_ATTR = NUM_IWL_MVM_VENDOR_ATTR - 1,
@@ -239,15 +240,15 @@ index 67d67e0638eb..5ab40249ee24 100644
  
  enum iwl_mvm_vendor_events_idx {
 diff --git a/include/uapi/linux/nl80211-vnd-intel.h b/include/uapi/linux/nl80211-vnd-intel.h
-index 4ed7d0b24512..c9df3cd3031d 100644
+index 4ed7d0b24512..57725a25b1e5 100644
 --- a/include/uapi/linux/nl80211-vnd-intel.h
 +++ b/include/uapi/linux/nl80211-vnd-intel.h
 @@ -51,6 +51,8 @@ enum iwl_mvm_vendor_cmd {
  	IWL_MVM_VENDOR_CMD_GET_CSME_CONN_INFO			= 0x2d,
  	IWL_MVM_VENDOR_CMD_HOST_GET_OWNERSHIP			= 0x30,
  	IWL_MVM_VENDOR_CMD_ROAMING_FORBIDDEN_EVENT		= 0x32,
-+	IWL_MVM_VENDOR_CMD_GET_FW_VERSION			= 0x33,
-+	IWL_MVM_VENDOR_CMD_GET_DRV_VERSION			= 0x34,
++	IWL_MVM_VENDOR_CMD_GET_FW_VERSION			= 0x41,
++	IWL_MVM_VENDOR_CMD_GET_DRV_VERSION			= 0x42,
  };
  
  enum iwl_vendor_auth_akm_mode {
@@ -264,11 +265,11 @@ index 4ed7d0b24512..c9df3cd3031d 100644
  	IWL_MVM_VENDOR_ATTR_BAND				= 0x69,
  	IWL_MVM_VENDOR_ATTR_COLLOC_CHANNEL			= 0x70,
  	IWL_MVM_VENDOR_ATTR_COLLOC_ADDR				= 0x71,
-+	IWL_MVM_VENDOR_ATTR_FW_VER				= 0x72,
-+	IWL_MVM_VENDOR_ATTR_DRV_VER				= 0x73,
++	IWL_MVM_VENDOR_ATTR_FW_VER				= 0x81,
++	IWL_MVM_VENDOR_ATTR_DRV_VER				= 0x82,
  
  	NUM_IWL_MVM_VENDOR_ATTR,
  	MAX_IWL_MVM_VENDOR_ATTR = NUM_IWL_MVM_VENDOR_ATTR - 1,
 -- 
-2.40.1
+2.40.0
 

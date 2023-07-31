@@ -1,4 +1,4 @@
-From 28603e81767737efae4dc7c7e94a0815182e7133 Mon Sep 17 00:00:00 2001
+From 537c7cd74f80b2594d3356f37b25ceff92deafff Mon Sep 17 00:00:00 2001
 From: "Badrappan, Jeevaka" <jeevaka.badrappan@intel.com>
 Date: Thu, 1 Jun 2023 16:07:27 +0530
 Subject: [PATCH] Add kernel headers for use by vendor HAL libraries
@@ -33,7 +33,7 @@ index d66894a..bfe980c 100644
  LOCAL_FIRMWARE_SRC += $(foreach f,$(LOCAL_FIRMWARE_DIR),$(shell cd $(FIRMWARES_DIR) && find $(f) -type f,l) )
 diff --git a/kernel/lts2022-chromium/kernel-headers/linux/iwl-vendor-cmd.h b/kernel/lts2022-chromium/kernel-headers/linux/iwl-vendor-cmd.h
 new file mode 100644
-index 0000000..a2e93c8
+index 0000000..0439758
 --- /dev/null
 +++ b/kernel/lts2022-chromium/kernel-headers/linux/iwl-vendor-cmd.h
 @@ -0,0 +1,922 @@
@@ -205,8 +205,8 @@ index 0000000..a2e93c8
 +	IWL_MVM_VENDOR_CMD_SAR_GET_TABLE                        = 0x34,
 +	IWL_MVM_VENDOR_CMD_GEO_SAR_GET_TABLE                    = 0x35,
 +	IWL_MVM_VENDOR_CMD_SGOM_GET_TABLE			= 0x36,
-+	IWL_MVM_VENDOR_CMD_GET_FW_VERSION			= 0x37,
-+	IWL_MVM_VENDOR_CMD_GET_DRV_VERSION			= 0x38,
++	IWL_MVM_VENDOR_CMD_GET_FW_VERSION			= 0x41,
++	IWL_MVM_VENDOR_CMD_GET_DRV_VERSION			= 0x42,
 +};
 +
 +/**
@@ -618,7 +618,7 @@ index 0000000..a2e93c8
 + *	decryption.
 + */
 +enum iwl_vendor_fips_test_vector_flags {
-+	IWL_VENDOR_FIPS_TEST_VECTOR_FLAGS_ENCRYPT = BIT(0),
++	IWL_VENDOR_FIPS_TEST_VECTOR_FLAGS_ENCRYPT = 1,
 +};
 +
 +/**
@@ -950,8 +950,8 @@ index 0000000..a2e93c8
 +	IWL_MVM_VENDOR_ATTR_GEO_SAR_TABLE                       = 0x76,
 +	IWL_MVM_VENDOR_ATTR_GEO_SAR_VER                         = 0x77,
 +	IWL_MVM_VENDOR_ATTR_SGOM_TABLE				= 0x78,
-+	IWL_MVM_VENDOR_ATTR_FW_VER				= 0x79,
-+	IWL_MVM_VENDOR_ATTR_DRV_VER				= 0x80,
++	IWL_MVM_VENDOR_ATTR_FW_VER				= 0x81,
++	IWL_MVM_VENDOR_ATTR_DRV_VER				= 0x82,
 +
 +	NUM_IWL_MVM_VENDOR_ATTR,
 +	MAX_IWL_MVM_VENDOR_ATTR = NUM_IWL_MVM_VENDOR_ATTR - 1,
