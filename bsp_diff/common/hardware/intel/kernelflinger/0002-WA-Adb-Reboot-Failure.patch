@@ -1,0 +1,27 @@
+From 3492ee33b68168140ce8201258fb9b0e1b64004a Mon Sep 17 00:00:00 2001
+From: "Huang, Yang" <yang.huang@intel.com>
+Date: Fri, 21 Jul 2023 16:45:02 +0800
+Subject: [PATCH] [WA] Adb Reboot Failure
+
+Signed-off-by: Huang, Yang <yang.huang@intel.com>
+---
+ avb/libavb_ab/avb_ab_flow.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/avb/libavb_ab/avb_ab_flow.c b/avb/libavb_ab/avb_ab_flow.c
+index 70b66f5..9eee203 100644
+--- a/avb/libavb_ab/avb_ab_flow.c
++++ b/avb/libavb_ab/avb_ab_flow.c
+@@ -132,8 +132,7 @@ AvbIOResult avb_ab_data_write(AvbABOps* ab_ops, const AvbABData* data) {
+ }
+ 
+ static bool slot_is_bootable(AvbABSlotData* slot) {
+-  return slot->priority > 0 &&
+-         (slot->successful_boot || (slot->tries_remaining > 0));
++  return true;
+ }
+ 
+ static void slot_set_unbootable(AvbABSlotData* slot) {
+-- 
+2.25.1
+
