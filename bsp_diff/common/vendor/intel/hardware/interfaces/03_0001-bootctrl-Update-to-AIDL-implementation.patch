@@ -1,4 +1,4 @@
-From 293e6e58a443b6a145dc060b1b53cbcb0e0b95c4 Mon Sep 17 00:00:00 2001
+From c16141ead0373f0fb2fc7ee783a39446fa53ed03 Mon Sep 17 00:00:00 2001
 From: "Zhong,Fangjian" <fangjian.zhong@intel.com>
 Date: Wed, 21 Jun 2023 02:15:31 +0800
 Subject: [PATCH] bootctrl: Update to AIDL implementation
@@ -12,11 +12,11 @@ Signed-off-by: Zhong,Fangjian <fangjian.zhong@intel.com>
  boot/Android.bp                               |  59 ++++-
  boot/BootControl.cpp                          | 210 ++++++++++--------
  boot/BootControl.h                            |  63 ++----
- boot/android.hardware.boot-service.rc         |   5 +
+ boot/android.hardware.boot-service.rc         |   4 +
  .../android.hardware.boot-service.recovery.rc |   6 +
  boot/android.hardware.boot-service.xml        |   6 +
  boot/main.cpp                                 |  38 ++++
- 7 files changed, 246 insertions(+), 141 deletions(-)
+ 7 files changed, 245 insertions(+), 141 deletions(-)
  create mode 100644 boot/android.hardware.boot-service.rc
  create mode 100644 boot/android.hardware.boot-service.recovery.rc
  create mode 100644 boot/android.hardware.boot-service.xml
@@ -449,15 +449,14 @@ index 02d7cf6..57008cd 100644
 +}  // namespace aidl::android::hardware::boot
 diff --git a/boot/android.hardware.boot-service.rc b/boot/android.hardware.boot-service.rc
 new file mode 100644
-index 0000000..183a907
+index 0000000..c8c2261
 --- /dev/null
 +++ b/boot/android.hardware.boot-service.rc
-@@ -0,0 +1,5 @@
+@@ -0,0 +1,4 @@
 +service vendor.boot-default /vendor/bin/hw/android.hardware.boot-service.intel
 +    class early_hal
-+    user system
-+    group system
-+    interface aidl android.hardware.boot.IBootControl/default
++    user root
++    group root
 diff --git a/boot/android.hardware.boot-service.recovery.rc b/boot/android.hardware.boot-service.recovery.rc
 new file mode 100644
 index 0000000..0648593
