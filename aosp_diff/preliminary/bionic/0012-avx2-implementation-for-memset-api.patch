@@ -1,6 +1,6 @@
-From 6e88c94e456dfcb9b79c83a0e6776eb9826ec3ac Mon Sep 17 00:00:00 2001
-From: celadon <celadon@intel.com>
-Date: Thu, 5 Jan 2023 06:27:56 +0000
+From d64c46b5c61d5742e4cd7ee9beb07f89a908fcaf Mon Sep 17 00:00:00 2001
+From: "Soni, Ravi Kumar" <ravi.kumar.soni@intel.com>
+Date: Fri, 29 Sep 2023 11:20:02 +0530
 Subject: [PATCH] avx2 implementation for memset api.
 
 This patch includes handwritten avx2
@@ -25,6 +25,7 @@ bionic-benchmark results:
 
 Tracked-On: OAM-103728
 Signed-off-by: ahs <amrita.h.s@intel.com>
+Signed-off-by: Soni, Ravi Kumar <ravi.kumar.soni@intel.com>
 ---
  libc/Android.bp                               |   1 +
  .../arch-x86_64/dynamic_function_dispatch.cpp |   7 +
@@ -262,5 +263,5 @@ index b8a8eb765..09af797de 100644
  FUNCTION_DELEGATE(memmove, memmove_generic)
  FUNCTION_DELEGATE(memchr, memchr_generic)
 -- 
-2.39.0
+2.25.1
 
