@@ -1,0 +1,26 @@
+From 41985189c4fa4588821c58253eafdb165816e892 Mon Sep 17 00:00:00 2001
+From: Vinay Prasad Kompella <vinay.kompella@intel.com>
+Date: Thu, 9 Nov 2023 12:22:09 +0000
+Subject: [PATCH] Add external/cpu_features to bazel allowlist
+
+Change-Id: I7e079ff1729758334a94dd2009f445ab0b1cfaf7
+Signed-off-by: Vinay Prasad Kompella <vinay.kompella@intel.com>
+---
+ android/allowlists/allowlists.go | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/android/allowlists/allowlists.go b/android/allowlists/allowlists.go
+index 63d4e11e0..8f60d58da 100644
+--- a/android/allowlists/allowlists.go
++++ b/android/allowlists/allowlists.go
+@@ -125,6 +125,7 @@ var (
+ 		"external/bsdiff":                        Bp2BuildDefaultTrueRecursively,
+ 		"external/bzip2":                         Bp2BuildDefaultTrueRecursively,
+ 		"external/conscrypt":                     Bp2BuildDefaultTrue,
++		"external/cpu_features":		          Bp2BuildDefaultTrueRecursively,
+ 		"external/e2fsprogs":                     Bp2BuildDefaultTrueRecursively,
+ 		"external/eigen":                         Bp2BuildDefaultTrueRecursively,
+ 		"external/erofs-utils":                   Bp2BuildDefaultTrueRecursively,
+-- 
+2.17.1
+
